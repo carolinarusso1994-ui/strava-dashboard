@@ -3,135 +3,162 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Strava Dashboard</title>
+<title>Performance Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#faf9f7;
-  --surface:#ffffff;
-  --surface2:#f3f1ee;
-  --border:#e5e2dc;
-  --text:#1c1917;
-  --muted:#78716c;
-  --orange:#FC4C02;
-  --orange-light:#fff1ec;
-  --green:#15803d;
-  --green-light:#dcfce7;
-  --blue:#1d4ed8;
-  --blue-light:#dbeafe;
-  --red:#dc2626;
+  --bg:#f7f6f3;--surface:#fff;--surface2:#f0ede8;--border:#e4e0d8;
+  --text:#1a1814;--muted:#7c7268;
+  --orange:#FC4C02;--orange-l:#fff2ec;
+  --green:#16a34a;--green-l:#dcfce7;
+  --blue:#2563eb;--blue-l:#dbeafe;
+  --purple:#7c3aed;--purple-l:#ede9fe;
+  --red:#dc2626;--red-l:#fee2e2;
+  --amber:#d97706;--amber-l:#fef3c7;
+  /* HR zones */
+  --z1:#60a5fa;--z2:#34d399;--z3:#fbbf24;--z4:#f97316;--z5:#ef4444;
 }
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh}
  
-/* ── AUTH SCREEN ── */
+/* ── AUTH ── */
 #auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
-.auth-box{max-width:480px;width:100%;text-align:center}
-.logo{font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:500;margin-bottom:.25rem}
+.auth-box{max-width:500px;width:100%;text-align:center}
+.logo{font-family:'DM Mono',monospace;font-size:1.9rem;font-weight:500;margin-bottom:.2rem}
 .logo span{color:var(--orange)}
-.logo-sub{color:var(--muted);font-size:.88rem;margin-bottom:2.5rem}
- 
+.logo-sub{color:var(--muted);font-size:.85rem;margin-bottom:2rem}
 .connect-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;text-align:left}
-.connect-card h2{font-size:1rem;font-weight:500;margin-bottom:.4rem}
-.connect-card p{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
- 
-.field-group{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.25rem}
-.field label{display:block;font-size:.72rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem}
-.field input{width:100%;padding:.6rem .9rem;border:1px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:.88rem;background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
+.connect-card h2{font-size:1rem;font-weight:500;margin-bottom:.3rem}
+.connect-card p{font-size:.83rem;color:var(--muted);margin-bottom:1.25rem;line-height:1.6}
+.field{margin-bottom:.75rem}
+.field label{display:block;font-size:.7rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
+.field input{width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:.85rem;background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
 .field input:focus{border-color:var(--orange)}
- 
-.btn-strava{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;padding:.75rem;background:var(--orange);color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:500;cursor:pointer;transition:opacity .15s;font-family:'DM Sans',sans-serif}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.hint{font-size:.72rem;color:var(--muted);margin-top:.25rem}
+.btn-strava{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;padding:.75rem;background:var(--orange);color:#fff;border:none;border-radius:10px;font-size:.92rem;font-weight:500;cursor:pointer;transition:opacity .15s;font-family:'DM Sans',sans-serif;margin-top:1.25rem}
 .btn-strava:hover{opacity:.88}
-.btn-strava svg{width:20px;height:20px;flex-shrink:0}
- 
-.note{font-size:.75rem;color:var(--muted);margin-top:1rem;line-height:1.6;text-align:center}
+.btn-strava svg{width:18px;height:18px;flex-shrink:0}
+.note{font-size:.72rem;color:var(--muted);margin-top:.85rem;line-height:1.6;text-align:center}
  
 /* ── LOADING ── */
 #loading-screen{display:none;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;gap:1.25rem;text-align:center;padding:2rem}
-.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin .7s linear infinite}
+.spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-#load-msg{font-size:.88rem;color:var(--muted)}
+#load-msg{font-size:.85rem;color:var(--muted)}
  
 /* ── DASHBOARD ── */
 #dashboard{display:none}
- 
-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.header-logo{font-family:'DM Mono',monospace;font-size:1rem;font-weight:500}.header-logo span{color:var(--orange)}
-.athlete-info{display:flex;align-items:center;gap:.75rem}
-.avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--border)}
-.athlete-name{font-size:.85rem;font-weight:500}
-.btn-logout{font-size:.75rem;color:var(--muted);background:none;border:1px solid var(--border);border-radius:7px;padding:.28rem .7rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
-.btn-logout:hover{color:var(--red);border-color:var(--red)}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.hlogo{font-family:'DM Mono',monospace;font-size:.95rem;font-weight:500}.hlogo span{color:var(--orange)}
+.hright{display:flex;align-items:center;gap:.75rem}
+.havatar{width:30px;height:30px;border-radius:50%;object-fit:cover;border:1.5px solid var(--border)}
+.hname{font-size:.82rem;font-weight:500}
+.hbtn{font-size:.72rem;color:var(--muted);background:none;border:1px solid var(--border);border-radius:6px;padding:.25rem .65rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.hbtn:hover{color:var(--red);border-color:var(--red)}
  
 nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 2rem;overflow-x:auto}
-.tab{font-size:.78rem;font-weight:500;letter-spacing:.07em;text-transform:uppercase;padding:.72rem 1.2rem;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;margin-bottom:-1px}
+.tab{font-size:.76rem;font-weight:500;letter-spacing:.07em;text-transform:uppercase;padding:.7rem 1.1rem;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;margin-bottom:-1px}
 .tab:hover{color:var(--text)}
 .tab.active{color:var(--orange);border-bottom-color:var(--orange)}
  
-main{padding:2rem;max-width:1280px;margin:0 auto}
+main{padding:1.75rem 2rem;max-width:1300px;margin:0 auto}
 .section{display:none}
 .section.active{display:block;animation:up .22s ease}
-@keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
  
-/* ── GRID & CARDS ── */
-.grid{display:grid;gap:1rem}
+/* ── LAYOUT ── */
+.grid{display:grid;gap:.9rem}
 .g4{grid-template-columns:repeat(4,1fr)}
 .g3{grid-template-columns:repeat(3,1fr)}
 .g2{grid-template-columns:repeat(2,1fr)}
-@media(max-width:960px){.g4{grid-template-columns:repeat(2,1fr)}}
+.g21{grid-template-columns:2fr 1fr}
+.g12{grid-template-columns:1fr 2fr}
+@media(max-width:1024px){.g4{grid-template-columns:repeat(2,1fr)}.g21,.g12{grid-template-columns:1fr}}
 @media(max-width:600px){.g4,.g3,.g2{grid-template-columns:1fr}main{padding:1rem}header,nav{padding:0 1rem}}
  
-.card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:1.2rem 1.4rem;overflow:hidden;position:relative}
-.card-stripe{height:3px;margin:-1.2rem -1.4rem 1.2rem;border-radius:13px 13px 0 0}
-.cs-orange{background:var(--orange)}.cs-green{background:var(--green)}.cs-blue{background:var(--blue)}
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.15rem 1.35rem;overflow:hidden}
+.stripe{height:3px;margin:-1.15rem -1.35rem 1.1rem;border-radius:12px 12px 0 0}
+.s-o{background:var(--orange)}.s-g{background:var(--green)}.s-b{background:var(--blue)}.s-p{background:var(--purple)}.s-r{background:var(--red)}.s-a{background:var(--amber)}
  
-.lbl{font-size:.68rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.55rem}
-.big{font-family:'DM Mono',monospace;font-size:2.2rem;font-weight:500;line-height:1;color:var(--text)}
-.unit{font-size:.85rem;font-weight:300;color:var(--muted);margin-left:.15rem}
-.sub{font-size:.76rem;color:var(--muted);margin-top:.35rem;line-height:1.4}
+.lbl{font-size:.66rem;font-weight:500;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
+.big{font-family:'DM Mono',monospace;font-size:2rem;font-weight:500;line-height:1;color:var(--text)}
+.big.sm{font-size:1.5rem}
+.unit{font-size:.82rem;font-weight:300;color:var(--muted);margin-left:.12rem}
+.sub{font-size:.73rem;color:var(--muted);margin-top:.3rem;line-height:1.4}
  
-.sec-title{font-family:'DM Mono',monospace;font-size:.85rem;color:var(--muted);margin-bottom:.9rem;margin-top:1.8rem;display:flex;align-items:center;gap:.7rem}
-.sec-title:first-child{margin-top:0}
-.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--muted);margin-bottom:.85rem;margin-top:1.75rem;display:flex;align-items:center;gap:.65rem}
+.sec:first-child{margin-top:0}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
  
 /* ── BAR ── */
-.bar-wrap{margin-top:.7rem}
-.bar-row{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-bottom:.3rem}
-.bar-track{height:4px;background:var(--surface2);border-radius:100px;overflow:hidden}
-.bar-fill{height:100%;border-radius:100px;transition:width 1s cubic-bezier(.4,0,.2,1)}
-.bf-o{background:var(--orange)}.bf-g{background:var(--green)}.bf-b{background:var(--blue)}
- 
-/* ── ACTIVITIES ── */
-.act-list{display:flex;flex-direction:column;gap:.45rem}
-.act-row{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:.85rem 1.2rem;display:grid;grid-template-columns:2.1rem 1fr auto auto auto;align-items:center;gap:.9rem;transition:border-color .15s}
-.act-row:hover{border-color:#ccc8c2}
-.act-icon{width:2.1rem;height:2.1rem;background:var(--surface2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem}
-.act-name{font-size:.9rem;font-weight:500}
-.act-date{font-size:.7rem;color:var(--muted);margin-top:.1rem}
-.act-stat{text-align:right}
-.act-v{font-family:'DM Mono',monospace;font-size:.9rem;font-weight:500}
-.act-l{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
- 
-/* ── BADGE ── */
-.badge{display:inline-flex;align-items:center;padding:.18rem .55rem;border-radius:100px;font-size:.68rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
-.bg-o{background:var(--orange-light);color:#b83700}
-.bg-g{background:var(--green-light);color:#14532d}
-.bg-b{background:var(--blue-light);color:#1e3a8a}
-.bg-m{background:var(--surface2);color:var(--muted)}
+.bwrap{margin-top:.65rem}
+.brow{display:flex;justify-content:space-between;font-size:.68rem;color:var(--muted);margin-bottom:.28rem}
+.btrack{height:4px;background:var(--surface2);border-radius:100px;overflow:hidden}
+.bfill{height:100%;border-radius:100px;transition:width 1s cubic-bezier(.4,0,.2,1)}
  
 /* ── CHART ── */
-.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:1.4rem}
-.chart-wrap{position:relative;height:210px;margin-top:1rem}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.35rem}
+.chart-wrap{position:relative;height:200px;margin-top:.85rem}
+.chart-wrap.tall{height:260px}
+.chart-title{font-size:.8rem;font-weight:500;color:var(--text)}
+.chart-sub{font-size:.72rem;color:var(--muted);margin-top:.15rem}
  
-.empty{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:2.5rem;text-align:center;color:var(--muted);font-size:.88rem;line-height:1.7}
+/* ── ZONE BARS ── */
+.zone-list{display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem}
+.zone-row{display:flex;align-items:center;gap:.75rem}
+.zone-label{font-size:.72rem;font-weight:500;min-width:48px;color:var(--text)}
+.zone-desc{font-size:.68rem;color:var(--muted);min-width:90px}
+.zone-track{flex:1;height:8px;background:var(--surface2);border-radius:100px;overflow:hidden}
+.zone-fill{height:100%;border-radius:100px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.zone-pct{font-family:'DM Mono',monospace;font-size:.72rem;min-width:32px;text-align:right;color:var(--muted)}
  
-/* ── PROFILE CARD ── */
-.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:1.5rem;display:flex;align-items:center;gap:1.25rem}
-.profile-avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--border);flex-shrink:0}
-.profile-name{font-size:1.2rem;font-weight:500;margin-bottom:.2rem}
-.profile-loc{font-size:.82rem;color:var(--muted)}
+/* ── FITNESS FORM ── */
+.form-bar{display:flex;align-items:center;gap:.5rem;margin-top:.5rem}
+.form-indicator{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.form-label{font-size:.78rem;color:var(--muted)}
+.tsb-value{font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:500}
+ 
+/* ── ACTIVITY LIST ── */
+.act-list{display:flex;flex-direction:column;gap:.4rem}
+.act-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.8rem 1.1rem;display:grid;grid-template-columns:2rem 1fr auto auto auto;align-items:center;gap:.8rem;transition:border-color .15s}
+.act-row:hover{border-color:#ccc8bf}
+.act-icon{width:2rem;height:2rem;background:var(--surface2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.95rem}
+.act-name{font-size:.87rem;font-weight:500}
+.act-date{font-size:.68rem;color:var(--muted);margin-top:.08rem}
+.act-stat{text-align:right}
+.act-v{font-family:'DM Mono',monospace;font-size:.87rem;font-weight:500}
+.act-l{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:1px}
+ 
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;padding:.16rem .5rem;border-radius:100px;font-size:.66rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase}
+.bg-o{background:var(--orange-l);color:#b03500}
+.bg-g{background:var(--green-l);color:#14532d}
+.bg-b{background:var(--blue-l);color:#1e3a8a}
+.bg-p{background:var(--purple-l);color:#4c1d95}
+.bg-r{background:var(--red-l);color:#7f1d1d}
+.bg-a{background:var(--amber-l);color:#78350f}
+.bg-m{background:var(--surface2);color:var(--muted)}
+ 
+.empty{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:2rem;text-align:center;color:var(--muted);font-size:.85rem;line-height:1.7}
+ 
+/* ── INSIGHT BOX ── */
+.insight{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin-bottom:.6rem}
+.insight-title{font-size:.8rem;font-weight:500;margin-bottom:.25rem}
+.insight-body{font-size:.78rem;color:var(--muted);line-height:1.6}
+.insight.green{border-left-color:var(--green)}
+.insight.blue{border-left-color:var(--blue)}
+.insight.purple{border-left-color:var(--purple)}
+ 
+/* ── FC CONFIG ── */
+.fc-config{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.fc-config label{font-size:.72rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.fc-config input{width:70px;padding:.35rem .6rem;border:1px solid var(--border);border-radius:6px;font-family:'DM Mono',monospace;font-size:.85rem;background:var(--surface);color:var(--text);outline:none}
+.fc-config input:focus{border-color:var(--orange)}
+.fc-config button{padding:.35rem .85rem;background:var(--orange);color:#fff;border:none;border-radius:6px;font-size:.78rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
 </style>
 </head>
 <body>
@@ -139,26 +166,36 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
 <!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-box">
-    <div class="logo">strava<span>.</span>dash</div>
-    <p class="logo-sub">Tu rendimiento deportivo, en un vistazo</p>
+    <div class="logo">performance<span>.</span>dash</div>
+    <p class="logo-sub">Análisis avanzado de entrenamiento · Conectado a Strava</p>
     <div class="connect-card">
-      <h2>Conectar con Strava</h2>
-      <p>Ingresá tus credenciales de la API de Strava para autorizar el acceso a tus actividades.</p>
-      <div class="field-group">
+      <h2>Configurar tu dashboard</h2>
+      <p>Ingresá tus credenciales de Strava y tus datos fisiológicos para un análisis preciso.</p>
+      <div class="field">
+        <label>Client ID</label>
+        <input type="text" id="client-id" value="211490">
+      </div>
+      <div class="field">
+        <label>Client Secret</label>
+        <input type="password" id="client-secret" placeholder="Tu client secret de Strava">
+      </div>
+      <div class="field-row">
         <div class="field">
-          <label>Client ID</label>
-          <input type="text" id="client-id" placeholder="Ej: 211490" value="211490">
+          <label>FC Máxima (bpm)</label>
+          <input type="number" id="fcmax" placeholder="Ej: 185" value="">
+          <div class="hint">Si no la sabés, la estimamos con tu edad</div>
         </div>
         <div class="field">
-          <label>Client Secret</label>
-          <input type="password" id="client-secret" placeholder="Tu client secret">
+          <label>Edad</label>
+          <input type="number" id="age" placeholder="Ej: 30" value="">
+          <div class="hint">Para calcular FC máx estimada</div>
         </div>
       </div>
       <button class="btn-strava" onclick="startOAuth()">
         <svg viewBox="0 0 24 24" fill="white"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
         Conectar con Strava
       </button>
-      <p class="note">Tus credenciales nunca salen de tu navegador. Todo corre localmente.</p>
+      <p class="note">Tus datos nunca salen de tu navegador.</p>
     </div>
   </div>
 </div>
@@ -166,49 +203,56 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
 <!-- LOADING -->
 <div id="loading-screen">
   <div class="spinner"></div>
-  <div id="load-msg">Conectando con Strava…</div>
+  <div id="load-msg">Conectando…</div>
 </div>
  
 <!-- DASHBOARD -->
 <div id="dashboard">
   <header>
-    <div class="header-logo">strava<span>.</span>dash</div>
-    <div class="athlete-info">
-      <img class="avatar" id="header-avatar" src="" alt="">
-      <span class="athlete-name" id="header-name"></span>
-      <button class="btn-logout" onclick="logout()">Salir</button>
+    <div class="hlogo">performance<span>.</span>dash</div>
+    <div class="hright">
+      <img class="havatar" id="h-avatar" src="" alt="">
+      <span class="hname" id="h-name"></span>
+      <button class="hbtn" onclick="logout()">Salir</button>
     </div>
   </header>
   <nav>
-    <div class="tab active" onclick="showTab('overview',this)">Resumen</div>
-    <div class="tab" onclick="showTab('activities',this)">Actividades</div>
-    <div class="tab" onclick="showTab('records',this)">Récords</div>
-    <div class="tab" onclick="showTab('profile',this)">Perfil</div>
+    <div class="tab active" onclick="showTab('forma',this)">Forma &amp; Fatiga</div>
+    <div class="tab" onclick="showTab('zonas',this)">Zonas FC</div>
+    <div class="tab" onclick="showTab('largos',this)">Entrenamientos largos</div>
+    <div class="tab" onclick="showTab('progresion',this)">Progresión</div>
+    <div class="tab" onclick="showTab('febrero',this)">Febrero 2025</div>
   </nav>
   <main>
-    <div class="section active" id="tab-overview"></div>
-    <div class="section" id="tab-activities"></div>
-    <div class="section" id="tab-records"></div>
-    <div class="section" id="tab-profile"></div>
+    <div class="section active" id="tab-forma"></div>
+    <div class="section" id="tab-zonas"></div>
+    <div class="section" id="tab-largos"></div>
+    <div class="section" id="tab-progresion"></div>
+    <div class="section" id="tab-febrero"></div>
   </main>
 </div>
  
 <script>
-const CLIENT_ID = document.getElementById('client-id');
-const CLIENT_SECRET = document.getElementById('client-secret');
+// ═══════════════════════════════════════════════════════
+//  CONFIG & STATE
+// ═══════════════════════════════════════════════════════
 const REDIRECT = 'https://carolinarusso1994-ui.github.io/strava-dashboard/strava-dashboard.html';
-let STATE = {};
+let S = { token:null, athlete:null, activities:[], fcmax:180, age:30 };
  
-// ── OAUTH FLOW ──────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════════════════
 function startOAuth() {
-  const cid = CLIENT_ID.value.trim();
-  const cs = CLIENT_SECRET.value.trim();
-  if (!cid || !cs) { alert('Ingresá tu Client ID y Client Secret.'); return; }
-  sessionStorage.setItem('strava_cid', cid);
-  sessionStorage.setItem('strava_cs', cs);
-  const scope = 'read,activity:read_all,profile:read_all';
-  const url = `https://www.strava.com/oauth/authorize?client_id=${cid}&redirect_uri=${encodeURIComponent(REDIRECT)}&response_type=code&scope=${scope}&approval_prompt=auto`;
-  location.href = url;
+  const cid = document.getElementById('client-id').value.trim();
+  const cs = document.getElementById('client-secret').value.trim();
+  const fcmax = parseInt(document.getElementById('fcmax').value) || 0;
+  const age = parseInt(document.getElementById('age').value) || 0;
+  if (!cid || !cs) { alert('Ingresá Client ID y Client Secret.'); return; }
+  sessionStorage.setItem('s_cid', cid);
+  sessionStorage.setItem('s_cs', cs);
+  if (fcmax) sessionStorage.setItem('s_fcmax', fcmax);
+  if (age) sessionStorage.setItem('s_age', age);
+  location.href = `https://www.strava.com/oauth/authorize?client_id=${cid}&redirect_uri=${encodeURIComponent(REDIRECT)}&response_type=code&scope=read,activity:read_all,profile:read_all&approval_prompt=auto`;
 }
  
 async function handleCallback() {
@@ -216,450 +260,770 @@ async function handleCallback() {
   const code = params.get('code');
   if (!code) return false;
   history.replaceState({}, '', location.pathname);
- 
-  const cid = sessionStorage.getItem('strava_cid');
-  const cs = sessionStorage.getItem('strava_cs');
+  const cid = sessionStorage.getItem('s_cid');
+  const cs = sessionStorage.getItem('s_cs');
   if (!cid || !cs) { showAuth(); return true; }
- 
-  showLoading('Obteniendo token de acceso…');
-  try {
-    const r = await fetch('https://www.strava.com/oauth/token', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({client_id:cid, client_secret:cs, code, grant_type:'authorization_code'})
-    });
-    const data = await r.json();
-    if (data.access_token) {
-      sessionStorage.setItem('strava_token', data.access_token);
-      sessionStorage.setItem('strava_athlete', JSON.stringify(data.athlete));
-      await loadDashboard(data.access_token, data.athlete);
-    } else {
-      alert('Error al obtener token: ' + (data.message || JSON.stringify(data)));
-      showAuth();
-    }
-  } catch(e) {
-    alert('Error de red: ' + e.message);
-    showAuth();
-  }
+  showLoading('Obteniendo acceso…');
+  const r = await fetch('https://www.strava.com/oauth/token', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({client_id:cid,client_secret:cs,code,grant_type:'authorization_code'})
+  });
+  const d = await r.json();
+  if (d.access_token) {
+    sessionStorage.setItem('s_token', d.access_token);
+    sessionStorage.setItem('s_athlete', JSON.stringify(d.athlete));
+    await boot(d.access_token, d.athlete);
+  } else { alert('Error: ' + (d.message||'desconocido')); showAuth(); }
   return true;
 }
  
 function showAuth() {
-  document.getElementById('auth-screen').style.display = '';
-  document.getElementById('loading-screen').style.display = 'none';
-  document.getElementById('dashboard').style.display = 'none';
-  const cid = sessionStorage.getItem('strava_cid');
-  if (cid) CLIENT_ID.value = cid;
+  document.getElementById('auth-screen').style.display='';
+  document.getElementById('loading-screen').style.display='none';
+  document.getElementById('dashboard').style.display='none';
+  const cid = sessionStorage.getItem('s_cid');
+  if (cid) document.getElementById('client-id').value = cid;
 }
  
 function showLoading(msg) {
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('loading-screen').style.display = 'flex';
-  document.getElementById('load-msg').textContent = msg || 'Cargando…';
-  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('loading-screen').style.display='flex';
+  document.getElementById('load-msg').textContent = msg||'Cargando…';
+  document.getElementById('dashboard').style.display='none';
 }
  
-function logout() {
-  sessionStorage.clear();
-  showAuth();
-}
+function logout() { sessionStorage.clear(); showAuth(); }
  
-// ── STRAVA API ──────────────────────────────────────────────
-async function stravaGet(endpoint, token) {
-  const r = await fetch('https://www.strava.com/api/v3' + endpoint, {
-    headers: {Authorization: 'Bearer ' + token}
-  });
-  if (!r.ok) throw new Error('Error API: ' + r.status);
+// ═══════════════════════════════════════════════════════
+//  API
+// ═══════════════════════════════════════════════════════
+const api = async (ep) => {
+  const r = await fetch('https://www.strava.com/api/v3'+ep, {headers:{Authorization:'Bearer '+S.token}});
+  if (!r.ok) throw new Error(r.status);
   return r.json();
-}
+};
  
-// ── LOAD DASHBOARD ──────────────────────────────────────────
-async function loadDashboard(token, athlete) {
+// ═══════════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════════
+async function boot(token, athlete) {
+  S.token = token;
+  S.athlete = athlete;
+  const storedFcmax = parseInt(sessionStorage.getItem('s_fcmax'))||0;
+  const storedAge = parseInt(sessionStorage.getItem('s_age'))||0;
+  S.age = storedAge || 30;
+  S.fcmax = storedFcmax || (220 - S.age);
+ 
   showLoading('Cargando actividades…');
- 
-  // Fetch activities (up to 200)
-  let activities = [];
+  let acts = [];
   try {
-    const page1 = await stravaGet('/athlete/activities?per_page=100&page=1', token);
-    activities = page1;
-    if (page1.length === 100) {
+    const p1 = await api('/athlete/activities?per_page=100&page=1');
+    acts = p1;
+    if (p1.length===100) {
       showLoading('Cargando más actividades…');
-      const page2 = await stravaGet('/athlete/activities?per_page=100&page=2', token);
-      activities = [...activities, ...page2];
+      const p2 = await api('/athlete/activities?per_page=100&page=2');
+      acts = [...acts, ...p2];
+      if (p2.length===100) {
+        const p3 = await api('/athlete/activities?per_page=100&page=3');
+        acts = [...acts, ...p3];
+      }
     }
-  } catch(e) { console.error(e); }
+  } catch(e){}
  
-  // Fetch athlete stats
-  showLoading('Cargando estadísticas…');
-  let stats = null;
-  try { stats = await stravaGet('/athletes/' + athlete.id + '/stats', token); } catch(e) {}
+  S.activities = acts.sort((a,b)=>new Date(b.start_date)-new Date(a.start_date));
  
-  STATE = { token, athlete, activities, stats };
+  document.getElementById('h-avatar').src = athlete.profile_medium||'';
+  document.getElementById('h-name').textContent = athlete.firstname+' '+athlete.lastname;
+  document.getElementById('loading-screen').style.display='none';
+  document.getElementById('dashboard').style.display='block';
  
-  // Header
-  document.getElementById('header-avatar').src = athlete.profile_medium || athlete.profile || '';
-  document.getElementById('header-name').textContent = athlete.firstname + ' ' + athlete.lastname;
- 
-  document.getElementById('loading-screen').style.display = 'none';
-  document.getElementById('dashboard').style.display = 'block';
- 
-  builtTabs.clear();
-  builtTabs.add('overview');
-  buildOverview();
+  builtTabs.clear(); builtTabs.add('forma');
+  buildForma();
 }
  
-// ── FORMATTERS ──────────────────────────────────────────────
-const fmtDist = m => m >= 1000 ? (m/1000).toFixed(2)+' km' : Math.round(m)+' m';
+// ═══════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════
+const fmtDist = m => m>=1000?(m/1000).toFixed(1)+' km':Math.round(m)+'m';
 const fmtDur = s => { const h=Math.floor(s/3600),m=Math.floor((s%3600)/60); return h>0?`${h}h ${m}m`:`${m}m`; };
-const fmtPace = (mps,type) => {
-  if (!mps) return '—';
-  if (type && (type.toLowerCase().includes('ride')||type.toLowerCase().includes('cycl')||type.toLowerCase().includes('velom'))) return (mps*3.6).toFixed(1)+' km/h';
-  const spk=1000/mps; return `${Math.floor(spk/60)}:${String(Math.round(spk%60)).padStart(2,'0')}/km`;
-};
-const fmtDate = d => { try { return new Date(d).toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'}); } catch { return d; }};
-const mean = arr => arr.length ? arr.reduce((s,v)=>s+v,0)/arr.length : 0;
-const actIcon = t => {
-  const m={Run:'🏃',Ride:'🚴',Swim:'🏊',Walk:'🚶',Hike:'🥾',VirtualRide:'🚴',TrailRun:'⛰️',
-    WeightTraining:'💪',Yoga:'🧘',Rowing:'🚣',Elliptical:'〽️',StandUpPaddling:'🏄',Kayaking:'🛶'};
-  return m[t] || '⚡';
-};
+const fmtDate = d => { try{return new Date(d).toLocaleDateString('es-AR',{day:'2-digit',month:'short'})}catch{return d} };
+const fmtDateFull = d => { try{return new Date(d).toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})}catch{return d} };
+const mean = a => a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
+const actIcon = t => ({Run:'🏃',Ride:'🚴',Swim:'🏊',Walk:'🚶',Hike:'🥾',WeightTraining:'💪',
+  VirtualRide:'🚴',TrailRun:'⛰️',Yoga:'🧘',Rowing:'🚣'}[t]||'⚡');
  
-// ── OVERVIEW ────────────────────────────────────────────────
-function buildOverview() {
-  const {activities, stats} = STATE;
-  const el = document.getElementById('tab-overview');
+// ── HR ZONES (% FCmax) ──────────────────────────────────
+// Z1: <60% recuperación/quema grasa base
+// Z2: 60-70% aeróbico/quema grasa óptima
+// Z3: 70-80% aeróbico medio
+// Z4: 80-90% umbral anaeróbico
+// Z5: >90% máximo
+function getZone(hr) {
+  const pct = hr / S.fcmax * 100;
+  if (pct < 60) return 1;
+  if (pct < 70) return 2;
+  if (pct < 80) return 3;
+  if (pct < 90) return 4;
+  return 5;
+}
  
-  const now = new Date();
-  const d30 = new Date(now - 30*24*3600*1000);
-  const ytd = activities.filter(a => new Date(a.start_date) >= new Date(now.getFullYear()+'-01-01'));
-  const recent = activities.filter(a => new Date(a.start_date) >= d30);
+function zoneColor(z) { return ['','var(--z1)','var(--z2)','var(--z3)','var(--z4)','var(--z5)'][z]; }
+function zoneLabel(z) { return ['','Z1 Recuperación','Z2 Quema grasa','Z3 Aeróbico','Z4 Umbral','Z5 Máximo'][z]; }
+function zoneBadgeClass(z) { return ['','bg-b','bg-g','bg-a','bg-o','bg-r'][z]; }
  
-  const totalDist = activities.reduce((s,a)=>s+(a.distance||0),0);
-  const totalTime = activities.reduce((s,a)=>s+(a.moving_time||0),0);
-  const totalElev = activities.reduce((s,a)=>s+(a.total_elevation_gain||0),0);
-  const ytdDist = ytd.reduce((s,a)=>s+(a.distance||0),0);
+// ── TRAINING LOAD (simplified TSS) ──────────────────────
+// Si no hay potencia, estimamos carga por FC y duración
+function calcLoad(act) {
+  if (!act.moving_time) return 0;
+  const dur = act.moving_time / 3600; // horas
+  const avgHR = act.average_heartrate || 0;
+  if (avgHR > 0) {
+    const hrRatio = avgHR / S.fcmax;
+    // Simplified TRIMP: duración × HR ratio × factor exponencial
+    const trimp = dur * 60 * hrRatio * Math.exp(1.92 * hrRatio);
+    return Math.round(trimp);
+  }
+  // Sin FC: estimación por duración e intensidad percibida
+  const distKm = (act.distance||0)/1000;
+  if (act.type==='Run') return Math.round(dur * 50 + distKm * 3);
+  if (act.type==='Ride') return Math.round(dur * 35 + distKm * 1);
+  return Math.round(dur * 40);
+}
  
-  // By type
-  const byType = {};
-  activities.forEach(a=>{ byType[a.type]=(byType[a.type]||0)+1; });
+// ── CTL / ATL / TSB ─────────────────────────────────────
+// CTL (fitness): EMA 42 días de carga
+// ATL (fatiga):  EMA 7 días de carga
+// TSB (forma):   CTL - ATL
+function computeCtlAtl(activities) {
+  const sorted = [...activities].sort((a,b)=>new Date(a.start_date)-new Date(b.start_date));
+  if (!sorted.length) return [];
  
-  // Monthly chart data
-  const monthly = {};
-  activities.forEach(a => {
-    const key = a.start_date.slice(0,7);
-    monthly[key] = (monthly[key]||0) + (a.distance||0)/1000;
+  const first = new Date(sorted[0].start_date);
+  const last = new Date();
+  const days = Math.ceil((last-first)/(1000*86400)) + 1;
+ 
+  // Build daily load map
+  const daily = {};
+  sorted.forEach(a => {
+    const key = a.start_date.slice(0,10);
+    daily[key] = (daily[key]||0) + calcLoad(a);
   });
-  const months = Object.keys(monthly).sort().slice(-12);
-  const chartId = 'chart-ov-' + Date.now();
+ 
+  const kCTL = 2/(42+1), kATL = 2/(7+1);
+  let ctl=0, atl=0;
+  const result = [];
+  for (let i=0;i<days;i++) {
+    const d = new Date(first); d.setDate(d.getDate()+i);
+    const key = d.toISOString().slice(0,10);
+    const load = daily[key]||0;
+    ctl = ctl*(1-kCTL) + load*kCTL;
+    atl = atl*(1-kATL) + load*kATL;
+    result.push({ date:key, load, ctl:Math.round(ctl), atl:Math.round(atl), tsb:Math.round(ctl-atl) });
+  }
+  return result;
+}
+ 
+// ═══════════════════════════════════════════════════════
+//  TAB: FORMA & FATIGA
+// ═══════════════════════════════════════════════════════
+function buildForma() {
+  const el = document.getElementById('tab-forma');
+  const series = computeCtlAtl(S.activities);
+  const last60 = series.slice(-60);
+  const today = series[series.length-1] || {ctl:0,atl:0,tsb:0};
+  const weekAgo = series[series.length-8] || {ctl:0,atl:0,tsb:0};
+ 
+  const tsbStatus = today.tsb > 10 ? {label:'Forma óptima', cls:'bg-g', color:'var(--green)', msg:'Estás descansada y lista para rendir al máximo.'} :
+    today.tsb > -10 ? {label:'Forma neutra', cls:'bg-a', color:'var(--amber)', msg:'Balance entre carga y recuperación. Buen momento para entrenar fuerte.'} :
+    today.tsb > -30 ? {label:'Carga alta', cls:'bg-o', color:'var(--orange)', msg:'Acumulando fatiga. Priorizá recuperación y no agregues más volumen.'} :
+    {label:'Sobreentrenamiento', cls:'bg-r', color:'var(--red)', msg:'Fatiga excesiva. Necesitás descanso activo o días libres.'};
+ 
+  const chartId1 = 'c-ctl-'+Date.now();
+  const chartId2 = 'c-tsb-'+Date.now();
  
   el.innerHTML = `
-    <div class="sec-title">este año (${now.getFullYear()})</div>
+    <div class="fc-config">
+      <label>FC Máx</label>
+      <input type="number" id="cfg-fcmax" value="${S.fcmax}" style="width:65px">
+      <label>Edad</label>
+      <input type="number" id="cfg-age" value="${S.age}" style="width:55px">
+      <button onclick="updateConfig()">Actualizar</button>
+      <span style="font-size:.72rem;color:var(--muted)">FC máx estimada: 220 - edad. Ajustá si conocés la tuya.</span>
+    </div>
+ 
+    <div class="sec">estado actual</div>
     <div class="grid g4">
       <div class="card">
-        <div class="card-stripe cs-orange"></div>
-        <div class="lbl">Actividades</div>
-        <div class="big">${ytd.length}</div>
-        <div class="sub">${recent.length} en los últimos 30 días</div>
+        <div class="stripe s-b"></div>
+        <div class="lbl">Fitness (CTL)</div>
+        <div class="big">${today.ctl}</div>
+        <div class="sub">${today.ctl>weekAgo.ctl?'↑':'↓'} ${Math.abs(today.ctl-weekAgo.ctl)} vs semana pasada</div>
       </div>
       <div class="card">
-        <div class="card-stripe cs-green"></div>
-        <div class="lbl">Distancia</div>
-        <div class="big">${(ytdDist/1000).toFixed(0)}<span class="unit">km</span></div>
-        <div class="sub">Total histórico: ${(totalDist/1000).toFixed(0)} km</div>
+        <div class="stripe s-o"></div>
+        <div class="lbl">Fatiga (ATL)</div>
+        <div class="big">${today.atl}</div>
+        <div class="sub">${today.atl>weekAgo.atl?'↑ Más cargada':'↓ Recuperando'}</div>
       </div>
       <div class="card">
-        <div class="card-stripe cs-blue"></div>
-        <div class="lbl">Tiempo en movimiento</div>
-        <div class="big">${Math.floor(totalTime/3600)}<span class="unit">h</span></div>
-        <div class="sub">${activities.length} actividades totales</div>
+        <div class="stripe" style="background:${tsbStatus.color}"></div>
+        <div class="lbl">Forma (TSB)</div>
+        <div class="tsb-value" style="color:${tsbStatus.color}">${today.tsb>0?'+':''}${today.tsb}</div>
+        <div style="margin-top:.5rem"><span class="badge ${tsbStatus.cls}">${tsbStatus.label}</span></div>
       </div>
       <div class="card">
-        <div class="lbl">Desnivel acumulado</div>
-        <div class="big">${(totalElev/1000).toFixed(1)}<span class="unit">km</span></div>
-        <div class="sub">Elevación total</div>
+        <div class="lbl">Carga última semana</div>
+        <div class="big sm">${series.slice(-7).reduce((s,d)=>s+d.load,0)}</div>
+        <div class="sub">TRIMP acumulado (7d)</div>
       </div>
     </div>
  
-    ${stats ? `
-    <div class="sec-title">estadísticas de strava</div>
-    <div class="grid g3">
-      ${stats.ytd_run_totals?.count ? `<div class="card">
-        <div class="lbl">🏃 Carrera este año</div>
-        <div class="big">${(stats.ytd_run_totals.distance/1000).toFixed(0)}<span class="unit">km</span></div>
-        <div class="sub">${stats.ytd_run_totals.count} salidas · ${fmtDur(stats.ytd_run_totals.moving_time)}</div>
-      </div>` : ''}
-      ${stats.ytd_ride_totals?.count ? `<div class="card">
-        <div class="lbl">🚴 Ciclismo este año</div>
-        <div class="big">${(stats.ytd_ride_totals.distance/1000).toFixed(0)}<span class="unit">km</span></div>
-        <div class="sub">${stats.ytd_ride_totals.count} salidas · ${fmtDur(stats.ytd_ride_totals.moving_time)}</div>
-      </div>` : ''}
-      ${stats.ytd_swim_totals?.count ? `<div class="card">
-        <div class="lbl">🏊 Natación este año</div>
-        <div class="big">${(stats.ytd_swim_totals.distance/1000).toFixed(2)}<span class="unit">km</span></div>
-        <div class="sub">${stats.ytd_swim_totals.count} sesiones</div>
-      </div>` : ''}
-    </div>` : ''}
+    <div class="sec">qué significa esto para vos</div>
+    <div class="insight ${today.tsb>10?'green':today.tsb>-10?'blue':''}">
+      <div class="insight-title">${tsbStatus.label}</div>
+      <div class="insight-body">${tsbStatus.msg}</div>
+    </div>
+    <div class="insight blue">
+      <div class="insight-title">¿Cuándo rendir al máximo?</div>
+      <div class="insight-body">El TSB ideal para una competencia o entrenamiento exigente es entre +5 y +25. Llegás ahí reduciendo el volumen 3-5 días antes (tapering).</div>
+    </div>
+    <div class="insight green">
+      <div class="insight-title">Zona de quema de grasa y tu fatiga</div>
+      <div class="insight-body">Si terminás los largos cansada, es probable que estés entrenando demasiado en Z3-Z4. El 80% del volumen debería estar en Z2 (60-70% FCmáx) donde el cuerpo usa grasa como fuente de energía.</div>
+    </div>
  
-    <div class="sec-title">distancia mensual</div>
+    <div class="sec">evolución últimos 60 días</div>
     <div class="chart-card">
+      <div class="chart-title">Fitness (CTL) vs Fatiga (ATL)</div>
+      <div class="chart-sub">CTL sube lento, ATL fluctúa rápido con cada entrenamiento</div>
+      <div class="chart-wrap tall"><canvas id="${chartId1}"></canvas></div>
+    </div>
+ 
+    <div class="chart-card" style="margin-top:.9rem">
+      <div class="chart-title">Forma deportiva (TSB)</div>
+      <div class="chart-sub">Positivo = descansada y en forma · Negativo = cargada/fatigada</div>
+      <div class="chart-wrap"><canvas id="${chartId2}"></canvas></div>
+    </div>
+  `;
+ 
+  setTimeout(()=>{
+    const labels = last60.map(d=>fmtDate(d.date));
+    new Chart(document.getElementById(chartId1),{
+      type:'line',
+      data:{labels,datasets:[
+        {label:'Fitness (CTL)',data:last60.map(d=>d.ctl),borderColor:'#2563eb',backgroundColor:'#2563eb15',borderWidth:2,pointRadius:0,fill:true,tension:.3},
+        {label:'Fatiga (ATL)',data:last60.map(d=>d.atl),borderColor:'#FC4C02',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:.3,borderDash:[4,3]},
+      ]},
+      options:chartOpts()
+    });
+    const tsbColors = last60.map(d=>d.tsb>=0?'#16a34a':'#dc2626');
+    new Chart(document.getElementById(chartId2),{
+      type:'bar',
+      data:{labels,datasets:[{label:'Forma (TSB)',data:last60.map(d=>d.tsb),backgroundColor:tsbColors,borderRadius:3}]},
+      options:{...chartOpts(),plugins:{legend:{display:false}}}
+    });
+  },80);
+}
+ 
+window.updateConfig = () => {
+  S.fcmax = parseInt(document.getElementById('cfg-fcmax').value)||S.fcmax;
+  S.age = parseInt(document.getElementById('cfg-age').value)||S.age;
+  sessionStorage.setItem('s_fcmax', S.fcmax);
+  sessionStorage.setItem('s_age', S.age);
+  builtTabs.clear(); builtTabs.add('forma');
+  buildForma();
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-forma').classList.add('active');
+};
+ 
+// ═══════════════════════════════════════════════════════
+//  TAB: ZONAS FC
+// ═══════════════════════════════════════════════════════
+function buildZonas() {
+  const el = document.getElementById('tab-zonas');
+  const withHR = S.activities.filter(a=>a.average_heartrate>0);
+ 
+  // Count time in each zone based on avg HR proxy
+  const zoneDur = [0,0,0,0,0,0]; // index 1-5
+  const zoneCount = [0,0,0,0,0,0];
+  withHR.forEach(a => {
+    const z = getZone(a.average_heartrate);
+    zoneDur[z] += a.moving_time||0;
+    zoneCount[z]++;
+  });
+  const totalDur = zoneDur.reduce((s,v)=>s+v,0);
+ 
+  // By sport
+  const runs = withHR.filter(a=>a.type==='Run'||a.type==='TrailRun');
+  const rides = withHR.filter(a=>a.type==='Ride'||a.type==='VirtualRide');
+ 
+  const zoneHRs = [
+    {z:1, range:`< ${Math.round(S.fcmax*0.6)} bpm`, label:'Recuperación activa', desc:'Caminar, soltar. Muy baja intensidad.', fat:'95%', carbs:'5%'},
+    {z:2, range:`${Math.round(S.fcmax*0.6)}–${Math.round(S.fcmax*0.7)} bpm`, label:'Quema de grasa óptima', desc:'Aeróbico suave. Podés mantener una conversación.', fat:'85%', carbs:'15%'},
+    {z:3, range:`${Math.round(S.fcmax*0.7)}–${Math.round(S.fcmax*0.8)} bpm`, label:'Aeróbico medio', desc:'Ritmo sostenido. Empieza a costar hablar.', fat:'50%', carbs:'50%'},
+    {z:4, range:`${Math.round(S.fcmax*0.8)}–${Math.round(S.fcmax*0.9)} bpm`, label:'Umbral anaeróbico', desc:'Duro. Solo podés decir frases cortas.', fat:'25%', carbs:'75%'},
+    {z:5, range:`> ${Math.round(S.fcmax*0.9)} bpm`, label:'Máximo esfuerzo', desc:'Sprint, máxima intensidad. No podés hablar.', fat:'5%', carbs:'95%'},
+  ];
+ 
+  const fatBurnTotal = withHR.reduce((s,a)=>{
+    const z=getZone(a.average_heartrate);
+    const fatPct=[0,.95,.85,.50,.25,.05][z];
+    return s+(a.moving_time||0)*fatPct;
+  },0);
+  const carbTotal = withHR.reduce((s,a)=>{
+    const z=getZone(a.average_heartrate);
+    const carbPct=[0,.05,.15,.50,.75,.95][z];
+    return s+(a.moving_time||0)*carbPct;
+  },0);
+  const totalWithHR = fatBurnTotal+carbTotal;
+  const fatBurnPct = totalWithHR?Math.round(fatBurnTotal/totalWithHR*100):0;
+ 
+  const z2pct = totalDur?Math.round(zoneDur[2]/totalDur*100):0;
+ 
+  const chartId = 'c-zones-'+Date.now();
+ 
+  el.innerHTML = `
+    <div class="sec">tus zonas de frecuencia cardíaca (FCmáx: ${S.fcmax} bpm)</div>
+ 
+    <div class="grid g3">
+      <div class="card">
+        <div class="stripe s-g"></div>
+        <div class="lbl">Tiempo en zona 2 (grasa)</div>
+        <div class="big">${fmtDur(zoneDur[2])}</div>
+        <div class="sub">${z2pct}% del tiempo total con FC registrada</div>
+        <div class="bwrap">
+          <div class="btrack"><div class="bfill" style="background:var(--green);width:${z2pct}%"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="stripe s-o"></div>
+        <div class="lbl">% energía de grasas (estimado)</div>
+        <div class="big">${fatBurnPct}<span class="unit">%</span></div>
+        <div class="sub">Del total de actividades con FC</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Actividades con FC registrada</div>
+        <div class="big">${withHR.length}<span class="unit">/${S.activities.length}</span></div>
+        <div class="sub">Solo estas tienen análisis de zonas</div>
+      </div>
+    </div>
+ 
+    <div class="sec">distribución por zona</div>
+    <div class="chart-card">
+      <div class="chart-title">Tiempo total por zona</div>
       <div class="chart-wrap"><canvas id="${chartId}"></canvas></div>
     </div>
  
-    <div class="sec-title">tipos de actividad</div>
-    <div class="grid g3">
-      ${Object.entries(byType).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([type,count])=>{
-        const pct = Math.round((count/activities.length)*100);
-        return `<div class="card">
-          <div class="lbl">${actIcon(type)} ${type.replace(/([A-Z])/g,' $1').trim()}</div>
-          <div class="big">${count}<span class="unit">sesiones</span></div>
-          <div class="bar-wrap">
-            <div class="bar-row"><span>${pct}% del total</span></div>
-            <div class="bar-track"><div class="bar-fill bf-o" style="width:${pct}%"></div></div>
+    <div class="sec">referencia de zonas · FCmáx ${S.fcmax} bpm</div>
+    <div class="card">
+      <div class="zone-list">
+        ${zoneHRs.map(z=>{
+          const pct=totalDur?Math.round(zoneDur[z.z]/totalDur*100):0;
+          return `<div class="zone-row">
+            <div class="zone-label" style="color:${zoneColor(z.z)}">Z${z.z}</div>
+            <div class="zone-desc">${z.label}</div>
+            <div class="zone-track"><div class="zone-fill" style="background:${zoneColor(z.z)};width:${pct}%"></div></div>
+            <div class="zone-pct">${pct}%</div>
+            <div style="font-size:.68rem;color:var(--muted);min-width:100px;text-align:right">🔥${z.fat} grasa</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+ 
+    <div class="sec">recomendaciones para vos</div>
+    ${z2pct < 50 ? `<div class="insight">
+      <div class="insight-title">⚠️ Estás entrenando demasiado en zonas altas</div>
+      <div class="insight-body">Solo el ${z2pct}% de tu tiempo está en Z2, la zona de quema de grasa óptima. Para mejorar tu resistencia y llegar menos cansada a los largos, buscá que el 70-80% de tu volumen sea en Z2. Corré/andate más lento.</div>
+    </div>` : `<div class="insight green">
+      <div class="insight-title">✅ Buena distribución de zonas</div>
+      <div class="insight-body">El ${z2pct}% en Z2 es saludable. Mantenelo para seguir mejorando la eficiencia de quema de grasa.</div>
+    </div>`}
+    <div class="insight blue">
+      <div class="insight-title">Por qué terminás cansada en los largos</div>
+      <div class="insight-body">Si en los entrenamientos largos tu FC sube a Z3-Z4, el cuerpo quema más carbohidratos que grasa. Los carbohidratos se agotan (2-3hs) y aparece la fatiga. La solución: bajar el ritmo para mantenerte en Z2 y entrenar al cuerpo a usar grasa como combustible principal.</div>
+    </div>
+    <div class="insight purple">
+      <div class="insight-title">Test de campo: tu ritmo de Z2</div>
+      <div class="insight-body">Tu FC objetivo para Z2 es ${Math.round(S.fcmax*0.6)}–${Math.round(S.fcmax*0.7)} bpm. En el próximo entrenamiento largo, monitoreá que no pases de ${Math.round(S.fcmax*0.7)} bpm aunque tengas que bajar mucho el ritmo. En 4-8 semanas vas a notar que podés ir más rápido con la misma FC.</div>
+    </div>
+  `;
+ 
+  setTimeout(()=>{
+    new Chart(document.getElementById(chartId),{
+      type:'bar',
+      data:{
+        labels:['Z1 Recuperación','Z2 Quema grasa','Z3 Aeróbico','Z4 Umbral','Z5 Máximo'],
+        datasets:[{
+          data:[1,2,3,4,5].map(z=>Math.round(zoneDur[z]/60)),
+          backgroundColor:['var(--z1)','var(--z2)','var(--z3)','var(--z4)','var(--z5)'],
+          borderRadius:6,
+        }]
+      },
+      options:{...chartOpts(),plugins:{legend:{display:false}},
+        scales:{
+          x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:11},color:'#7c7268'}},
+          y:{grid:{color:'#e4e0d8'},ticks:{font:{family:'DM Mono',size:11},color:'#7c7268'},
+            title:{display:true,text:'minutos',font:{size:11},color:'#7c7268'}}
+        }
+      }
+    });
+  },80);
+}
+ 
+// ═══════════════════════════════════════════════════════
+//  TAB: ENTRENAMIENTOS LARGOS
+// ═══════════════════════════════════════════════════════
+function buildLargos() {
+  const el = document.getElementById('tab-largos');
+  // Largos = actividades > 60min para running/cycling
+  const largos = S.activities.filter(a=>
+    (a.type==='Run'||a.type==='TrailRun'||a.type==='Ride'||a.type==='VirtualRide') &&
+    (a.moving_time||0)>=3600
+  ).sort((a,b)=>new Date(b.start_date)-new Date(a.start_date));
+ 
+  if (!largos.length) { el.innerHTML=`<div class="empty">No se encontraron entrenamientos largos (+60 min).</div>`; return; }
+ 
+  const avgHRLargos = mean(largos.filter(a=>a.average_heartrate>0).map(a=>a.average_heartrate));
+  const avgZone = avgHRLargos>0 ? getZone(avgHRLargos) : 0;
+  const avgDist = mean(largos.map(a=>a.distance||0));
+  const avgDur = mean(largos.map(a=>a.moving_time||0));
+  const longestDur = Math.max(...largos.map(a=>a.moving_time||0));
+  const longestDist = Math.max(...largos.map(a=>a.distance||0));
+ 
+  // Trend: FC de los últimos 10 largos
+  const last10 = largos.slice(0,10).reverse();
+  const chartId = 'c-largos-'+Date.now();
+ 
+  el.innerHTML = `
+    <div class="sec">tus entrenamientos largos (+60 min)</div>
+    <div class="grid g4">
+      <div class="card">
+        <div class="stripe s-o"></div>
+        <div class="lbl">Total largos</div>
+        <div class="big">${largos.length}</div>
+        <div class="sub">Runs y rides +1 hora</div>
+      </div>
+      <div class="card">
+        <div class="stripe s-b"></div>
+        <div class="lbl">Duración promedio</div>
+        <div class="big sm">${fmtDur(Math.round(avgDur))}</div>
+        <div class="sub">Más largo: ${fmtDur(longestDur)}</div>
+      </div>
+      <div class="card">
+        <div class="stripe s-g"></div>
+        <div class="lbl">Distancia promedio</div>
+        <div class="big sm">${fmtDist(Math.round(avgDist))}</div>
+        <div class="sub">Más largo: ${fmtDist(Math.round(longestDist))}</div>
+      </div>
+      <div class="card">
+        <div class="lbl">FC promedio en largos</div>
+        <div class="big sm">${avgHRLargos?Math.round(avgHRLargos)+' bpm':'—'}</div>
+        ${avgZone?`<div style="margin-top:.4rem"><span class="badge ${zoneBadgeClass(avgZone)}">${zoneLabel(avgZone)}</span></div>`:''}
+      </div>
+    </div>
+ 
+    ${avgHRLargos>0?`
+    <div class="sec">análisis de fatiga en largos</div>
+    ${avgZone>=3?`<div class="insight">
+      <div class="insight-title">⚠️ Tu FC en largos está en ${zoneLabel(avgZone)} (Z${avgZone})</div>
+      <div class="insight-body">Un promedio de ${Math.round(avgHRLargos)} bpm en tus salidas largas significa que estás usando principalmente carbohidratos como energía. Esto explica la fatiga hacia el final. La meta es mantener los largos en Z2 (${Math.round(S.fcmax*0.6)}–${Math.round(S.fcmax*0.7)} bpm).</div>
+    </div>`:`<div class="insight green">
+      <div class="insight-title">✅ Tus largos están bien en Z${avgZone}</div>
+      <div class="insight-body">FC promedio de ${Math.round(avgHRLargos)} bpm es buena para entrenamientos largos. Seguí así.</div>
+    </div>`}
+    <div class="insight blue">
+      <div class="insight-title">Estrategia para terminar sin cansancio</div>
+      <div class="insight-body">1) Empezá los primeros 10-15 min más lento de lo habitual. 2) Mantené FC &lt; ${Math.round(S.fcmax*0.72)} bpm. 3) Hidratate cada 20 min. 4) En salidas +90 min, consumí 30-60g de carbohidratos/hora (gel, banana, dátiles).</div>
+    </div>`:''}
+ 
+    ${last10.length>1?`
+    <div class="sec">tendencia FC en últimos largos</div>
+    <div class="chart-card">
+      <div class="chart-title">FC promedio por entrenamiento largo</div>
+      <div class="chart-sub">Querés que esta línea baje con el tiempo → mejor eficiencia aeróbica</div>
+      <div class="chart-wrap"><canvas id="${chartId}"></canvas></div>
+    </div>`:''}
+ 
+    <div class="sec">todos los largos</div>
+    <div class="act-list">
+      ${largos.map(a=>{
+        const z=a.average_heartrate?getZone(a.average_heartrate):0;
+        return `<div class="act-row">
+          <div class="act-icon">${actIcon(a.type)}</div>
+          <div>
+            <div class="act-name">${a.name}</div>
+            <div class="act-date">${fmtDateFull(a.start_date_local)} ${z?`· <span class="badge ${zoneBadgeClass(z)}">${zoneLabel(z)}</span>`:''}
+            </div>
+          </div>
+          <div class="act-stat">
+            <div class="act-v">${fmtDist(a.distance)}</div>
+            <div class="act-l">distancia</div>
+          </div>
+          <div class="act-stat">
+            <div class="act-v">${fmtDur(a.moving_time)}</div>
+            <div class="act-l">duración</div>
+          </div>
+          <div class="act-stat">
+            <div class="act-v">${a.average_heartrate?Math.round(a.average_heartrate)+' bpm':'—'}</div>
+            <div class="act-l">FC prom</div>
           </div>
         </div>`;
       }).join('')}
     </div>
- 
-    <div class="sec-title">últimas actividades</div>
-    ${buildActList(activities.slice(0,6))}
   `;
  
-  setTimeout(() => {
-    const ctx = document.getElementById(chartId);
-    if (!ctx) return;
-    new Chart(ctx, {
-      type:'bar',
+  setTimeout(()=>{
+    if (last10.length<2) return;
+    const ctx=document.getElementById(chartId);
+    if(!ctx) return;
+    new Chart(ctx,{
+      type:'line',
       data:{
-        labels: months.map(m=>{ const [y,mo]=m.split('-'); return new Date(y,mo-1).toLocaleString('es-AR',{month:'short',year:'2-digit'}); }),
+        labels:last10.map(a=>fmtDate(a.start_date_local)),
         datasets:[{
-          data: months.map(m => +monthly[m].toFixed(1)),
-          backgroundColor:'#FC4C0222',
-          borderColor:'#FC4C02',
-          borderWidth:2,
-          borderRadius:5,
+          label:'FC promedio',
+          data:last10.map(a=>Math.round(a.average_heartrate||0)),
+          borderColor:'#FC4C02',backgroundColor:'#FC4C0215',
+          borderWidth:2,pointRadius:4,pointBackgroundColor:'#FC4C02',fill:true,tension:.3,
+        },{
+          label:`Z2 máx (${Math.round(S.fcmax*0.7)} bpm)`,
+          data:last10.map(()=>Math.round(S.fcmax*0.7)),
+          borderColor:'#16a34a',borderWidth:1.5,borderDash:[6,4],pointRadius:0,
         }]
       },
-      options:{
-        responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false}},
-        scales:{
-          x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:11},color:'#78716c'}},
-          y:{grid:{color:'#e5e2dc'},ticks:{font:{family:'DM Mono',size:11},color:'#78716c'}}
-        }
-      }
+      options:chartOpts()
     });
-  }, 80);
+  },80);
 }
  
-// ── ACTIVITIES ───────────────────────────────────────────────
-function buildActivities() {
-  const {activities} = STATE;
-  const el = document.getElementById('tab-activities');
+// ═══════════════════════════════════════════════════════
+//  TAB: PROGRESIÓN
+// ═══════════════════════════════════════════════════════
+function buildProgresion() {
+  const el = document.getElementById('tab-progresion');
+  const acts = S.activities;
  
-  // Filter buttons
-  const types = [...new Set(activities.map(a=>a.type))].sort();
-  let filtered = activities;
+  // Monthly stats
+  const monthly = {};
+  acts.forEach(a=>{
+    const key = a.start_date.slice(0,7);
+    if (!monthly[key]) monthly[key]={count:0,dist:0,dur:0,load:0,hrs:[]};
+    monthly[key].count++;
+    monthly[key].dist += a.distance||0;
+    monthly[key].dur += a.moving_time||0;
+    monthly[key].load += calcLoad(a);
+    if (a.average_heartrate) monthly[key].hrs.push(a.average_heartrate);
+  });
  
-  const render = (acts) => `
-    <div class="sec-title">${acts.length} actividades</div>
-    ${buildActList(acts)}
-  `;
+  const months = Object.keys(monthly).sort().slice(-12);
+  const chartId1='c-prog1-'+Date.now();
+  const chartId2='c-prog2-'+Date.now();
+  const chartId3='c-prog3-'+Date.now();
+ 
+  const fmtMonth = m => { const [y,mo]=m.split('-'); return new Date(y,mo-1).toLocaleString('es-AR',{month:'short',year:'2-digit'}); };
+ 
+  // Best and worst months
+  const bestDist = months.reduce((b,m)=>monthly[m].dist>monthly[b].dist?m:b, months[0]);
+  const trend = months.length>=2 ? monthly[months[months.length-1]].dist - monthly[months[months.length-2]].dist : 0;
  
   el.innerHTML = `
-    <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem">
-      <button class="badge bg-o" style="cursor:pointer;padding:.3rem .8rem;font-size:.75rem" onclick="filterActs('all',this)">Todas (${activities.length})</button>
-      ${types.map(t=>`<button class="badge bg-m" style="cursor:pointer;padding:.3rem .8rem;font-size:.75rem" onclick="filterActs('${t}',this)">${actIcon(t)} ${t.replace(/([A-Z])/g,' $1').trim()} (${activities.filter(a=>a.type===t).length})</button>`).join('')}
+    <div class="sec">evolución mensual</div>
+    <div class="grid g3">
+      <div class="card">
+        <div class="stripe s-o"></div>
+        <div class="lbl">Mejor mes (distancia)</div>
+        <div class="big sm">${fmtDist(Math.round(monthly[bestDist]?.dist||0))}</div>
+        <div class="sub">${fmtMonth(bestDist)}</div>
+      </div>
+      <div class="card">
+        <div class="stripe s-b"></div>
+        <div class="lbl">Tendencia vs mes anterior</div>
+        <div class="big sm" style="color:${trend>=0?'var(--green)':'var(--red)'}">${trend>=0?'+':''}${fmtDist(Math.round(Math.abs(trend)))}</div>
+        <div class="sub">${trend>=0?'↑ Progresión positiva':'↓ Bajó el volumen'}</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Promedio actividades/mes</div>
+        <div class="big sm">${Math.round(mean(months.map(m=>monthly[m].count)))}</div>
+        <div class="sub">Últimos ${months.length} meses</div>
+      </div>
     </div>
-    <div id="acts-list">${render(activities)}</div>
+ 
+    <div class="sec">distancia mensual (km)</div>
+    <div class="chart-card">
+      <div class="chart-wrap"><canvas id="${chartId1}"></canvas></div>
+    </div>
+ 
+    <div class="sec">carga de entrenamiento mensual (TRIMP)</div>
+    <div class="chart-card">
+      <div class="chart-sub">Carga estimada. Subida progresiva = buena adaptación. Saltos bruscos = riesgo de lesión.</div>
+      <div class="chart-wrap"><canvas id="${chartId2}"></canvas></div>
+    </div>
+ 
+    <div class="sec">FC promedio mensual</div>
+    <div class="chart-card">
+      <div class="chart-sub">Si baja con el tiempo → tu corazón se vuelve más eficiente al mismo esfuerzo. ¡Eso es fitness!</div>
+      <div class="chart-wrap"><canvas id="${chartId3}"></canvas></div>
+    </div>
   `;
+ 
+  setTimeout(()=>{
+    const labels = months.map(fmtMonth);
+    new Chart(document.getElementById(chartId1),{
+      type:'bar',
+      data:{labels,datasets:[{data:months.map(m=>(monthly[m].dist/1000).toFixed(1)),
+        backgroundColor:'#FC4C0220',borderColor:'#FC4C02',borderWidth:2,borderRadius:5}]},
+      options:{...chartOpts(),plugins:{legend:{display:false}}}
+    });
+    new Chart(document.getElementById(chartId2),{
+      type:'line',
+      data:{labels,datasets:[{data:months.map(m=>monthly[m].load),
+        borderColor:'#7c3aed',backgroundColor:'#7c3aed15',borderWidth:2,pointRadius:3,
+        pointBackgroundColor:'#7c3aed',fill:true,tension:.3}]},
+      options:{...chartOpts(),plugins:{legend:{display:false}}}
+    });
+    const hrData = months.map(m=>monthly[m].hrs.length?Math.round(mean(monthly[m].hrs)):null);
+    new Chart(document.getElementById(chartId3),{
+      type:'line',
+      data:{labels,datasets:[{data:hrData,borderColor:'#dc2626',backgroundColor:'#dc262615',
+        borderWidth:2,pointRadius:3,pointBackgroundColor:'#dc2626',fill:true,tension:.3,spanGaps:true}]},
+      options:{...chartOpts(),plugins:{legend:{display:false}}}
+    });
+  },80);
 }
  
-window.filterActs = (type, btn) => {
-  document.querySelectorAll('#tab-activities .badge').forEach(b=>{ b.className='badge bg-m'; b.style.cssText='cursor:pointer;padding:.3rem .8rem;font-size:.75rem'; });
-  btn.className='badge bg-o'; btn.style.cssText='cursor:pointer;padding:.3rem .8rem;font-size:.75rem';
-  const acts = type==='all' ? STATE.activities : STATE.activities.filter(a=>a.type===type);
-  document.getElementById('acts-list').innerHTML = `<div class="sec-title">${acts.length} actividades</div>${buildActList(acts)}`;
-};
+// ═══════════════════════════════════════════════════════
+//  TAB: FEBRERO
+// ═══════════════════════════════════════════════════════
+function buildFebrero() {
+  const el = document.getElementById('tab-febrero');
+  const feb = S.activities.filter(a=>a.start_date.startsWith('2025-02'));
  
-function buildActList(acts) {
-  if (!acts.length) return `<div class="empty">Sin actividades para mostrar.</div>`;
-  return `<div class="act-list">${acts.map(a=>`
-    <div class="act-row">
-      <div class="act-icon">${actIcon(a.type)}</div>
-      <div>
-        <div class="act-name">${a.name}</div>
-        <div class="act-date">${fmtDate(a.start_date_local)} · <span class="badge bg-m" style="font-size:.62rem">${a.type.replace(/([A-Z])/g,' $1').trim()}</span></div>
-      </div>
-      <div class="act-stat">
-        <div class="act-v">${fmtDist(a.distance)}</div>
-        <div class="act-l">distancia</div>
-      </div>
-      <div class="act-stat">
-        <div class="act-v">${fmtDur(a.moving_time)}</div>
-        <div class="act-l">duración</div>
-      </div>
-      <div class="act-stat">
-        <div class="act-v">${a.average_heartrate ? Math.round(a.average_heartrate)+' bpm' : fmtPace(a.average_speed, a.type)}</div>
-        <div class="act-l">${a.average_heartrate ? 'FC prom' : 'ritmo/vel'}</div>
-      </div>
-    </div>
-  `).join('')}</div>`;
-}
+  if (!feb.length) { el.innerHTML=`<div class="empty">No se encontraron actividades en febrero 2025.</div>`; return; }
  
-// ── RECORDS ──────────────────────────────────────────────────
-function buildRecords() {
-  const {activities} = STATE;
-  const el = document.getElementById('tab-records');
+  const runs=feb.filter(a=>a.type==='Run'||a.type==='TrailRun');
+  const rides=feb.filter(a=>a.type==='Ride'||a.type==='VirtualRide');
+  const gym=feb.filter(a=>a.type==='WeightTraining'||a.type==='Crossfit');
+  const totalDist=feb.reduce((s,a)=>s+(a.distance||0),0);
+  const totalDur=feb.reduce((s,a)=>s+(a.moving_time||0),0);
+  const totalLoad=feb.reduce((s,a)=>s+calcLoad(a),0);
+  const avgHR=mean(feb.filter(a=>a.average_heartrate>0).map(a=>a.average_heartrate));
  
-  const runs = activities.filter(a=>a.type==='Run'||a.type==='TrailRun');
-  const rides = activities.filter(a=>a.type==='Ride'||a.type==='VirtualRide');
-  const swims = activities.filter(a=>a.type==='Swim');
- 
-  const best = (arr, key, fmt) => {
-    if (!arr.length) return '—';
-    const v = Math.max(...arr.map(a=>a[key]||0));
-    return v ? fmt(v) : '—';
-  };
-  const longest = (arr) => {
-    if (!arr.length) return null;
-    return arr.reduce((b,a)=>(a.distance||0)>(b.distance||0)?a:b);
-  };
- 
-  const prs = (arr) => {
-    const lb = arr.filter(a=>a.distance>=42000);
-    const hm = arr.filter(a=>a.distance>=21000&&a.distance<42000);
-    const t10 = arr.filter(a=>a.distance>=9500&&a.distance<11000);
-    const t5 = arr.filter(a=>a.distance>=4500&&a.distance<5500);
-    const bestTime = (group) => group.length ? fmtDur(Math.min(...group.map(a=>a.moving_time||a.elapsed_time||99999))) : '—';
-    return {marathon:bestTime(lb), half:bestTime(hm), ten:bestTime(t10), five:bestTime(t5)};
-  };
- 
-  const runPR = prs(runs);
-  const longestRun = longest(runs);
-  const longestRide = longest(rides);
+  // Zone breakdown for feb
+  const zoneDur=[0,0,0,0,0,0];
+  feb.filter(a=>a.average_heartrate>0).forEach(a=>{
+    zoneDur[getZone(a.average_heartrate)]+=a.moving_time||0;
+  });
+  const totalZoneDur=zoneDur.reduce((s,v)=>s+v,0);
  
   el.innerHTML = `
-    ${runs.length ? `
-    <div class="sec-title">🏃 carrera</div>
+    <div class="sec">febrero 2025 · resumen</div>
     <div class="grid g4">
-      <div class="card"><div class="card-stripe cs-orange"></div><div class="lbl">Mayor distancia</div>
-        <div class="big">${longestRun ? (longestRun.distance/1000).toFixed(1) : '—'}<span class="unit">km</span></div>
-        <div class="sub">${longestRun ? longestRun.name : ''}</div>
+      <div class="card"><div class="stripe s-o"></div>
+        <div class="lbl">Actividades totales</div>
+        <div class="big">${feb.length}</div>
+        <div class="sub">🏃 ${runs.length} runs · 🚴 ${rides.length} rides · 💪 ${gym.length} gym</div>
       </div>
-      <div class="card"><div class="lbl">Mejor maratón</div><div class="big" style="font-size:1.6rem">${runPR.marathon}</div></div>
-      <div class="card"><div class="lbl">Mejor media maratón</div><div class="big" style="font-size:1.6rem">${runPR.half}</div></div>
-      <div class="card"><div class="lbl">Mejor 10K</div><div class="big" style="font-size:1.6rem">${runPR.ten}</div>
-        <div class="sub">5K: ${runPR.five}</div>
+      <div class="card"><div class="stripe s-g"></div>
+        <div class="lbl">Distancia total</div>
+        <div class="big sm">${fmtDist(Math.round(totalDist))}</div>
+        <div class="sub">Runs: ${fmtDist(Math.round(runs.reduce((s,a)=>s+(a.distance||0),0)))} · Rides: ${fmtDist(Math.round(rides.reduce((s,a)=>s+(a.distance||0),0)))}</div>
       </div>
-    </div>
-    <div class="grid g3" style="margin-top:1rem">
-      <div class="card"><div class="lbl">FC máxima registrada</div>
-        <div class="big">${best(runs,'max_heartrate',v=>Math.round(v))}<span class="unit">bpm</span></div>
+      <div class="card"><div class="stripe s-b"></div>
+        <div class="lbl">Tiempo total</div>
+        <div class="big sm">${fmtDur(totalDur)}</div>
+        <div class="sub">Carga TRIMP: ${totalLoad}</div>
       </div>
-      <div class="card"><div class="lbl">Mayor desnivel</div>
-        <div class="big">${best(runs,'total_elevation_gain',v=>Math.round(v))}<span class="unit">m</span></div>
-      </div>
-      <div class="card"><div class="lbl">Salida más larga</div>
-        <div class="big" style="font-size:1.5rem">${longestRun ? fmtDur(longestRun.moving_time) : '—'}</div>
-      </div>
-    </div>` : ''}
- 
-    ${rides.length ? `
-    <div class="sec-title">🚴 ciclismo</div>
-    <div class="grid g3">
-      <div class="card"><div class="card-stripe cs-blue"></div><div class="lbl">Mayor distancia</div>
-        <div class="big">${longestRide ? (longestRide.distance/1000).toFixed(1) : '—'}<span class="unit">km</span></div>
-        <div class="sub">${longestRide ? longestRide.name : ''}</div>
-      </div>
-      <div class="card"><div class="lbl">Velocidad máxima</div>
-        <div class="big">${best(rides,'max_speed',v=>(v*3.6).toFixed(1))}<span class="unit">km/h</span></div>
-      </div>
-      <div class="card"><div class="lbl">Mayor desnivel</div>
-        <div class="big">${best(rides,'total_elevation_gain',v=>Math.round(v))}<span class="unit">m</span></div>
-      </div>
-    </div>` : ''}
- 
-    ${swims.length ? `
-    <div class="sec-title">🏊 natación</div>
-    <div class="grid g3">
-      <div class="card"><div class="lbl">Mayor distancia</div>
-        <div class="big">${best(swims,'distance',v=>(v/1000).toFixed(2))}<span class="unit">km</span></div>
-      </div>
-      <div class="card"><div class="lbl">Sesiones totales</div>
-        <div class="big">${swims.length}</div>
-      </div>
-    </div>` : ''}
- 
-    ${!runs.length && !rides.length && !swims.length ? `<div class="empty">No se encontraron actividades con récords calculables.</div>` : ''}
-  `;
-}
- 
-// ── PROFILE ──────────────────────────────────────────────────
-function buildProfile() {
-  const {athlete, stats, activities} = STATE;
-  const el = document.getElementById('tab-profile');
- 
-  el.innerHTML = `
-    <div class="sec-title">atleta</div>
-    <div class="profile-card">
-      <img class="profile-avatar" src="${athlete.profile||''}" alt="">
-      <div>
-        <div class="profile-name">${athlete.firstname} ${athlete.lastname}</div>
-        <div class="profile-loc">${[athlete.city, athlete.state, athlete.country].filter(Boolean).join(', ') || 'Ubicación no especificada'}</div>
-        <div style="margin-top:.5rem;display:flex;gap:.5rem;flex-wrap:wrap">
-          ${athlete.sex === 'M' ? '<span class="badge bg-b">Masculino</span>' : athlete.sex === 'F' ? '<span class="badge bg-o">Femenino</span>' : ''}
-          ${athlete.premium ? '<span class="badge bg-g">Strava Summit</span>' : ''}
-          <span class="badge bg-m">${activities.length} actividades cargadas</span>
-        </div>
+      <div class="card">
+        <div class="lbl">FC promedio del mes</div>
+        <div class="big sm">${avgHR?Math.round(avgHR)+' bpm':'—'}</div>
+        ${avgHR?`<div style="margin-top:.4rem"><span class="badge ${zoneBadgeClass(getZone(avgHR))}">${zoneLabel(getZone(avgHR))}</span></div>`:''}
       </div>
     </div>
  
-    ${stats ? `
-    <div class="sec-title">totales históricos</div>
-    <div class="grid g3">
-      ${stats.all_run_totals?.count ? `<div class="card">
-        <div class="lbl">🏃 Carrera total</div>
-        <div class="big">${(stats.all_run_totals.distance/1000).toFixed(0)}<span class="unit">km</span></div>
-        <div class="sub">${stats.all_run_totals.count} actividades · ${fmtDur(stats.all_run_totals.moving_time)}</div>
-      </div>` : ''}
-      ${stats.all_ride_totals?.count ? `<div class="card">
-        <div class="lbl">🚴 Ciclismo total</div>
-        <div class="big">${(stats.all_ride_totals.distance/1000).toFixed(0)}<span class="unit">km</span></div>
-        <div class="sub">${stats.all_ride_totals.count} actividades · ${fmtDur(stats.all_ride_totals.moving_time)}</div>
-      </div>` : ''}
-      ${stats.all_swim_totals?.count ? `<div class="card">
-        <div class="lbl">🏊 Natación total</div>
-        <div class="big">${(stats.all_swim_totals.distance/1000).toFixed(2)}<span class="unit">km</span></div>
-        <div class="sub">${stats.all_swim_totals.count} sesiones</div>
-      </div>` : ''}
-    </div>` : ''}
+    ${totalZoneDur>0?`
+    <div class="sec">distribución de zonas · febrero</div>
+    <div class="card">
+      <div class="zone-list">
+        ${[1,2,3,4,5].map(z=>{
+          const pct=Math.round(zoneDur[z]/totalZoneDur*100);
+          return `<div class="zone-row">
+            <div class="zone-label" style="color:${zoneColor(z)}">Z${z}</div>
+            <div class="zone-desc">${zoneLabel(z)}</div>
+            <div class="zone-track"><div class="zone-fill" style="background:${zoneColor(z)};width:${pct}%"></div></div>
+            <div class="zone-pct">${pct}%</div>
+            <div style="font-size:.68rem;color:var(--muted);min-width:80px;text-align:right">${fmtDur(zoneDur[z])}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`:''}
+ 
+    <div class="sec">todas las actividades de febrero</div>
+    <div class="act-list">
+      ${feb.map(a=>{
+        const z=a.average_heartrate?getZone(a.average_heartrate):0;
+        return `<div class="act-row">
+          <div class="act-icon">${actIcon(a.type)}</div>
+          <div>
+            <div class="act-name">${a.name}</div>
+            <div class="act-date">${fmtDateFull(a.start_date_local)} ${z?`· <span class="badge ${zoneBadgeClass(z)}">${zoneLabel(z)}</span>`:''}
+            </div>
+          </div>
+          <div class="act-stat">
+            <div class="act-v">${fmtDist(a.distance)}</div>
+            <div class="act-l">distancia</div>
+          </div>
+          <div class="act-stat">
+            <div class="act-v">${fmtDur(a.moving_time)}</div>
+            <div class="act-l">duración</div>
+          </div>
+          <div class="act-stat">
+            <div class="act-v">${a.average_heartrate?Math.round(a.average_heartrate)+' bpm':'—'}</div>
+            <div class="act-l">FC prom</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
   `;
 }
  
-// ── TABS ─────────────────────────────────────────────────────
-const tabBuilders = {overview:buildOverview, activities:buildActivities, records:buildRecords, profile:buildProfile};
-const builtTabs = new Set();
+// ═══════════════════════════════════════════════════════
+//  CHART OPTIONS
+// ═══════════════════════════════════════════════════════
+function chartOpts() {
+  return {
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{font:{family:'DM Sans',size:11},color:'#7c7268',boxWidth:12}}},
+    scales:{
+      x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:10},color:'#7c7268',maxTicksLimit:8}},
+      y:{grid:{color:'#e4e0d8'},ticks:{font:{family:'DM Mono',size:10},color:'#7c7268'}}
+    }
+  };
+}
  
-function showTab(name, el) {
+// ═══════════════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════════════
+const tabBuilders={forma:buildForma,zonas:buildZonas,largos:buildLargos,progresion:buildProgresion,febrero:buildFebrero};
+const builtTabs=new Set();
+ 
+function showTab(name,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
-  if (!builtTabs.has(name) && tabBuilders[name]) { tabBuilders[name](); builtTabs.add(name); }
+  if (!builtTabs.has(name)&&tabBuilders[name]){tabBuilders[name]();builtTabs.add(name);}
 }
  
-// ── INIT ─────────────────────────────────────────────────────
-(async () => {
-  const handled = await handleCallback();
-  if (!handled) {
-    const token = sessionStorage.getItem('strava_token');
-    const athleteStr = sessionStorage.getItem('strava_athlete');
-    if (token && athleteStr) {
-      const athlete = JSON.parse(athleteStr);
-      await loadDashboard(token, athlete);
-    } else {
-      showAuth();
-    }
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+(async()=>{
+  const handled=await handleCallback();
+  if (!handled){
+    const token=sessionStorage.getItem('s_token');
+    const ath=sessionStorage.getItem('s_athlete');
+    if (token&&ath) await boot(token,JSON.parse(ath));
+    else showAuth();
   }
 })();
 </script>
