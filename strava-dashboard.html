@@ -3,390 +3,895 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard</title>
+<title>Carol · Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,300;1,9..144,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f7f5f2;--surface:#fff;--surface2:#f0ede8;--border:#e4e0d8;
-  --text:#1a1814;--muted:#7c7268;--muted2:#a09890;
-  --orange:#FC4C02;--orange-l:#fff2ec;
-  --green:#16a34a;--green-l:#dcfce7;
-  --blue:#2563eb;--blue-l:#dbeafe;
-  --purple:#7c3aed;--purple-l:#ede9fe;
-  --red:#dc2626;--red-l:#fee2e2;
-  --amber:#d97706;--amber-l:#fef3c7;
-  --pink:#db2777;--pink-l:#fce7f3;
-  --teal:#0d9488;--teal-l:#ccfbf1;
-  --z1:#60a5fa;--z2:#34d399;--z3:#fbbf24;--z4:#f97316;--z5:#ef4444;
+  /* Carol palette — tierra, montaña, atardecer */
+  --bg:#1a1612;
+  --bg2:#211d18;
+  --surface:#2a2420;
+  --surface2:#332d27;
+  --border:#3d3530;
+  --border2:#4a4238;
+ 
+  --text:#f0e8dc;
+  --text2:#c4b8a8;
+  --muted:#8a7d6e;
+  --muted2:#5a5048;
+ 
+  /* Accent colors from photos */
+  --terra:#c4622d;    /* tierra caliente */
+  --terra-l:#3d2518;
+  --sage:#5a7a4a;     /* verde montaña */
+  --sage-l:#1e2d18;
+  --dusk:#b87040;     /* atardecer ocre */
+  --dusk-l:#3a2510;
+  --sky:#4a6a8a;      /* cielo tormentoso */
+  --sky-l:#1a2a38;
+  --rose:#c4506a;     /* rosa atardecer */
+  --rose-l:#3a1820;
+ 
+  /* cycle phases */
+  --men:#e05050;  --men-l:#3a1818;
+  --fol:#5a8a50;  --fol-l:#1a2e18;
+  --ovu:#d07030;  --ovu-l:#3a2510;
+  --lut:#7a5aaa;  --lut-l:#281a3a;
+ 
   --radius:12px;
+  --radius-sm:8px;
 }
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh}
-#auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
-.auth-box{max-width:520px;width:100%}
-.auth-logo{font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:500;text-align:center;margin-bottom:.2rem}
-.auth-logo span{color:var(--orange)}
-.auth-sub{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:2rem}
+ 
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
+ 
+/* ── TEXTURE overlay ── */
+body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
+ 
+/* ══ AUTH ══════════════════════════════════════════ */
+#auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;z-index:1}
+#auth-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%,rgba(196,98,45,.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(90,122,74,.1) 0%,transparent 50%);pointer-events:none}
+ 
+.auth-wrap{max-width:480px;width:100%;position:relative;z-index:1}
+.auth-brand{text-align:center;margin-bottom:2rem}
+.auth-brand-name{font-family:'Fraunces',serif;font-size:2.5rem;font-weight:300;color:var(--text);letter-spacing:-.02em;line-height:1}
+.auth-brand-name em{font-style:italic;color:var(--dusk)}
+.auth-brand-sub{font-size:.8rem;color:var(--muted);margin-top:.4rem;letter-spacing:.08em;text-transform:uppercase}
+ 
 .auth-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem}
-.auth-card h2{font-size:.95rem;font-weight:500;margin-bottom:.3rem}
-.auth-card p{font-size:.82rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
+.auth-card h2{font-size:.9rem;font-weight:500;color:var(--text2);margin-bottom:.3rem}
+.auth-card p{font-size:.8rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
+ 
 .field{margin-bottom:.75rem}
-.field label{display:block;font-size:.68rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
-.field input,.field select{width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
-.field input:focus,.field select:focus{border-color:var(--orange)}
-.frow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
-.hint{font-size:.7rem;color:var(--muted2);margin-top:.2rem}
-.btn-connect{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;padding:.8rem;background:var(--orange);color:#fff;border:none;border-radius:10px;font-size:.9rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:1.25rem;transition:opacity .15s}
-.btn-connect:hover{opacity:.88}
-.btn-connect svg{width:17px;height:17px}
-.auth-note{font-size:.7rem;color:var(--muted2);text-align:center;margin-top:.85rem;line-height:1.6}
-#loading-screen{display:none;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;gap:1.25rem;text-align:center;padding:2rem}
-.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin .7s linear infinite}
+.field label{display:block;font-size:.65rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
+.field input,.field select{width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:.85rem;background:var(--bg2);color:var(--text);outline:none;transition:border-color .15s}
+.field input:focus,.field select:focus{border-color:var(--terra)}
+.field select option{background:var(--surface)}
+.frow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.65rem}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
+.hint{font-size:.66rem;color:var(--muted2);margin-top:.2rem}
+ 
+.btn-strava{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;padding:.8rem;background:var(--terra);color:#fff;border:none;border-radius:var(--radius-sm);font-size:.88rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:1.25rem;transition:opacity .15s}
+.btn-strava:hover{opacity:.85}
+.btn-strava svg{width:16px;height:16px;flex-shrink:0}
+.auth-note{font-size:.68rem;color:var(--muted2);text-align:center;margin-top:.75rem;line-height:1.6}
+ 
+/* ══ LOADING ══════════════════════════════════════ */
+#loading-screen{display:none;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;gap:1.25rem;text-align:center;padding:2rem;position:relative;z-index:1}
+.spinner{width:32px;height:32px;border:2px solid var(--border2);border-top-color:var(--terra);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-#load-msg{font-size:.83rem;color:var(--muted)}
-#dashboard{display:none}
-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
-.hlogo{font-family:'DM Mono',monospace;font-size:.9rem;font-weight:500}.hlogo span{color:var(--orange)}
+#load-msg{font-size:.8rem;color:var(--muted)}
+ 
+/* ══ SHELL ════════════════════════════════════════ */
+#app{display:none;position:relative;z-index:1}
+ 
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;backdrop-filter:blur(12px)}
+.hbrand{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:300;letter-spacing:-.01em}
+.hbrand em{font-style:italic;color:var(--dusk)}
 .hright{display:flex;align-items:center;gap:.75rem}
-.havatar{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1.5px solid var(--border)}
-.hname{font-size:.8rem;font-weight:500}
-.hbtn{font-size:.7rem;color:var(--muted);background:none;border:1px solid var(--border);border-radius:6px;padding:.22rem .6rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
-.hbtn:hover{color:var(--red);border-color:var(--red)}
-nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 2rem;overflow-x:auto;position:sticky;top:56px;z-index:190}
-.tab{font-size:.74rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:.65rem 1.1rem;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;margin-bottom:-1px}
-.tab:hover{color:var(--text)}
-.tab.active{color:var(--orange);border-bottom-color:var(--orange)}
-main{padding:1.75rem 2rem;max-width:1320px;margin:0 auto}
+.havatar{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1.5px solid var(--border2)}
+.hday{font-size:.72rem;color:var(--muted);padding:.2rem .65rem;background:var(--surface);border:1px solid var(--border);border-radius:100px}
+.hbtn{font-size:.68rem;color:var(--muted);background:none;border:1px solid var(--border);border-radius:6px;padding:.22rem .6rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.hbtn:hover{color:var(--rose);border-color:var(--rose)}
+ 
+nav{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;padding:0 2rem;overflow-x:auto;position:sticky;top:56px;z-index:190}
+.tab{font-size:.72rem;font-weight:400;letter-spacing:.05em;text-transform:uppercase;padding:.65rem 1rem;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;margin-bottom:-1px}
+.tab:hover{color:var(--text2)}
+.tab.active{color:var(--terra);border-bottom-color:var(--terra);font-weight:500}
+ 
+main{padding:1.75rem 2rem;max-width:1300px;margin:0 auto}
 .section{display:none}
-.section.active{display:block;animation:fadeUp .22s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-.filter-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:1.5rem;padding:.85rem 1.1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
-.filter-label{font-size:.7rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:.25rem}
-.filter-chip{padding:.3rem .75rem;border:1px solid var(--border);border-radius:100px;font-size:.75rem;cursor:pointer;background:var(--surface);color:var(--muted);transition:all .15s;font-family:'DM Sans',sans-serif}
-.filter-chip:hover{border-color:var(--orange);color:var(--orange)}
-.filter-chip.active{background:var(--orange);border-color:var(--orange);color:#fff;font-weight:500}
-.filter-sep{width:1px;height:18px;background:var(--border);margin:0 .2rem}
-.filter-select{padding:.28rem .7rem;border:1px solid var(--border);border-radius:100px;font-size:.75rem;background:var(--surface);color:var(--text);outline:none;cursor:pointer;font-family:'DM Sans',sans-serif}
+.section.active{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+ 
+/* ══ LAYOUT ════════════════════════════════════ */
 .grid{display:grid;gap:.85rem}
 .g4{grid-template-columns:repeat(4,1fr)}
 .g3{grid-template-columns:repeat(3,1fr)}
 .g2{grid-template-columns:repeat(2,1fr)}
 .g21{grid-template-columns:2fr 1fr}
-@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g21{grid-template-columns:1fr}}
-@media(max-width:640px){.g4,.g3,.g2{grid-template-columns:1fr}main{padding:1rem}header,nav{padding:0 1rem}.frow{grid-template-columns:1fr}}
+.g12{grid-template-columns:1fr 2fr}
+@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g21,.g12{grid-template-columns:1fr}}
+@media(max-width:620px){.g4,.g3,.g2{grid-template-columns:1fr}main{padding:1rem}header,nav{padding:0 1rem}.frow,.frow2{grid-template-columns:1fr}}
+ 
+/* ══ CARDS ═══════════════════════════════════ */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.3rem;overflow:hidden}
-.stripe{height:3px;margin:-1.1rem -1.3rem 1rem;border-radius:var(--radius) var(--radius) 0 0}
-.s-o{background:var(--orange)}.s-g{background:var(--green)}.s-b{background:var(--blue)}.s-p{background:var(--purple)}.s-pk{background:var(--pink)}.s-t{background:var(--teal)}
-.lbl{font-size:.64rem;font-weight:500;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem}
-.big{font-family:'DM Mono',monospace;font-size:1.9rem;font-weight:500;line-height:1;color:var(--text)}
+.card-accent{height:2px;margin:-1.1rem -1.3rem 1rem;border-radius:var(--radius) var(--radius) 0 0}
+.ca-terra{background:var(--terra)}.ca-sage{background:var(--sage)}.ca-dusk{background:var(--dusk)}.ca-sky{background:var(--sky)}.ca-rose{background:var(--rose)}
+ 
+.lbl{font-size:.62rem;font-weight:500;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem}
+.big{font-family:'Fraunces',serif;font-size:1.9rem;font-weight:300;line-height:1;color:var(--text)}
 .big.sm{font-size:1.4rem}.big.xs{font-size:1.1rem}
-.unit{font-size:.8rem;font-weight:300;color:var(--muted);margin-left:.1rem}
+.unit{font-size:.78rem;color:var(--muted);margin-left:.1rem}
 .sub{font-size:.7rem;color:var(--muted);margin-top:.3rem;line-height:1.4}
-.sec{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);margin-bottom:.8rem;margin-top:1.6rem;display:flex;align-items:center;gap:.6rem}
+ 
+.sec{font-family:'Fraunces',serif;font-size:.9rem;font-weight:300;font-style:italic;color:var(--muted);margin-bottom:.85rem;margin-top:1.75rem;display:flex;align-items:center;gap:.75rem}
 .sec:first-child{margin-top:0}
 .sec::after{content:'';flex:1;height:1px;background:var(--border)}
-.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
-.chart-ttl{font-size:.8rem;font-weight:500}
-.chart-sub{font-size:.7rem;color:var(--muted);margin-top:.1rem;margin-bottom:.75rem}
-.cwrap{position:relative;height:190px}
-.cwrap.tall{height:240px}
+ 
+/* ══ FILTER BAR ══════════════════════════════ */
+.filter-bar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem;padding:.75rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+.flbl{font-size:.65rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.fchip{padding:.28rem .7rem;border:1px solid var(--border);border-radius:100px;font-size:.72rem;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s;font-family:'DM Sans',sans-serif}
+.fchip:hover{border-color:var(--terra);color:var(--terra)}
+.fchip.active{background:var(--terra);border-color:var(--terra);color:#fff;font-weight:500}
+.fsep{width:1px;height:16px;background:var(--border)}
+.fsel{padding:.25rem .65rem;border:1px solid var(--border);border-radius:100px;font-size:.72rem;background:var(--surface);color:var(--text2);outline:none;cursor:pointer;font-family:'DM Sans',sans-serif}
+.fsel option{background:var(--surface2)}
+ 
+/* ══ ACTIVITY LIST ═══════════════════════════ */
 .act-list{display:flex;flex-direction:column;gap:.38rem}
 .act-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.75rem 1.1rem;display:grid;grid-template-columns:1.9rem 1fr repeat(4,auto);align-items:center;gap:.75rem;transition:border-color .15s}
-.act-row:hover{border-color:#ccc8bf}
+.act-row:hover{border-color:var(--border2)}
 .act-icon{width:1.9rem;height:1.9rem;background:var(--surface2);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.9rem}
-.act-name{font-size:.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.act-meta{font-size:.67rem;color:var(--muted);margin-top:.08rem}
-.astat{text-align:right;min-width:60px}
-.av{font-family:'DM Mono',monospace;font-size:.85rem;font-weight:500}
+.act-name{font-size:.85rem;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.act-meta{font-size:.67rem;color:var(--muted);margin-top:.06rem}
+.astat{text-align:right;min-width:58px}
+.av{font-family:'Fraunces',serif;font-size:.88rem;font-weight:300;color:var(--text)}
 .al{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:1px}
-.badge{display:inline-flex;align-items:center;padding:.14rem .48rem;border-radius:100px;font-size:.64rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase}
-.bo{background:var(--orange-l);color:#b03500}.bg{background:var(--green-l);color:#14532d}
-.bb{background:var(--blue-l);color:#1e3a8a}.bp{background:var(--purple-l);color:#4c1d95}
-.br{background:var(--red-l);color:#7f1d1d}.ba{background:var(--amber-l);color:#78350f}
-.bpk{background:var(--pink-l);color:#831843}.bt{background:var(--teal-l);color:#134e4a}
+ 
+/* ══ BADGE ═══════════════════════════════════ */
+.badge{display:inline-flex;align-items:center;padding:.13rem .48rem;border-radius:100px;font-size:.62rem;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.bt{background:var(--terra-l);color:#e8845a}
+.bs{background:var(--sage-l);color:#7ab060}
+.bd{background:var(--dusk-l);color:#d09060}
+.bk{background:var(--sky-l);color:#6a9aba}
+.br{background:var(--rose-l);color:#d4708a}
 .bm{background:var(--surface2);color:var(--muted)}
-.insight{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:0 10px 10px 0;padding:.9rem 1.1rem;margin-bottom:.55rem}
-.insight.green{border-left-color:var(--green)}.insight.blue{border-left-color:var(--blue)}
-.insight.purple{border-left-color:var(--purple)}.insight.pink{border-left-color:var(--pink)}.insight.teal{border-left-color:var(--teal)}
-.it{font-size:.8rem;font-weight:500;margin-bottom:.2rem}
-.ib{font-size:.76rem;color:var(--muted);line-height:1.65}
-.report-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.75rem 2rem;margin-bottom:1rem}
-.report-hero h1{font-size:1.5rem;font-weight:600;margin-bottom:.3rem;line-height:1.3}
-.report-hero .date{font-size:.78rem;color:var(--muted);margin-bottom:1.25rem}
+ 
+/* ══ CHART ═══════════════════════════════════ */
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.ct{font-size:.8rem;font-weight:500;color:var(--text2)}
+.cs{font-size:.68rem;color:var(--muted);margin-top:.1rem;margin-bottom:.75rem}
+.cwrap{position:relative;height:185px}
+.cwrap.tall{height:230px}
+ 
+/* ══ INSIGHT ════════════════════════════════ */
+.insight{background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--terra);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:.85rem 1rem;margin-bottom:.55rem}
+.insight.sage{border-left-color:var(--sage)}
+.insight.sky{border-left-color:var(--sky)}
+.insight.lut{border-left-color:var(--lut)}
+.insight.rose{border-left-color:var(--rose)}
+.it{font-size:.78rem;font-weight:500;margin-bottom:.2rem;color:var(--text2)}
+.ib{font-size:.74rem;color:var(--muted);line-height:1.65}
+ 
+/* ══ BAR ═════════════════════════════════════*/
+.btrack{height:4px;background:var(--surface2);border-radius:100px;overflow:hidden;margin-top:.5rem}
+.bfill{height:100%;border-radius:100px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+ 
+/* ══ ZONE BARS ══════════════════════════════ */
+.zrow{display:flex;align-items:center;gap:.65rem;margin-bottom:.42rem}
+.zlbl{font-size:.68rem;font-weight:500;min-width:40px}
+.zdesc{font-size:.63rem;color:var(--muted);min-width:95px}
+.ztrack{flex:1;height:6px;background:var(--surface2);border-radius:100px;overflow:hidden}
+.zfill{height:100%;border-radius:100px;transition:width 1s}
+.zpct{font-size:.68rem;min-width:28px;text-align:right;color:var(--muted)}
+.z1c{background:#60a5fa}.z2c{background:#34d399}.z3c{background:#fbbf24}.z4c{background:#f97316}.z5c{background:#ef4444}
+ 
+/* ══ REPORT ══════════════════════════════════ */
+.report-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1rem}
+.rh-label{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--terra);font-weight:500;margin-bottom:.5rem}
+.rh-title{font-family:'Fraunces',serif;font-size:1.8rem;font-weight:300;line-height:1.2;margin-bottom:.25rem}
+.rh-title em{font-style:italic;color:var(--dusk)}
+.rh-date{font-size:.74rem;color:var(--muted);margin-bottom:1.25rem}
+.rh-score{display:inline-flex;align-items:center;gap:.5rem;padding:.38rem .95rem;border-radius:100px;font-size:.8rem;font-weight:500;margin-bottom:1rem}
 .report-block{margin-bottom:1.25rem}
-.report-block h2{font-size:1rem;font-weight:500;margin-bottom:.5rem}
-.report-block p{font-size:.88rem;color:var(--muted);line-height:1.75}
+.report-block h2{font-family:'Fraunces',serif;font-size:1rem;font-weight:300;margin-bottom:.45rem;color:var(--text2);display:flex;align-items:center;gap:.5rem}
+.report-block p{font-size:.84rem;color:var(--muted);line-height:1.75}
 .report-block p strong{color:var(--text);font-weight:500}
-.report-score{display:inline-flex;align-items:center;gap:.5rem;padding:.4rem 1rem;border-radius:100px;font-size:.85rem;font-weight:500;margin-bottom:.85rem}
-.nutri-hero{background:linear-gradient(135deg,#fce7f3 0%,#ede9fe 100%);border:1px solid #f0d9ea;border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem}
-.nutri-hero h2{font-size:1.1rem;font-weight:600;color:#831843;margin-bottom:.25rem}
-.nutri-hero p{font-size:.82rem;color:#9d174d;line-height:1.6}
-.cycle-phase{display:flex;align-items:stretch;gap:.75rem;margin-bottom:1.25rem;flex-wrap:wrap}
-.phase-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.phase-card{flex:1;min-width:130px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem}
-.phase-card.active-phase{border-color:var(--pink);box-shadow:0 0 0 1px var(--pink-l)}
-.phase-name{font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.2rem}
-.phase-days{font-size:.7rem;color:var(--muted)}
-.nutri-food{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-top:.75rem}
-.food-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem}
-.nutri-input-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-top:1rem}
-.nutri-input-wrap h3{font-size:.85rem;font-weight:500;margin-bottom:.75rem}
-.check-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;font-size:.82rem;cursor:pointer}
-.check-row input{width:14px;height:14px;accent-color:var(--pink);cursor:pointer}
-.nutri-btn{padding:.55rem 1.25rem;background:var(--pink);color:#fff;border:none;border-radius:8px;font-size:.82rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:.85rem;transition:opacity .15s}
-.nutri-btn:hover{opacity:.88}
-.nutri-response{margin-top:1rem;padding:1.1rem 1.25rem;background:var(--pink-l);border:1px solid #f9a8d4;border-radius:10px;font-size:.82rem;line-height:1.75;color:#831843;display:none;white-space:pre-wrap}
-.nutri-loading{display:none;align-items:center;gap:.6rem;margin-top:1rem;font-size:.8rem;color:var(--muted)}
-.ns{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--pink);border-radius:50%;animation:spin .7s linear infinite}
-.zrow{display:flex;align-items:center;gap:.7rem;margin-bottom:.45rem}
-.zlbl{font-size:.7rem;font-weight:500;min-width:44px}
-.zdesc{font-size:.65rem;color:var(--muted);min-width:100px}
-.ztrack{flex:1;height:7px;background:var(--surface2);border-radius:100px;overflow:hidden}
-.zfill{height:100%;border-radius:100px;transition:width 1s cubic-bezier(.4,0,.2,1)}
-.zpct{font-family:'DM Mono',monospace;font-size:.7rem;min-width:30px;text-align:right;color:var(--muted)}
-.bar-track{height:4px;background:var(--surface2);border-radius:100px;overflow:hidden;margin-top:.5rem}
-.bar-fill{height:100%;border-radius:100px;transition:width 1s cubic-bezier(.4,0,.2,1)}
-.empty{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:2rem;text-align:center;color:var(--muted);font-size:.83rem;line-height:1.7}
-@media(max-width:640px){.nutri-food{grid-template-columns:1fr 1fr}.act-row{grid-template-columns:1.9rem 1fr auto}.act-row .astat:nth-child(n+5){display:none}}
+ 
+/* ══ JOURNAL ════════════════════════════════ */
+.journal-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:.55rem;transition:border-color .15s}
+.journal-entry:hover{border-color:var(--border2)}
+.je-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem}
+.je-date{font-family:'Fraunces',serif;font-size:.95rem;font-weight:300;color:var(--text2)}
+.je-phase{font-size:.65rem;padding:.18rem .55rem;border-radius:100px;font-weight:500}
+.je-moods{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.65rem}
+.je-mood{font-size:.72rem;padding:.2rem .6rem;border-radius:100px;background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+.je-section{margin-bottom:.6rem}
+.je-section-lbl{font-size:.62rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem}
+.je-text{font-size:.8rem;color:var(--text2);line-height:1.6}
+.je-meals{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
+.je-meal{background:var(--surface2);border-radius:7px;padding:.45rem .6rem}
+.je-meal-name{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.15rem}
+.je-meal-food{font-size:.74rem;color:var(--text2)}
+ 
+/* ══ JOURNAL FORM ════════════════════════════ */
+.journal-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.25rem}
+.jf-title{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:300;margin-bottom:1.25rem;color:var(--text)}
+.jf-title em{font-style:italic;color:var(--dusk)}
+ 
+.mood-selector{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem}
+.mood-btn{padding:.3rem .75rem;border:1px solid var(--border);border-radius:100px;font-size:.75rem;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s;font-family:'DM Sans',sans-serif}
+.mood-btn:hover{border-color:var(--terra);color:var(--terra)}
+.mood-btn.selected{background:var(--terra-l);border-color:var(--terra);color:var(--terra)}
+ 
+.slider-row{display:flex;align-items:center;gap:.85rem;margin-bottom:.6rem}
+.slider-lbl{font-size:.72rem;color:var(--muted);min-width:130px}
+.slider-val{font-family:'Fraunces',serif;font-size:1rem;font-weight:300;min-width:28px;text-align:right;color:var(--terra)}
+input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
+ 
+.meal-input-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:.6rem}
+.meal-input-item{display:flex;flex-direction:column;gap:.25rem}
+.meal-input-item label{font-size:.62rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.meal-input-item textarea{padding:.55rem .75rem;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:.78rem;background:var(--bg2);color:var(--text);outline:none;resize:none;line-height:1.5;transition:border-color .15s}
+.meal-input-item textarea:focus{border-color:var(--terra)}
+ 
+.symptom-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem}
+.symptom-btn{padding:.28rem .7rem;border:1px solid var(--border);border-radius:100px;font-size:.72rem;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s;font-family:'DM Sans',sans-serif}
+.symptom-btn:hover{border-color:var(--lut);color:#9a80cc}
+.symptom-btn.selected{background:var(--lut-l);border-color:var(--lut);color:#9a80cc}
+ 
+.jf-notes textarea{width:100%;padding:.65rem .85rem;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:.8rem;background:var(--bg2);color:var(--text);outline:none;resize:vertical;line-height:1.55;min-height:80px;transition:border-color .15s}
+.jf-notes textarea:focus{border-color:var(--terra)}
+ 
+.save-btn{padding:.6rem 1.5rem;background:var(--terra);color:#fff;border:none;border-radius:var(--radius-sm);font-size:.82rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s}
+.save-btn:hover{opacity:.85}
+.save-ok{display:none;font-size:.75rem;color:var(--sage);margin-left:.75rem}
+ 
+/* ══ NUTRI / CHAT ══════════════════════════ */
+.nutri-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:.85rem}
+.nutri-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);background:var(--surface2)}
+.nutri-header h2{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:300;margin-bottom:.2rem}
+.nutri-header h2 em{font-style:italic;color:var(--dusk)}
+.nutri-header p{font-size:.75rem;color:var(--muted);line-height:1.6}
+ 
+.phase-track{display:flex;border-radius:var(--radius-sm);overflow:hidden;height:8px;margin:.85rem 0}
+.pt-seg{transition:flex .4s;cursor:pointer}
+.pt-seg:hover{opacity:.85}
+ 
+.phase-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:1rem}
+@media(max-width:800px){.phase-cards{grid-template-columns:repeat(2,1fr)}}
+ 
+.pc2{border-radius:var(--radius-sm);padding:.85rem 1rem;border:1px solid transparent;cursor:pointer;transition:all .2s}
+.pc2.men{background:var(--men-l);border-color:#5a2020}
+.pc2.fol{background:var(--fol-l);border-color:#1e4a18}
+.pc2.ovu{background:var(--ovu-l);border-color:#5a3a10}
+.pc2.lut{background:var(--lut-l);border-color:#3a2858}
+.pc2.selected{outline:2px solid var(--terra);outline-offset:1px}
+.pc2.current::after{content:'hoy';float:right;font-size:.58rem;font-weight:600;letter-spacing:.08em;padding:.12rem .4rem;border-radius:100px;background:var(--terra);color:#fff}
+.pc2-name{font-size:.8rem;font-weight:500;margin-bottom:.1rem;color:var(--text2)}
+.pc2-days{font-size:.65rem;color:var(--muted)}
+.pc2-energy{font-size:.68rem;font-weight:500;margin-top:.25rem}
+.pc2-energy.men{color:var(--men)}.pc2-energy.fol{color:var(--fol)}.pc2-energy.ovu{color:var(--ovu)}.pc2-energy.lut{color:var(--lut)}
+ 
+.nutri-detail{padding:1.25rem 1.5rem}
+.nd-why{font-size:.78rem;color:var(--muted);line-height:1.65;margin-bottom:1rem;padding:.75rem 1rem;background:var(--surface2);border-radius:var(--radius-sm);border-left:2px solid var(--dusk)}
+ 
+.foods-grid2{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1rem}
+@media(max-width:640px){.foods-grid2{grid-template-columns:1fr 1fr}}
+.fc2{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.6rem .75rem}
+.fc2-name{font-size:.77rem;font-weight:500;color:var(--text2);margin-bottom:.1rem}
+.fc2-why{font-size:.65rem;color:var(--muted)}
+ 
+.meals-week{display:flex;flex-direction:column;gap:.5rem}
+.mw-day{background:var(--surface2);border-radius:var(--radius-sm);padding:.8rem 1rem}
+.mw-day-name{font-size:.7rem;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
+.mw-meals{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem}
+@media(max-width:640px){.mw-meals{grid-template-columns:repeat(2,1fr)}}
+.mw-meal{font-size:.72rem;line-height:1.45}
+.mw-meal-label{font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);display:block;margin-bottom:.1rem}
+.mw-meal-food{color:var(--text2)}
+ 
+/* ══ CHAT ════════════════════════════════════ */
+.chat-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.chat-hdr{padding:.9rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.7rem;background:var(--surface2)}
+.chat-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--terra-l),var(--lut-l));display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
+.chat-hn{font-size:.82rem;font-weight:500;color:var(--text2)}
+.chat-hs{font-size:.65rem;color:var(--muted)}
+.chat-msgs{padding:1.1rem;min-height:200px;max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:.65rem}
+.msg{max-width:85%;padding:.7rem .95rem;border-radius:10px;font-size:.8rem;line-height:1.65}
+.msg.bot{background:var(--surface2);border:1px solid var(--border);border-radius:3px 10px 10px 10px;align-self:flex-start;color:var(--text2)}
+.msg.user{background:var(--terra);color:#fff;border-radius:10px 10px 3px 10px;align-self:flex-end}
+.msg.bot strong{font-weight:500;color:var(--text)}
+.chat-qqs{display:flex;gap:.35rem;flex-wrap:wrap;padding:.55rem .9rem .7rem;border-top:1px solid var(--border)}
+.qq{padding:.26rem .68rem;border:1px solid var(--border);border-radius:100px;font-size:.68rem;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s}
+.qq:hover{border-color:var(--terra);color:var(--terra)}
+.chat-input-row{display:flex;gap:.45rem;padding:.75rem .9rem;border-top:1px solid var(--border);background:var(--surface2)}
+.chat-inp{flex:1;padding:.5rem .85rem;border:1px solid var(--border);border-radius:100px;font-family:'DM Sans',sans-serif;font-size:.78rem;background:var(--bg2);color:var(--text);outline:none;transition:border-color .15s}
+.chat-inp:focus{border-color:var(--terra)}
+.chat-snd{padding:.5rem 1rem;background:var(--terra);color:#fff;border:none;border-radius:100px;font-size:.75rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s;white-space:nowrap}
+.chat-snd:hover{opacity:.85}
+.chat-snd:disabled{opacity:.4;cursor:not-allowed}
+.typing{display:none;align-items:center;gap:.28rem;padding:.45rem .7rem;background:var(--surface2);border-radius:8px;align-self:flex-start}
+.typing span{width:5px;height:5px;border-radius:50%;background:var(--muted);animation:bounce .9s infinite}
+.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+ 
+.empty{padding:2.5rem;text-align:center;color:var(--muted);font-size:.82rem;line-height:1.7;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+ 
+@media(max-width:620px){.act-row{grid-template-columns:1.9rem 1fr auto}.act-row .astat:nth-child(n+5){display:none}.je-meals{grid-template-columns:1fr}.meal-input-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
+ 
+<!-- AUTH -->
 <div id="auth-screen">
-  <div class="auth-box">
-    <div class="auth-logo">performance<span>.</span>dash</div>
-    <p class="auth-sub">Entrenamiento · Nutrición · Bienestar</p>
+  <div class="auth-wrap">
+    <div class="auth-brand">
+      <div class="auth-brand-name"><em>carol</em>.dash</div>
+      <div class="auth-brand-sub">Entrenamiento · Nutrición · Bienestar</div>
+    </div>
     <div class="auth-card">
-      <h2>Conectar y configurar</h2>
-      <p>Ingresá tus datos para personalizar el análisis de rendimiento y nutrición.</p>
-      <div class="field"><label>Client ID de Strava</label><input type="text" id="cid" value="211490"></div>
-      <div class="field"><label>Client Secret de Strava</label><input type="password" id="cs" placeholder="Tu client secret"></div>
+      <h2>Hola Carol, conectá tu Strava</h2>
+      <p>Ingresá tus datos para activar el dashboard personalizado con análisis deportivo, nutrición por ciclo y journal diario.</p>
+      <div class="field"><label>Client ID Strava</label><input type="text" id="cid" value="211490"></div>
+      <div class="field"><label>Client Secret Strava</label><input type="password" id="cs" placeholder="Tu client secret"></div>
       <div class="frow">
         <div class="field"><label>Edad</label><input type="number" id="age" placeholder="Ej: 29"><div class="hint">Para FC máx estimada</div></div>
-        <div class="field"><label>FC Máxima</label><input type="number" id="fcmax" placeholder="Opcional"><div class="hint">Si no la sabés, la calculamos</div></div>
-        <div class="field"><label>Peso (kg)</label><input type="number" id="weight" placeholder="Ej: 60"></div>
+        <div class="field"><label>FC Máxima</label><input type="number" id="fcmax" placeholder="Opcional"></div>
+        <div class="field"><label>Peso (kg)</label><input type="number" id="weight" placeholder="Ej: 58"></div>
       </div>
-      <div class="frow">
-        <div class="field"><label>Objetivo</label>
-          <select id="goal"><option value="equilibrado">Todo equilibrado</option><option value="rendimiento">Rendimiento deportivo</option><option value="grasa">Perder grasa</option><option value="musculo">Ganar músculo</option></select>
-        </div>
-        <div class="field"><label>Fase del ciclo</label>
+      <div class="frow2">
+        <div class="field"><label>Fase del ciclo hoy</label>
           <select id="cycle"><option value="menstruacion">Menstruación (1-5)</option><option value="folicular">Folicular (6-13)</option><option value="ovulacion" selected>Ovulación (14-16)</option><option value="lutea">Lútea (17-28)</option></select>
         </div>
         <div class="field"><label>Cómo te sentís</label>
-          <select id="feeling"><option value="energia" selected>Con energía</option><option value="cansada_fisica">Cansada físicamente</option><option value="cansada_mental">Cansada mentalmente</option><option value="hinchada">Hinchada/retención</option><option value="normal">Normal</option></select>
+          <select id="feeling"><option value="energia" selected>Con energía</option><option value="cansada_fisica">Cansada físicamente</option><option value="cansada_mental">Fatiga mental</option><option value="hinchada">Hinchada</option><option value="normal">Normal</option></select>
         </div>
       </div>
-      <button class="btn-connect" onclick="startOAuth()">
+      <button class="btn-strava" onclick="startOAuth()">
         <svg viewBox="0 0 24 24" fill="white"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
         Conectar con Strava
       </button>
-      <p class="auth-note">Todo se procesa en tu navegador.</p>
+      <p class="auth-note">Todo corre en tu navegador. Tus datos no van a ningún servidor externo.</p>
     </div>
   </div>
 </div>
+ 
+<!-- LOADING -->
 <div id="loading-screen"><div class="spinner"></div><div id="load-msg">Conectando…</div></div>
-<div id="dashboard">
+ 
+<!-- APP -->
+<div id="app">
   <header>
-    <div class="hlogo">performance<span>.</span>dash</div>
-    <div class="hright"><img class="havatar" id="h-avatar" src="" alt=""><span class="hname" id="h-name"></span><button class="hbtn" onclick="logout()">Salir</button></div>
+    <div class="hbrand"><em>carol</em>.dash</div>
+    <div class="hright">
+      <div class="hday" id="h-phase">—</div>
+      <img class="havatar" id="h-avatar" src="" alt="">
+      <button class="hbtn" onclick="logout()">Salir</button>
+    </div>
   </header>
   <nav>
-    <div class="tab active" onclick="showTab('resumen',this)">📊 Resumen</div>
+    <div class="tab active" onclick="showTab('inicio',this)">🏠 Inicio</div>
     <div class="tab" onclick="showTab('actividades',this)">🏃 Actividades</div>
     <div class="tab" onclick="showTab('zonas',this)">❤️ Zonas FC</div>
-    <div class="tab" onclick="showTab('forma',this)">⚡ Forma & Fatiga</div>
-    <div class="tab" onclick="showTab('reporte',this)">📝 Mi Reporte</div>
-    <div class="tab" onclick="showTab('nutri',this)">🥗 Nutricionista</div>
+    <div class="tab" onclick="showTab('forma',this)">⚡ Forma</div>
+    <div class="tab" onclick="showTab('journal',this)">📓 Journal</div>
+    <div class="tab" onclick="showTab('nutricion',this)">🌿 Nutrición</div>
+    <div class="tab" onclick="showTab('reporte',this)">🌄 Mi Reporte</div>
   </nav>
   <main>
-    <div class="section active" id="tab-resumen"></div>
+    <div class="section active" id="tab-inicio"></div>
     <div class="section" id="tab-actividades"></div>
     <div class="section" id="tab-zonas"></div>
     <div class="section" id="tab-forma"></div>
+    <div class="section" id="tab-journal"></div>
+    <div class="section" id="tab-nutricion"></div>
     <div class="section" id="tab-reporte"></div>
-    <div class="section" id="tab-nutri"></div>
   </main>
 </div>
+ 
 <script>
+// ══════════════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════════════
 const REDIRECT='https://carolinarusso1994-ui.github.io/strava-dashboard/strava-dashboard.html';
-let S={token:null,athlete:null,activities:[],fcmax:180,age:30,weight:60,goal:'equilibrado',cycle:'ovulacion',feeling:'energia',filter:{period:'month',type:'all',month:new Date().toISOString().slice(0,7)}};
+let S={token:null,athlete:null,activities:[],fcmax:180,age:30,weight:58,cycle:'ovulacion',feeling:'energia',filter:{period:'month',type:'all',month:new Date().toISOString().slice(0,7)}};
+let JOURNAL=[];
+let chatHistory=[];
+ 
+// ══════════════════════════════════════════════════
+//  AUTH
+// ══════════════════════════════════════════════════
 function startOAuth(){
   const cid=document.getElementById('cid').value.trim(),cs=document.getElementById('cs').value.trim();
   if(!cid||!cs){alert('Ingresá Client ID y Client Secret.');return;}
   const age=parseInt(document.getElementById('age').value)||30;
   const fcmax=parseInt(document.getElementById('fcmax').value)||(220-age);
-  const weight=parseFloat(document.getElementById('weight').value)||60;
-  const goal=document.getElementById('goal').value,cycle=document.getElementById('cycle').value,feeling=document.getElementById('feeling').value;
-  Object.entries({cid,cs,age,fcmax,weight,goal,cycle,feeling}).forEach(([k,v])=>sessionStorage.setItem('pd_'+k,v));
+  const weight=parseFloat(document.getElementById('weight').value)||58;
+  const cycle=document.getElementById('cycle').value,feeling=document.getElementById('feeling').value;
+  Object.entries({cid,cs,age,fcmax,weight,cycle,feeling}).forEach(([k,v])=>sessionStorage.setItem('cd_'+k,v));
   location.href=`https://www.strava.com/oauth/authorize?client_id=${cid}&redirect_uri=${encodeURIComponent(REDIRECT)}&response_type=code&scope=read,activity:read_all,profile:read_all&approval_prompt=auto`;
 }
 async function handleCallback(){
-  const params=new URLSearchParams(location.search),code=params.get('code');
+  const p=new URLSearchParams(location.search),code=p.get('code');
   if(!code)return false;
   history.replaceState({},'','');
-  const cid=sessionStorage.getItem('pd_cid'),cs=sessionStorage.getItem('pd_cs');
+  const cid=sessionStorage.getItem('cd_cid'),cs=sessionStorage.getItem('cd_cs');
   if(!cid||!cs){showAuth();return true;}
-  showLoading('Obteniendo acceso…');
+  showLoad('Obteniendo acceso…');
   const r=await fetch('https://www.strava.com/oauth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_id:cid,client_secret:cs,code,grant_type:'authorization_code'})});
   const d=await r.json();
-  if(d.access_token){sessionStorage.setItem('pd_token',d.access_token);sessionStorage.setItem('pd_athlete',JSON.stringify(d.athlete));await boot(d.access_token,d.athlete);}
+  if(d.access_token){sessionStorage.setItem('cd_token',d.access_token);sessionStorage.setItem('cd_athlete',JSON.stringify(d.athlete));await boot(d.access_token,d.athlete);}
   else{alert('Error: '+(d.message||'?'));showAuth();}
   return true;
 }
-function showAuth(){document.getElementById('auth-screen').style.display='';document.getElementById('loading-screen').style.display='none';document.getElementById('dashboard').style.display='none';const cid=sessionStorage.getItem('pd_cid');if(cid)document.getElementById('cid').value=cid;}
-function showLoading(msg){document.getElementById('auth-screen').style.display='none';document.getElementById('loading-screen').style.display='flex';document.getElementById('load-msg').textContent=msg||'Cargando…';document.getElementById('dashboard').style.display='none';}
+function showAuth(){document.getElementById('auth-screen').style.display='';document.getElementById('loading-screen').style.display='none';document.getElementById('app').style.display='none';}
+function showLoad(m){document.getElementById('auth-screen').style.display='none';document.getElementById('loading-screen').style.display='flex';document.getElementById('load-msg').textContent=m||'Cargando…';document.getElementById('app').style.display='none';}
 function logout(){sessionStorage.clear();showAuth();}
 const api=async ep=>{const r=await fetch('https://www.strava.com/api/v3'+ep,{headers:{Authorization:'Bearer '+S.token}});if(!r.ok)throw new Error(r.status);return r.json();};
+ 
+// ══════════════════════════════════════════════════
+//  BOOT
+// ══════════════════════════════════════════════════
 async function boot(token,athlete){
   S.token=token;S.athlete=athlete;
-  S.age=parseInt(sessionStorage.getItem('pd_age'))||30;
-  S.fcmax=parseInt(sessionStorage.getItem('pd_fcmax'))||(220-S.age);
-  S.weight=parseFloat(sessionStorage.getItem('pd_weight'))||60;
-  S.goal=sessionStorage.getItem('pd_goal')||'equilibrado';
-  S.cycle=sessionStorage.getItem('pd_cycle')||'ovulacion';
-  S.feeling=sessionStorage.getItem('pd_feeling')||'energia';
-  showLoading('Cargando actividades…');
+  S.age=parseInt(sessionStorage.getItem('cd_age'))||30;
+  S.fcmax=parseInt(sessionStorage.getItem('cd_fcmax'))||(220-S.age);
+  S.weight=parseFloat(sessionStorage.getItem('cd_weight'))||58;
+  S.cycle=sessionStorage.getItem('cd_cycle')||'ovulacion';
+  S.feeling=sessionStorage.getItem('cd_feeling')||'energia';
+  // Load saved journal
+  try{const j=localStorage.getItem('carol_journal');if(j)JOURNAL=JSON.parse(j);}catch(e){}
+  showLoad('Cargando actividades…');
   let acts=[];
-  try{for(let p=1;p<=3;p++){showLoading(`Cargando actividades (página ${p})…`);const batch=await api(`/athlete/activities?per_page=100&page=${p}`);acts=[...acts,...batch];if(batch.length<100)break;}}catch(e){}
+  try{for(let pg=1;pg<=3;pg++){showLoad(`Cargando actividades (${pg}/3)…`);const b=await api(`/athlete/activities?per_page=100&page=${pg}`);acts=[...acts,...b];if(b.length<100)break;}}catch(e){}
   S.activities=acts.sort((a,b)=>new Date(b.start_date)-new Date(a.start_date));
+  // Header
+  const phaseName={menstruacion:'🌑 Menstruación',folicular:'🌱 Folicular',ovulacion:'🌕 Ovulación',lutea:'🌘 Lútea'}[S.cycle]||'';
+  document.getElementById('h-phase').textContent=phaseName;
   document.getElementById('h-avatar').src=athlete.profile_medium||'';
-  document.getElementById('h-name').textContent=athlete.firstname+' '+athlete.lastname;
   document.getElementById('loading-screen').style.display='none';
-  document.getElementById('dashboard').style.display='block';
-  builtTabs.clear();builtTabs.add('resumen');buildResumen();
+  document.getElementById('app').style.display='block';
+  builtTabs.clear();builtTabs.add('inicio');
+  buildInicio();
 }
-function getFilteredActs(ov={}){
-  const f={...S.filter,...ov};let acts=S.activities;
-  if(f.type!=='all'){if(f.type==='running')acts=acts.filter(a=>['Run','TrailRun'].includes(a.type));else if(f.type==='cycling')acts=acts.filter(a=>['Ride','VirtualRide'].includes(a.type));else if(f.type==='gym')acts=acts.filter(a=>['WeightTraining','Crossfit','Workout'].includes(a.type));else acts=acts.filter(a=>a.type===f.type);}
-  const now=new Date();
-  if(f.period==='week')acts=acts.filter(a=>new Date(a.start_date)>=new Date(now-7*86400000));
-  else if(f.period==='month')acts=acts.filter(a=>new Date(a.start_date)>=new Date(now.getFullYear(),now.getMonth(),1));
-  else if(f.period==='3months')acts=acts.filter(a=>new Date(a.start_date)>=new Date(now-90*86400000));
-  else if(f.period==='year')acts=acts.filter(a=>new Date(a.start_date)>=new Date(now.getFullYear(),0,1));
-  else if(f.period==='custom'&&f.month)acts=acts.filter(a=>a.start_date.startsWith(f.month));
-  return acts;
-}
-function buildFilterBar(id,fnIdx,showType=true){
-  const f=S.filter;
-  const months=[...new Set(S.activities.map(a=>a.start_date.slice(0,7)))].sort().reverse().slice(0,12);
-  const fmtM=m=>{const[y,mo]=m.split('-');return new Date(y,mo-1).toLocaleString('es-AR',{month:'short',year:'2-digit'});};
-  return `<div class="filter-bar" id="${id}">
-    <span class="filter-label">Período</span>
-    ${[['week','Esta semana'],['month','Este mes'],['3months','3 meses'],['year','Este año'],['all','Todo']].map(([v,l])=>`<button class="filter-chip${f.period===v?' active':''}" onclick="sf('period','${v}',${fnIdx})">${l}</button>`).join('')}
-    <div class="filter-sep"></div>
-    <select class="filter-select" onchange="sf('period','custom',${fnIdx},this.value)"><option value="">Mes específico</option>${months.map(m=>`<option value="${m}" ${f.period==='custom'&&f.month===m?'selected':''}>${fmtM(m)}</option>`).join('')}</select>
-    ${showType?`<div class="filter-sep"></div><span class="filter-label">Deporte</span>${[['all','Todos'],['running','Running'],['cycling','Ciclismo'],['gym','Gym']].map(([v,l])=>`<button class="filter-chip${f.type===v?' active':''}" onclick="sf('type','${v}',${fnIdx})">${l}</button>`).join('')}`:''}
-  </div>`;
-}
-window.sf=(key,val,fnIdx,extra='')=>{
-  if(key==='period'&&val==='custom'){S.filter.period='custom';S.filter.month=extra;}else S.filter[key]=val;
-  const names=['resumen','actividades','zonas','forma','reporte'];
-  const fns=[buildResumen,buildActividades,buildZonas,buildForma,buildReporte];
-  builtTabs.delete(names[fnIdx]);
-  fns[fnIdx]();builtTabs.add(names[fnIdx]);
-};
+ 
+// ══════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════
 const fmtDist=m=>m>=1000?(m/1000).toFixed(1)+' km':Math.round(m)+'m';
 const fmtDur=s=>{const h=Math.floor(s/3600),m=Math.floor((s%3600)/60);return h>0?`${h}h ${m}m`:`${m}m`;};
 const fmtDate=d=>{try{return new Date(d).toLocaleDateString('es-AR',{day:'2-digit',month:'short'})}catch{return d}};
-const fmtDateFull=d=>{try{return new Date(d).toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})}catch{return d}};
+const fmtDateFull=d=>{try{return new Date(d).toLocaleDateString('es-AR',{weekday:'long',day:'2-digit',month:'long'})}catch{return d}};
 const mean=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
 const actIcon=t=>({Run:'🏃',Ride:'🚴',Swim:'🏊',Walk:'🚶',Hike:'🥾',WeightTraining:'💪',VirtualRide:'🚴',TrailRun:'⛰️',Yoga:'🧘',Crossfit:'🏋️',Workout:'🏋️'}[t]||'⚡');
-const actColor=t=>(['Run','TrailRun'].includes(t)?'var(--orange)':['Ride','VirtualRide'].includes(t)?'var(--blue)':['WeightTraining','Crossfit','Workout'].includes(t)?'var(--purple)':'var(--green)');
+const actCol=t=>(['Run','TrailRun'].includes(t)?'var(--terra)':['Ride','VirtualRide'].includes(t)?'var(--sky)':['WeightTraining','Crossfit','Workout'].includes(t)?'var(--lut)':'var(--sage)');
 function getZone(hr){const p=hr/S.fcmax*100;return p<60?1:p<70?2:p<80?3:p<90?4:5;}
-const zoneColor=z=>['','var(--z1)','var(--z2)','var(--z3)','var(--z4)','var(--z5)'][z];
-const zoneLabel=z=>['','Z1 Recuperación','Z2 Quema grasa','Z3 Aeróbico','Z4 Umbral','Z5 Máximo'][z];
-const zoneBadge=z=>['','bb','bg','ba','bo','br'][z];
-function calcLoad(a){const dur=(a.moving_time||0)/3600,hr=a.average_heartrate||0;if(hr>0){const r=hr/S.fcmax;return Math.round(dur*60*r*Math.exp(1.92*r));}const d=(a.distance||0)/1000;if(['Run','TrailRun'].includes(a.type))return Math.round(dur*50+d*3);if(['Ride','VirtualRide'].includes(a.type))return Math.round(dur*35+d);return Math.round(dur*40);}
+const zClr=['','var(--z1c)','var(--z2c)','var(--z3c)','var(--z4c)','var(--z5c)'];
+const zLbl=['','Z1 Recuperación','Z2 Quema grasa','Z3 Aeróbico','Z4 Umbral','Z5 Máximo'];
+const zBadge=['','bk','bs','bd','bt','br'];
+function calcLoad(a){const d=(a.moving_time||0)/3600,hr=a.average_heartrate||0;if(hr>0){const r=hr/S.fcmax;return Math.round(d*60*r*Math.exp(1.92*r));}const km=(a.distance||0)/1000;if(['Run','TrailRun'].includes(a.type))return Math.round(d*50+km*3);if(['Ride','VirtualRide'].includes(a.type))return Math.round(d*35+km);return Math.round(d*40);}
 function computeCtlAtl(){
   const sorted=[...S.activities].sort((a,b)=>new Date(a.start_date)-new Date(b.start_date));
   if(!sorted.length)return[];
   const first=new Date(sorted[0].start_date),days=Math.ceil((new Date()-first)/86400000)+1;
   const daily={};sorted.forEach(a=>{const k=a.start_date.slice(0,10);daily[k]=(daily[k]||0)+calcLoad(a);});
-  const kC=2/43,kA=2/8;let ctl=0,atl=0;const result=[];
-  for(let i=0;i<days;i++){const d=new Date(first);d.setDate(d.getDate()+i);const k=d.toISOString().slice(0,10);const load=daily[k]||0;ctl=ctl*(1-kC)+load*kC;atl=atl*(1-kA)+load*kA;result.push({date:k,load,ctl:Math.round(ctl),atl:Math.round(atl),tsb:Math.round(ctl-atl)});}
-  return result;
+  const kC=2/43,kA=2/8;let ctl=0,atl=0;const res=[];
+  for(let i=0;i<days;i++){const d=new Date(first);d.setDate(d.getDate()+i);const k=d.toISOString().slice(0,10);const load=daily[k]||0;ctl=ctl*(1-kC)+load*kC;atl=atl*(1-kA)+load*kA;res.push({date:k,load,ctl:Math.round(ctl),atl:Math.round(atl),tsb:Math.round(ctl-atl)});}
+  return res;
 }
-let ci={};function destroyChart(id){if(ci[id]){ci[id].destroy();delete ci[id];}}
-function mkChart(id,cfg){destroyChart(id);const ctx=document.getElementById(id);if(!ctx)return;ci[id]=new Chart(ctx,cfg);}
-function chartOpts(leg=true){return{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:leg,labels:{font:{family:'DM Sans',size:10},color:'#7c7268',boxWidth:10,padding:12}}},scales:{x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:10},color:'#7c7268',maxTicksLimit:8}},y:{grid:{color:'#e8e4dc'},ticks:{font:{family:'DM Mono',size:10},color:'#7c7268'}}}};}
-function buildActList(acts){
+let CI={};function dC(id){if(CI[id]){CI[id].destroy();delete CI[id];}}
+function mC(id,cfg){dC(id);const ctx=document.getElementById(id);if(!ctx)return;CI[id]=new Chart(ctx,cfg);}
+function cOpts(leg=true){return{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:leg,labels:{font:{family:'DM Sans',size:10},color:'var(--muted)',boxWidth:10,padding:10}}},scales:{x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:10},color:'var(--muted)',maxTicksLimit:8}},y:{grid:{color:'var(--border)'},ticks:{font:{family:'Fraunces',size:10},color:'var(--muted)'}}}};}
+ 
+function getFiltered(ov={}){
+  const f={...S.filter,...ov};let acts=S.activities;
+  if(f.type!=='all'){if(f.type==='running')acts=acts.filter(a=>['Run','TrailRun'].includes(a.type));else if(f.type==='cycling')acts=acts.filter(a=>['Ride','VirtualRide'].includes(a.type));else if(f.type==='gym')acts=acts.filter(a=>['WeightTraining','Crossfit','Workout'].includes(a.type));}
+  const now=new Date();
+  if(f.period==='week')acts=acts.filter(a=>new Date(a.start_date)>=new Date(now-7*864e5));
+  else if(f.period==='month')acts=acts.filter(a=>new Date(a.start_date)>=new Date(now.getFullYear(),now.getMonth(),1));
+  else if(f.period==='3months')acts=acts.filter(a=>new Date(a.start_date)>=new Date(now-90*864e5));
+  else if(f.period==='year')acts=acts.filter(a=>new Date(a.start_date)>=new Date(now.getFullYear(),0,1));
+  else if(f.period==='custom'&&f.month)acts=acts.filter(a=>a.start_date.startsWith(f.month));
+  return acts;
+}
+ 
+function filterBar(id,fnIdx,showType=true){
+  const f=S.filter;
+  const months=[...new Set(S.activities.map(a=>a.start_date.slice(0,7)))].sort().reverse().slice(0,12);
+  const fmtM=m=>{const[y,mo]=m.split('-');return new Date(y,mo-1).toLocaleString('es-AR',{month:'short',year:'2-digit'});};
+  return `<div class="filter-bar">
+    <span class="flbl">Período</span>
+    ${[['week','Esta semana'],['month','Este mes'],['3months','3 meses'],['year','Este año'],['all','Todo']].map(([v,l])=>`<button class="fchip${f.period===v?' active':''}" onclick="sf('period','${v}',${fnIdx})">${l}</button>`).join('')}
+    <div class="fsep"></div>
+    <select class="fsel" onchange="sf('period','custom',${fnIdx},this.value)"><option value="">Mes…</option>${months.map(m=>`<option value="${m}" ${f.period==='custom'&&f.month===m?'selected':''}>${fmtM(m)}</option>`).join('')}</select>
+    ${showType?`<div class="fsep"></div><span class="flbl">Deporte</span>${[['all','Todos'],['running','Running'],['cycling','Ciclismo'],['gym','Gym']].map(([v,l])=>`<button class="fchip${f.type===v?' active':''}" onclick="sf('type','${v}',${fnIdx})">${l}</button>`).join('')}`:''}
+  </div>`;
+}
+window.sf=(key,val,fnIdx,extra='')=>{
+  if(key==='period'&&val==='custom'){S.filter.period='custom';S.filter.month=extra;}else S.filter[key]=val;
+  const names=['inicio','actividades','zonas','forma','journal','nutricion','reporte'];
+  const fns=[buildInicio,buildActividades,buildZonas,buildForma,buildJournal,buildNutricion,buildReporte];
+  builtTabs.delete(names[fnIdx]);fns[fnIdx]();builtTabs.add(names[fnIdx]);
+};
+ 
+function actList(acts){
   if(!acts.length)return`<div class="empty">Sin actividades para este filtro.</div>`;
-  return`<div class="act-list">${acts.map(a=>{const z=a.average_heartrate?getZone(a.average_heartrate):0;const pace=a.average_speed&&['Run','TrailRun'].includes(a.type)?(s=>{return `${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}/km`;})(1000/a.average_speed):a.average_speed&&['Ride','VirtualRide'].includes(a.type)?(a.average_speed*3.6).toFixed(1)+' km/h':'—';return`<div class="act-row"><div class="act-icon" style="background:${actColor(a.type)}20">${actIcon(a.type)}</div><div><div class="act-name">${a.name}</div><div class="act-meta">${fmtDateFull(a.start_date_local)}${z?` · <span class="badge ${zoneBadge(z)}">${zoneLabel(z)}</span>`:''}</div></div><div class="astat"><div class="av">${fmtDist(a.distance)}</div><div class="al">distancia</div></div><div class="astat"><div class="av">${fmtDur(a.moving_time)}</div><div class="al">duración</div></div><div class="astat"><div class="av">${a.average_heartrate?Math.round(a.average_heartrate)+' bpm':pace}</div><div class="al">${a.average_heartrate?'fc prom':'ritmo'}</div></div><div class="astat"><div class="av">${a.total_elevation_gain?Math.round(a.total_elevation_gain)+'m':'—'}</div><div class="al">desnivel</div></div></div>`;}).join('')}</div>`;}
-function buildResumen(){
-  const el=document.getElementById('tab-resumen'),acts=getFilteredActs();
-  const tD=acts.reduce((s,a)=>s+(a.distance||0),0),tT=acts.reduce((s,a)=>s+(a.moving_time||0),0);
-  const tE=acts.reduce((s,a)=>s+(a.total_elevation_gain||0),0);
-  const wHR=acts.filter(a=>a.average_heartrate>0),avgHR=wHR.length?Math.round(mean(wHR.map(a=>a.average_heartrate))):0;
-  const byType={};acts.forEach(a=>{byType[a.type]=(byType[a.type]||0)+1;});
+  return`<div class="act-list">${acts.map(a=>{const z=a.average_heartrate?getZone(a.average_heartrate):0;const pace=a.average_speed&&['Run','TrailRun'].includes(a.type)?(s=>`${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}/km`)(1000/a.average_speed):a.average_speed&&['Ride','VirtualRide'].includes(a.type)?(a.average_speed*3.6).toFixed(1)+' km/h':'—';return`<div class="act-row"><div class="act-icon" style="background:${actCol(a.type)}20">${actIcon(a.type)}</div><div><div class="act-name">${a.name}</div><div class="act-meta">${fmtDateFull(a.start_date_local)}${z?` · <span class="badge ${zBadge[z]}">${zLbl[z]}</span>`:''}</div></div><div class="astat"><div class="av">${fmtDist(a.distance)}</div><div class="al">dist</div></div><div class="astat"><div class="av">${fmtDur(a.moving_time)}</div><div class="al">duración</div></div><div class="astat"><div class="av">${a.average_heartrate?Math.round(a.average_heartrate)+' bpm':pace}</div><div class="al">${a.average_heartrate?'fc prom':'ritmo'}</div></div><div class="astat"><div class="av">${a.total_elevation_gain?Math.round(a.total_elevation_gain)+'m':'—'}</div><div class="al">desnivel</div></div></div>`;}).join('')}</div>`;}
+ 
+// ══════════════════════════════════════════════════
+//  TAB: INICIO
+// ══════════════════════════════════════════════════
+function buildInicio(){
+  const el=document.getElementById('tab-inicio');
+  const acts=getFiltered();
+  const series=computeCtlAtl();
+  const td=series[series.length-1]||{ctl:0,atl:0,tsb:0};
+  const tD=acts.reduce((s,a)=>s+(a.distance||0),0);
+  const tT=acts.reduce((s,a)=>s+(a.moving_time||0),0);
+  const wHR=acts.filter(a=>a.average_heartrate>0);
+  const avgHR=wHR.length?Math.round(mean(wHR.map(a=>a.average_heartrate))):0;
+  const now=new Date();
+  const hour=now.getHours();
+  const greet=hour<12?'Buenos días':'hour<18'?'Buenas tardes':'Buenas noches';
+  const phaseName={menstruacion:'Menstruación',folicular:'Fase Folicular',ovulacion:'Ovulación',lutea:'Fase Lútea'}[S.cycle]||'';
+  const stColor=td.tsb>10?'var(--sage)':td.tsb>-10?'var(--dusk)':td.tsb>-30?'var(--terra)':'var(--rose)';
+  const stLabel=td.tsb>10?'En forma ✦':td.tsb>-10?'En balance':td.tsb>-30?'Cargada':'Muy fatigada';
+ 
+  // Last journal entry
+  const lastEntry=JOURNAL.length?JOURNAL[JOURNAL.length-1]:null;
+ 
+  // Weekly volume
   const weekly={};acts.forEach(a=>{const d=new Date(a.start_date),mon=new Date(d);mon.setDate(d.getDate()-d.getDay()+1);const k=mon.toISOString().slice(0,10);weekly[k]=(weekly[k]||0)+(a.distance||0)/1000;});
-  const weeks=Object.keys(weekly).sort().slice(-12);const c1='cr'+Date.now();
-  el.innerHTML=`${buildFilterBar('fb-r',0)}
-  <div class="sec">métricas del período</div>
-  <div class="grid g4">
-    <div class="card"><div class="stripe s-o"></div><div class="lbl">Actividades</div><div class="big">${acts.length}</div><div class="sub">${Object.entries(byType).map(([t,n])=>`${actIcon(t)} ${n}`).join(' · ')}</div></div>
-    <div class="card"><div class="stripe s-g"></div><div class="lbl">Distancia</div><div class="big sm">${fmtDist(Math.round(tD))}</div><div class="sub">Desnivel: ${Math.round(tE)} m</div></div>
-    <div class="card"><div class="stripe s-b"></div><div class="lbl">Tiempo total</div><div class="big sm">${fmtDur(tT)}</div><div class="sub">Prom: ${acts.length?fmtDur(Math.round(tT/acts.length)):'—'}/sesión</div></div>
-    <div class="card"><div class="lbl">FC promedio</div><div class="big sm">${avgHR||'—'}${avgHR?'<span class="unit">bpm</span>':''}</div>${avgHR?`<div style="margin-top:.4rem"><span class="badge ${zoneBadge(getZone(avgHR))}">${zoneLabel(getZone(avgHR))}</span></div>`:''}</div>
-  </div>
-  <div class="sec">volumen semanal</div>
-  <div class="chart-card"><div class="cwrap"><canvas id="${c1}"></canvas></div></div>
-  <div class="sec">últimas actividades</div>${buildActList(acts.slice(0,8))}`;
-  setTimeout(()=>{const fmtW=w=>new Date(w).toLocaleDateString('es-AR',{day:'2-digit',month:'short'});mkChart(c1,{type:'bar',data:{labels:weeks.map(fmtW),datasets:[{data:weeks.map(w=>+weekly[w].toFixed(1)),backgroundColor:'#FC4C0225',borderColor:'#FC4C02',borderWidth:2,borderRadius:5}]},options:{...chartOpts(false)}});},80);
+  const weeks=Object.keys(weekly).sort().slice(-8);
+  const c1='ci-wk-'+Date.now();
+ 
+  el.innerHTML=`
+    ${filterBar('fb-i',0,true)}
+    <div style="display:flex;align-items:baseline;gap:.75rem;margin-bottom:1.5rem;flex-wrap:wrap">
+      <span style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:300;color:var(--text)">Hola, <em style="font-style:italic;color:var(--dusk)">Carol</em> 🌿</span>
+      <span style="font-size:.78rem;color:var(--muted)">${phaseName} · ${new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'})}</span>
+    </div>
+ 
+    <div class="grid g4">
+      <div class="card"><div class="card-accent ca-terra"></div>
+        <div class="lbl">Actividades</div><div class="big">${acts.length}</div>
+        <div class="sub">En el período seleccionado</div>
+      </div>
+      <div class="card"><div class="card-accent ca-sage"></div>
+        <div class="lbl">Distancia</div><div class="big sm">${fmtDist(Math.round(tD))}</div>
+        <div class="sub">Tiempo: ${fmtDur(tT)}</div>
+      </div>
+      <div class="card"><div class="card-accent ca-sky"></div>
+        <div class="lbl">FC promedio</div><div class="big sm">${avgHR||'—'}${avgHR?'<span class="unit">bpm</span>':''}</div>
+        ${avgHR?`<div style="margin-top:.4rem"><span class="badge ${zBadge[getZone(avgHR)]}">${zLbl[getZone(avgHR)]}</span></div>`:''}
+      </div>
+      <div class="card">
+        <div class="lbl">Forma (TSB)</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:300;color:${stColor}">${td.tsb>0?'+':''}${td.tsb}</div>
+        <div style="margin-top:.35rem;font-size:.72rem;color:${stColor};font-weight:500">${stLabel}</div>
+      </div>
+    </div>
+ 
+    ${lastEntry?`
+    <div class="sec">último registro del journal</div>
+    <div class="journal-entry" style="cursor:pointer" onclick="showTab('journal',document.querySelector('[onclick*=journal]'))">
+      <div class="je-header">
+        <div class="je-date">${fmtDateFull(lastEntry.date)}</div>
+        <span class="je-phase badge bt">${{menstruacion:'🌑',folicular:'🌱',ovulacion:'🌕',lutea:'🌘'}[lastEntry.cycle]||'🌿'} ${lastEntry.cycleLabel||''}</span>
+      </div>
+      <div class="je-moods">${(lastEntry.moods||[]).map(m=>`<span class="je-mood">${m}</span>`).join('')}</div>
+      ${lastEntry.notes?`<div class="je-section"><div class="je-text" style="font-style:italic;color:var(--muted)">"${lastEntry.notes.slice(0,120)}${lastEntry.notes.length>120?'…':''}"</div></div>`:''}
+    </div>`:''}
+ 
+    <div class="sec">últimas actividades</div>
+    ${actList(acts.slice(0,5))}
+ 
+    <div class="sec">volumen semanal</div>
+    <div class="chart-card"><div class="cwrap"><canvas id="${c1}"></canvas></div></div>
+  `;
+  setTimeout(()=>{
+    const fmtW=w=>new Date(w).toLocaleDateString('es-AR',{day:'2-digit',month:'short'});
+    mC(c1,{type:'bar',data:{labels:weeks.map(fmtW),datasets:[{data:weeks.map(w=>+weekly[w].toFixed(1)),backgroundColor:'rgba(196,98,45,.25)',borderColor:'var(--terra)',borderWidth:1.5,borderRadius:4}]},options:{...cOpts(false)}});
+  },80);
 }
+ 
+// ══════════════════════════════════════════════════
+//  TAB: ACTIVIDADES
+// ══════════════════════════════════════════════════
 function buildActividades(){
-  const el=document.getElementById('tab-actividades'),acts=getFilteredActs();
-  el.innerHTML=`${buildFilterBar('fb-a',1,true)}<div class="sec">${acts.length} actividades</div>${buildActList(acts)}`;
+  const el=document.getElementById('tab-actividades'),acts=getFiltered();
+  el.innerHTML=`${filterBar('fb-a',1,true)}<div class="sec">${acts.length} actividades</div>${actList(acts)}`;
 }
+ 
+// ══════════════════════════════════════════════════
+//  TAB: ZONAS
+// ══════════════════════════════════════════════════
 function buildZonas(){
-  const el=document.getElementById('tab-zonas'),acts=getFilteredActs();
+  const el=document.getElementById('tab-zonas'),acts=getFiltered();
   const wHR=acts.filter(a=>a.average_heartrate>0),zD=[0,0,0,0,0,0];
   wHR.forEach(a=>{zD[getZone(a.average_heartrate)]+=a.moving_time||0;});
   const tot=zD.reduce((s,v)=>s+v,0),z2p=tot?Math.round(zD[2]/tot*100):0;
   const fatP=tot?Math.round(wHR.reduce((s,a)=>{const z=getZone(a.average_heartrate);return s+(a.moving_time||0)*[0,.95,.85,.50,.25,.05][z];},0)/tot*100):0;
-  const c1='cz'+Date.now();
-  const zones=[{z:1,range:`< ${Math.round(S.fcmax*.6)} bpm`,label:'Recuperación',fat:'95%'},{z:2,range:`${Math.round(S.fcmax*.6)}–${Math.round(S.fcmax*.7)} bpm`,label:'Quema de grasa',fat:'85%'},{z:3,range:`${Math.round(S.fcmax*.7)}–${Math.round(S.fcmax*.8)} bpm`,label:'Aeróbico',fat:'50%'},{z:4,range:`${Math.round(S.fcmax*.8)}–${Math.round(S.fcmax*.9)} bpm`,label:'Umbral',fat:'25%'},{z:5,range:`> ${Math.round(S.fcmax*.9)} bpm`,label:'Máximo',fat:'5%'}];
-  el.innerHTML=`${buildFilterBar('fb-z',2,true)}
+  const c1='cz-'+Date.now();
+  const zones=[{z:1,l:'Recuperación',f:'95%'},{z:2,l:'Quema de grasa',f:'85%'},{z:3,l:'Aeróbico',f:'50%'},{z:4,l:'Umbral',f:'25%'},{z:5,l:'Máximo',f:'5%'}];
+  const zClrArr=['var(--z1c)','var(--z2c)','var(--z3c)','var(--z4c)','var(--z5c)'];
+  el.innerHTML=`${filterBar('fb-z',2,true)}
   <div class="sec">resumen de zonas</div>
   <div class="grid g3">
-    <div class="card"><div class="stripe s-g"></div><div class="lbl">Tiempo en Z2 (grasa)</div><div class="big sm">${fmtDur(zD[2])}</div><div class="sub">${z2p}% del tiempo con FC</div><div class="bar-track"><div class="bar-fill" style="background:var(--green);width:${z2p}%"></div></div></div>
-    <div class="card"><div class="stripe s-o"></div><div class="lbl">Energía de grasas estimada</div><div class="big sm">${fatP}<span class="unit">%</span></div><div class="sub">El resto fue carbohidratos</div></div>
-    <div class="card"><div class="lbl">Actividades con FC</div><div class="big sm">${wHR.length}<span class="unit">/${acts.length}</span></div></div>
+    <div class="card"><div class="card-accent ca-sage"></div><div class="lbl">Tiempo en Z2 (quema grasa)</div><div class="big sm">${fmtDur(zD[2])}</div><div class="sub">${z2p}% del tiempo total</div><div class="btrack"><div class="bfill" style="background:var(--sage);width:${z2p}%"></div></div></div>
+    <div class="card"><div class="card-accent ca-dusk"></div><div class="lbl">Energía de grasas est.</div><div class="big sm">${fatP}<span class="unit">%</span></div><div class="sub">Resto: carbohidratos</div></div>
+    <div class="card"><div class="lbl">Con FC registrada</div><div class="big sm">${wHR.length}<span class="unit">/${acts.length}</span></div></div>
   </div>
   <div class="grid g21" style="margin-top:.85rem">
-    <div class="card"><div class="lbl">Distribución</div><div style="margin-top:.75rem">${zones.map(z=>{const p=tot?Math.round(zD[z.z]/tot*100):0;return`<div class="zrow"><div class="zlbl" style="color:${zoneColor(z.z)}">Z${z.z}</div><div class="zdesc">${z.label}</div><div class="ztrack"><div class="zfill" style="background:${zoneColor(z.z)};width:${p}%"></div></div><div class="zpct">${p}%</div><div style="font-size:.65rem;color:var(--muted);min-width:65px;text-align:right">🔥 ${z.fat}</div></div>`;}).join('')}</div></div>
-    <div class="chart-card"><div class="chart-ttl">Minutos por zona</div><div class="cwrap"><canvas id="${c1}"></canvas></div></div>
+    <div class="card"><div class="lbl">Distribución por zona</div><div style="margin-top:.75rem">
+      ${zones.map(z=>{const p=tot?Math.round(zD[z.z]/tot*100):0;return`<div class="zrow"><div class="zlbl" style="color:${zClrArr[z.z-1]}">Z${z.z}</div><div class="zdesc">${z.l}</div><div class="ztrack"><div class="zfill ${['z1c','z2c','z3c','z4c','z5c'][z.z-1]}" style="width:${p}%"></div></div><div class="zpct">${p}%</div><div style="font-size:.63rem;color:var(--muted);min-width:62px;text-align:right">🔥 ${z.f}</div></div>`;}).join('')}
+    </div></div>
+    <div class="chart-card"><div class="ct">Minutos por zona</div><div class="cwrap"><canvas id="${c1}"></canvas></div></div>
   </div>
-  ${z2p<50?`<div class="insight"><div class="it">⚠️ Solo el ${z2p}% en Z2 — demasiado tiempo en zonas altas</div><div class="ib">Para quemar más grasa y llegar menos cansada a los largos, buscá que el 70-80% de tu volumen esté en Z2 (${Math.round(S.fcmax*.6)}–${Math.round(S.fcmax*.7)} bpm).</div></div>`:`<div class="insight green"><div class="it">✅ ${z2p}% en Z2 — buena distribución</div><div class="ib">Estás entrenando bien para la quema de grasa.</div></div>`}
-  <div class="insight blue"><div class="it">Tu rango Z2: ${Math.round(S.fcmax*.6)}–${Math.round(S.fcmax*.7)} bpm</div><div class="ib">Mantené tu FC en ese rango en los largos. En 4-8 semanas vas a poder ir más rápido con la misma FC.</div></div>`;
-  setTimeout(()=>{mkChart(c1,{type:'bar',data:{labels:['Z1','Z2','Z3','Z4','Z5'],datasets:[{data:[1,2,3,4,5].map(z=>Math.round(zD[z]/60)),backgroundColor:['var(--z1)','var(--z2)','var(--z3)','var(--z4)','var(--z5)'],borderRadius:5}]},options:{...chartOpts(false),scales:{x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:11},color:'#7c7268'}},y:{grid:{color:'#e8e4dc'},ticks:{font:{family:'DM Mono',size:10},color:'#7c7268'},title:{display:true,text:'minutos',font:{size:10},color:'#7c7268'}}}}});},80);
+  ${z2p<50?`<div class="insight"><div class="it">⚠️ Solo ${z2p}% en Z2</div><div class="ib">Para quemar más grasa y llegar menos cansada a los largos, buscá que el 70-80% de tu volumen esté en Z2 (${Math.round(S.fcmax*.6)}–${Math.round(S.fcmax*.7)} bpm). Aunque sientas que vas muy lento, es correcto.</div></div>`:
+  `<div class="insight sage"><div class="it">✅ ${z2p}% en Z2 — buena distribución</div><div class="ib">Estás construyendo una sólida base aeróbica. Tu cuerpo se está haciendo más eficiente usando grasa como combustible.</div></div>`}
+  <div class="insight sky"><div class="it">Tu rango Z2: ${Math.round(S.fcmax*.6)}–${Math.round(S.fcmax*.7)} bpm (FCmáx: ${S.fcmax})</div><div class="ib">Mantené ese rango en los entrenamientos largos. En 4-8 semanas vas a poder ir más rápido con la misma FC.</div></div>`;
+  setTimeout(()=>{mC(c1,{type:'bar',data:{labels:['Z1','Z2','Z3','Z4','Z5'],datasets:[{data:[1,2,3,4,5].map(z=>Math.round(zD[z]/60)),backgroundColor:zClrArr,borderRadius:4}]},options:{...cOpts(false),scales:{x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:11},color:'var(--muted)'}},y:{grid:{color:'var(--border)'},ticks:{font:{family:'Fraunces',size:10},color:'var(--muted)'},title:{display:true,text:'minutos',font:{size:10},color:'var(--muted)'}}}}});},80);
 }
+ 
+// ══════════════════════════════════════════════════
+//  TAB: FORMA
+// ══════════════════════════════════════════════════
 function buildForma(){
-  const el=document.getElementById('tab-forma'),series=computeCtlAtl(),last60=series.slice(-60);
+  const el=document.getElementById('tab-forma'),series=computeCtlAtl(),l60=series.slice(-60);
   const td=series[series.length-1]||{ctl:0,atl:0,tsb:0},wk=series[series.length-8]||{ctl:0,atl:0,tsb:0};
-  const st=td.tsb>10?{label:'Forma óptima',cls:'bg',color:'var(--green)',msg:'Estás descansada y lista para rendir al máximo.'}:td.tsb>-10?{label:'Forma neutra',cls:'ba',color:'var(--amber)',msg:'Balance entre carga y recuperación. Podés entrenar fuerte.'}:td.tsb>-30?{label:'Carga alta',cls:'bo',color:'var(--orange)',msg:'Acumulando fatiga. Priorizá recuperación y bajá el volumen.'}:{label:'Sobreentrenamiento',cls:'br',color:'var(--red)',msg:'Necesitás 3-5 días de descanso antes de volver a cargar.'};
-  const c1='cf1'+Date.now(),c2='cf2'+Date.now();
+  const st=td.tsb>10?{l:'Forma óptima ✦',c:'var(--sage)',msg:'Estás descansada y lista para dar el máximo. Momento ideal para entrenar intenso o competir.'}:td.tsb>-10?{l:'Forma neutra',c:'var(--dusk)',msg:'Balance entre carga y recuperación. Podés entrenar fuerte con moderación.'}:td.tsb>-30?{l:'Carga alta',c:'var(--terra)',msg:'Acumulando fatiga. Bajá el volumen y priorizá sueño y alimentación.'}:{l:'Sobreentrenamiento',c:'var(--rose)',msg:'Necesitás 3-5 días de descanso activo antes de volver a cargar.'};
+  const c1='cf1-'+Date.now(),c2='cf2-'+Date.now();
   el.innerHTML=`<div class="sec">estado hoy</div>
   <div class="grid g4">
-    <div class="card"><div class="stripe s-b"></div><div class="lbl">Fitness (CTL)</div><div class="big">${td.ctl}</div><div class="sub">${td.ctl>=wk.ctl?'↑':'↓'} ${Math.abs(td.ctl-wk.ctl)} vs semana pasada</div></div>
-    <div class="card"><div class="stripe s-o"></div><div class="lbl">Fatiga (ATL)</div><div class="big">${td.atl}</div><div class="sub">${td.atl>wk.atl?'↑ Más cargada':'↓ Recuperando'}</div></div>
-    <div class="card"><div class="stripe" style="background:${st.color}"></div><div class="lbl">Forma (TSB)</div><div style="font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:500;color:${st.color}">${td.tsb>0?'+':''}${td.tsb}</div><div style="margin-top:.45rem"><span class="badge ${st.cls}">${st.label}</span></div></div>
-    <div class="card"><div class="lbl">Carga últimos 7d</div><div class="big xs">${series.slice(-7).reduce((s,d)=>s+d.load,0)}<span class="unit">TRIMP</span></div><div class="sub">vs ${series.slice(-14,-7).reduce((s,d)=>s+d.load,0)} sem. anterior</div></div>
+    <div class="card"><div class="card-accent ca-sky"></div><div class="lbl">Fitness (CTL)</div><div class="big">${td.ctl}</div><div class="sub">${td.ctl>=wk.ctl?'↑':'↓'} ${Math.abs(td.ctl-wk.ctl)} vs semana pasada</div></div>
+    <div class="card"><div class="card-accent ca-terra"></div><div class="lbl">Fatiga (ATL)</div><div class="big">${td.atl}</div><div class="sub">${td.atl>wk.atl?'↑ Más cargada':'↓ Recuperando'}</div></div>
+    <div class="card"><div class="card-accent" style="background:${st.c}"></div><div class="lbl">Forma (TSB)</div><div style="font-family:'Fraunces',serif;font-size:1.7rem;font-weight:300;color:${st.c}">${td.tsb>0?'+':''}${td.tsb}</div><div style="margin-top:.35rem;font-size:.72rem;color:${st.c};font-weight:500">${st.l}</div></div>
+    <div class="card"><div class="lbl">Carga 7 días</div><div class="big xs">${series.slice(-7).reduce((s,d)=>s+d.load,0)}<span class="unit">TRIMP</span></div><div class="sub">vs ${series.slice(-14,-7).reduce((s,d)=>s+d.load,0)} sem. ant.</div></div>
   </div>
-  <div class="insight ${td.tsb>10?'green':td.tsb>-10?'blue':''}"><div class="it">${st.label}</div><div class="ib">${st.msg}</div></div>
-  <div class="insight blue"><div class="it">¿Cuándo rendir al máximo?</div><div class="ib">El TSB ideal para competir o entrenar muy fuerte es entre +5 y +25. Llegás ahí reduciendo el volumen 3-5 días antes.</div></div>
+  <div class="insight" style="border-left-color:${st.c}"><div class="it">${st.l}</div><div class="ib">${st.msg}</div></div>
+  <div class="insight sky"><div class="it">¿Cuándo rendir al máximo?</div><div class="ib">TSB ideal para competir o sesión muy intensa: +5 a +25. Llegás ahí reduciendo el volumen 3-5 días antes (tapering).</div></div>
   <div class="sec">evolución 60 días</div>
-  <div class="chart-card"><div class="chart-ttl">Fitness vs Fatiga</div><div class="chart-sub">CTL (azul) sube lento. ATL (naranja punteado) fluctúa rápido.</div><div class="cwrap tall"><canvas id="${c1}"></canvas></div></div>
-  <div class="chart-card" style="margin-top:.85rem"><div class="chart-ttl">Forma (TSB)</div><div class="chart-sub">Verde = descansada. Rojo = cargada. Óptimo para competir: +5 a +25.</div><div class="cwrap"><canvas id="${c2}"></canvas></div></div>`;
+  <div class="chart-card"><div class="ct">Fitness vs Fatiga</div><div class="cs">CTL (azul) sube lento. ATL (naranja) fluctúa con cada entrenamiento.</div><div class="cwrap tall"><canvas id="${c1}"></canvas></div></div>
+  <div class="chart-card" style="margin-top:.85rem"><div class="ct">Forma deportiva (TSB)</div><div class="cs">Verde/dorado = descansada. Rojo = cargada. Óptimo competición: +5 a +25.</div><div class="cwrap"><canvas id="${c2}"></canvas></div></div>`;
   setTimeout(()=>{
-    const lbl=last60.map(d=>fmtDate(d.date));
-    mkChart(c1,{type:'line',data:{labels:lbl,datasets:[{label:'Fitness (CTL)',data:last60.map(d=>d.ctl),borderColor:'#2563eb',backgroundColor:'#2563eb12',borderWidth:2,pointRadius:0,fill:true,tension:.3},{label:'Fatiga (ATL)',data:last60.map(d=>d.atl),borderColor:'#FC4C02',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:.3,borderDash:[4,3]}]},options:chartOpts()});
-    mkChart(c2,{type:'bar',data:{labels:lbl,datasets:[{label:'Forma (TSB)',data:last60.map(d=>d.tsb),backgroundColor:last60.map(d=>d.tsb>=0?'#16a34a88':'#dc262688'),borderRadius:3}]},options:{...chartOpts(false)}});
+    const lbl=l60.map(d=>fmtDate(d.date));
+    mC(c1,{type:'line',data:{labels:lbl,datasets:[{label:'Fitness (CTL)',data:l60.map(d=>d.ctl),borderColor:'var(--sky)',backgroundColor:'rgba(74,106,138,.12)',borderWidth:2,pointRadius:0,fill:true,tension:.3},{label:'Fatiga (ATL)',data:l60.map(d=>d.atl),borderColor:'var(--terra)',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:.3,borderDash:[4,3]}]},options:cOpts()});
+    mC(c2,{type:'bar',data:{labels:lbl,datasets:[{label:'Forma (TSB)',data:l60.map(d=>d.tsb),backgroundColor:l60.map(d=>d.tsb>=0?'rgba(90,122,74,.7)':'rgba(196,80,106,.7)'),borderRadius:2}]},options:{...cOpts(false)}});
   },80);
 }
+ 
+// ══════════════════════════════════════════════════
+//  TAB: JOURNAL
+// ══════════════════════════════════════════════════
+function buildJournal(){
+  const el=document.getElementById('tab-journal');
+  const today=new Date().toISOString().slice(0,10);
+  const todayEntry=JOURNAL.find(j=>j.date===today);
+  const cycleLabel={menstruacion:'Menstruación',folicular:'Folicular',ovulacion:'Ovulación',lutea:'Lútea'}[S.cycle]||'';
+  const pastEntries=[...JOURNAL].reverse().slice(0,20);
+ 
+  el.innerHTML=`
+  <div class="journal-form">
+    <div class="jf-title">Registro de <em>hoy</em></div>
+    <div style="margin-bottom:1rem">
+      <div class="lbl">¿Cómo te sentís emocionalmente?</div>
+      <div class="mood-selector" id="mood-sel">
+        ${['😄 Feliz','😌 Tranquila','😤 Estresada','😢 Triste','😴 Cansada','⚡ Con energía','🌿 En paz','🔥 Motivada','😰 Ansiosa','🌧 Melancólica'].map(m=>`<button class="mood-btn ${todayEntry&&todayEntry.moods&&todayEntry.moods.includes(m)?'selected':''}" onclick="toggleMood(this)">${m}</button>`).join('')}
+      </div>
+    </div>
+    <div style="margin-bottom:1rem">
+      <div class="lbl">Energía y fatiga</div>
+      <div class="slider-row"><span class="slider-lbl">Energía (1–10)</span><input type="range" id="sl-energy" min="1" max="10" value="${todayEntry?todayEntry.energy:6}" oninput="document.getElementById('sv-energy').textContent=this.value"><span class="slider-val" id="sv-energy">${todayEntry?todayEntry.energy:6}</span></div>
+      <div class="slider-row"><span class="slider-lbl">Fatiga física (1–10)</span><input type="range" id="sl-fatigue" min="1" max="10" value="${todayEntry?todayEntry.fatigue:4}" oninput="document.getElementById('sv-fatigue').textContent=this.value"><span class="slider-val" id="sv-fatigue">${todayEntry?todayEntry.fatigue:4}</span></div>
+      <div class="slider-row"><span class="slider-lbl">Calidad de sueño (1–10)</span><input type="range" id="sl-sleep" min="1" max="10" value="${todayEntry?todayEntry.sleep:7}" oninput="document.getElementById('sv-sleep').textContent=this.value"><span class="slider-val" id="sv-sleep">${todayEntry?todayEntry.sleep:7}</span></div>
+    </div>
+    <div style="margin-bottom:1rem">
+      <div class="lbl">¿Qué comiste hoy?</div>
+      <div class="meal-input-grid">
+        <div class="meal-input-item"><label>🌅 Desayuno</label><textarea id="meal-breakfast" rows="3" placeholder="Ej: avena con banana y miel…">${todayEntry?todayEntry.meals?.breakfast||'':''}</textarea></div>
+        <div class="meal-input-item"><label>☀️ Almuerzo</label><textarea id="meal-lunch" rows="3" placeholder="Ej: pollo con quinoa y ensalada…">${todayEntry?todayEntry.meals?.lunch||'':''}</textarea></div>
+        <div class="meal-input-item"><label>🌙 Cena</label><textarea id="meal-dinner" rows="3" placeholder="Ej: salmón con batata asada…">${todayEntry?todayEntry.meals?.dinner||'':''}</textarea></div>
+      </div>
+      <div class="meal-input-grid" style="margin-top:.5rem">
+        <div class="meal-input-item"><label>🍎 Merienda / snacks</label><textarea id="meal-snacks" rows="2" placeholder="Ej: frutas, nueces…">${todayEntry?todayEntry.meals?.snacks||'':''}</textarea></div>
+        <div class="meal-input-item"><label>💧 Agua (vasos)</label><textarea id="meal-water" rows="2" placeholder="Ej: 8 vasos">${todayEntry?todayEntry.meals?.water||'':''}</textarea></div>
+        <div class="meal-input-item"><label>⚠️ Evitaste algo?</label><textarea id="meal-avoided" rows="2" placeholder="Ej: azúcar, sal…">${todayEntry?todayEntry.meals?.avoided||'':''}</textarea></div>
+      </div>
+    </div>
+    <div style="margin-bottom:1rem">
+      <div class="lbl">Síntomas del ciclo</div>
+      <div class="symptom-row" id="symptom-sel">
+        ${['Hinchazón','Antojo dulce','Antojo salado','Calambres','Retención líquidos','Dolor de cabeza','Irritabilidad','Niebla mental','Fatiga extrema','Sin síntomas'].map(s=>`<button class="symptom-btn ${todayEntry&&todayEntry.symptoms&&todayEntry.symptoms.includes(s)?'selected':''}" onclick="toggleSymptom(this)">${s}</button>`).join('')}
+      </div>
+    </div>
+    <div class="jf-notes" style="margin-bottom:1rem">
+      <div class="lbl">Notas libres · ¿Algo que quieras recordar de hoy?</div>
+      <textarea id="journal-notes" placeholder="Cómo fue el entrenamiento, cómo te sentiste, qué notaste en tu cuerpo…">${todayEntry?todayEntry.notes||'':''}</textarea>
+    </div>
+    <div style="display:flex;align-items:center">
+      <button class="save-btn" onclick="saveJournal()">Guardar registro</button>
+      <span class="save-ok" id="save-ok">✓ Guardado</span>
+    </div>
+  </div>
+ 
+  ${pastEntries.length?`
+  <div class="sec">registros anteriores</div>
+  ${pastEntries.map(e=>`<div class="journal-entry">
+    <div class="je-header">
+      <div class="je-date">${fmtDateFull(e.date)}</div>
+      <div style="display:flex;gap:.4rem;align-items:center">
+        <span class="badge bt">⚡${e.energy||'?'}</span>
+        <span class="badge bs">😴${e.sleep||'?'}</span>
+        ${e.cycle?`<span class="badge bm">${{menstruacion:'🌑',folicular:'🌱',ovulacion:'🌕',lutea:'🌘'}[e.cycle]||'🌿'} ${e.cycleLabel||''}</span>`:''}
+      </div>
+    </div>
+    ${e.moods&&e.moods.length?`<div class="je-moods">${e.moods.map(m=>`<span class="je-mood">${m}</span>`).join('')}</div>`:''}
+    ${e.meals&&(e.meals.breakfast||e.meals.lunch||e.meals.dinner)?`<div class="je-section">
+      <div class="je-section-lbl">Lo que comiste</div>
+      <div class="je-meals">
+        ${e.meals.breakfast?`<div class="je-meal"><div class="je-meal-name">Desayuno</div><div class="je-meal-food">${e.meals.breakfast}</div></div>`:''}
+        ${e.meals.lunch?`<div class="je-meal"><div class="je-meal-name">Almuerzo</div><div class="je-meal-food">${e.meals.lunch}</div></div>`:''}
+        ${e.meals.dinner?`<div class="je-meal"><div class="je-meal-name">Cena</div><div class="je-meal-food">${e.meals.dinner}</div></div>`:''}
+      </div>
+    </div>`:''}
+    ${e.symptoms&&e.symptoms.length?`<div class="je-section"><div class="je-section-lbl">Síntomas</div><div class="je-moods">${e.symptoms.map(s=>`<span class="je-mood">${s}</span>`).join('')}</div></div>`:''}
+    ${e.notes?`<div class="je-section"><div class="je-text" style="font-style:italic;color:var(--muted)">"${e.notes}"</div></div>`:''}
+  </div>`).join('')}`:''}
+  `;
+}
+ 
+window.toggleMood=btn=>{btn.classList.toggle('selected');};
+window.toggleSymptom=btn=>{btn.classList.toggle('selected');};
+ 
+window.saveJournal=()=>{
+  const today=new Date().toISOString().slice(0,10);
+  const moods=[...document.querySelectorAll('#mood-sel .mood-btn.selected')].map(b=>b.textContent);
+  const symptoms=[...document.querySelectorAll('#symptom-sel .symptom-btn.selected')].map(b=>b.textContent);
+  const entry={
+    date:today,
+    cycle:S.cycle,
+    cycleLabel:{menstruacion:'Menstruación',folicular:'Folicular',ovulacion:'Ovulación',lutea:'Lútea'}[S.cycle]||'',
+    moods,symptoms,
+    energy:parseInt(document.getElementById('sl-energy').value),
+    fatigue:parseInt(document.getElementById('sl-fatigue').value),
+    sleep:parseInt(document.getElementById('sl-sleep').value),
+    meals:{
+      breakfast:document.getElementById('meal-breakfast').value.trim(),
+      lunch:document.getElementById('meal-lunch').value.trim(),
+      dinner:document.getElementById('meal-dinner').value.trim(),
+      snacks:document.getElementById('meal-snacks').value.trim(),
+      water:document.getElementById('meal-water').value.trim(),
+      avoided:document.getElementById('meal-avoided').value.trim(),
+    },
+    notes:document.getElementById('journal-notes').value.trim(),
+  };
+  JOURNAL=JOURNAL.filter(j=>j.date!==today);
+  JOURNAL.push(entry);
+  JOURNAL.sort((a,b)=>a.date.localeCompare(b.date));
+  try{localStorage.setItem('carol_journal',JSON.stringify(JOURNAL));}catch(e){}
+  const ok=document.getElementById('save-ok');
+  ok.style.display='inline';
+  setTimeout(()=>ok.style.display='none',2500);
+  builtTabs.delete('reporte');
+};
+ 
+// ══════════════════════════════════════════════════
+//  TAB: NUTRICIÓN
+// ══════════════════════════════════════════════════
+const PHASES_DATA={
+  menstruacion:{name:'Menstruación',emoji:'🌑',days:'1–5',color:'var(--men)',bg:'var(--men-l)',energy:'Baja',
+    why:'Las hormonas están en su mínimo. Las prostaglandinas causan inflamación. Perdés hierro con el sangrado, lo que afecta el transporte de oxígeno al músculo.',
+    foods:[{n:'Lentejas + limón',w:'Hierro + vitamina C'},{n:'Salmón',w:'Omega-3 antiinflamatorio'},{n:'Espinaca',w:'Hierro + folatos'},{n:'Chocolate negro 70%',w:'Magnesio → calambres'},{n:'Banana',w:'Potasio → reduce retención'},{n:'Jengibre + cúrcuma',w:'Antiinflamatorio natural'}],
+    avoid:'Sal, alcohol, azúcar refinada, exceso de lácteos.',
+    meals:[{d:'Lunes',f:['Porridge avena + banana + chía','Lentejas estofadas con limón','Nueces + chocolate negro','Salmón con espinaca salteada']},{d:'Martes',f:['Tostada integral + palta + huevo','Arroz integral + pollo + cúrcuma','Yogur griego + arándanos','Sopa de vegetales + legumbres']}]},
+  folicular:{name:'Folicular',emoji:'🌱',days:'6–13',color:'var(--fol)',bg:'var(--fol-l)',energy:'Alta y en aumento',
+    why:'El estrógeno sube → mejor síntesis muscular, sensibilidad a la insulina óptima, estado de ánimo positivo. Tu mejor ventana para construir fuerza y resistencia.',
+    foods:[{n:'Huevos',w:'Proteína completa + colina'},{n:'Pollo + quinoa',w:'Proteína + carbos'},{n:'Brócoli + coliflor',w:'DIM → metabolismo estrógeno'},{n:'Arándanos + frutillas',w:'Antioxidantes'},{n:'Avena',w:'Fibra + energía sostenida'},{n:'Yogur griego',w:'Proteína + probióticos'}],
+    avoid:'Restricción calórica severa. Exceso de grasas saturadas.',
+    meals:[{d:'Miércoles',f:['Huevos + tostada masa madre','Pollo + quinoa + brócoli','Smoothie arándanos + espinaca','Merluza + batata + ensalada']},{d:'Jueves',f:['Bowl avena + frutillas + semillas','Ensalada completa: legumbres + huevo','Nueces + manzana','Milanesa de pollo al horno + arroz']}]},
+  ovulacion:{name:'Ovulación',emoji:'🌕',days:'14–16',color:'var(--ovu)',bg:'var(--ovu-l)',energy:'Máxima',
+    why:'Pico de estrógeno + testosterona. Máxima fuerza, energía y motivación. Tu cuerpo responde mejor al entrenamiento intenso y necesita más antioxidantes y zinc.',
+    foods:[{n:'Carne magra + remolacha',w:'Zinc + nitratos → rendimiento'},{n:'Palta + huevo',w:'Grasas hormonales + proteína'},{n:'Salmón',w:'Omega-3 + proteína completa'},{n:'Granada + arándanos',w:'Antioxidantes máximos'},{n:'Semillas de zapallo',w:'Zinc → testosterona'},{n:'Agua de coco',w:'Hidratación extra (temp sube)'}],
+    avoid:'Comida inflamatoria y procesada. Restricción de grasas.',
+    meals:[{d:'Viernes',f:['Tostada + palta + huevo + semillas','Carne magra + remolacha rallada','Smoothie granada + arándanos + espinaca','Salmón + quinoa + pimiento asado']},{d:'Sábado',f:['Yogur griego + granola + frutas rojas','Ensalada de lentejas + huevo + palta','Fruta + chocolate negro','Pollo + batata + ensalada verde']}]},
+  lutea:{name:'Lútea',emoji:'🌘',days:'17–23',color:'var(--lut)',bg:'var(--lut-l)',energy:'Decae hacia el final',
+    why:'Progesterona domina. Sube el metabolismo basal (+150-300 kcal/día), baja la sensibilidad a la insulina, aumenta el apetito. Es la fase donde más grasa quemás en cardio Z2 (Barr et al., 1995).',
+    foods:[{n:'Batata + avena',w:'Carbos complejos → anti-antojos'},{n:'Banana + mantequilla maní',w:'Triptófano → serotonina'},{n:'Chocolate negro 70%',w:'Magnesio → reduce SPM'},{n:'Garbanzos al horno',w:'B6 → serotonina'},{n:'Salmón + nueces',w:'Omega-3 → ánimo'},{n:'Almendras',w:'Calcio + magnesio'}],
+    avoid:'Azúcar refinada (ciclo vicioso antojos), sal en exceso, alcohol.',
+    meals:[{d:'Domingo',f:['Porridge avena + banana + almendras','Batata asada + pollo + ensalada','Chocolate negro + almendras','Garbanzos al horno + vegetales']},{d:'Lunes',f:['Tostada + palta + huevo','Salmón + arroz integral + brócoli','Banana + 2 cdas mantequilla maní','Sopa lentejas + espinaca + cúrcuma']}]},
+};
+ 
+function buildNutricion(){
+  const el=document.getElementById('tab-nutricion');
+  const ph=PHASES_DATA[S.cycle]||PHASES_DATA.ovulacion;
+  const cycleOrder=['menstruacion','folicular','ovulacion','lutea'];
+  let selectedPhase=S.cycle;
+ 
+  function renderDetail(phaseId){
+    const p=PHASES_DATA[phaseId];
+    document.getElementById('nutri-detail-inner').innerHTML=`
+      <div class="nd-why" style="border-left-color:${p.color}">${p.why}</div>
+      <div style="margin-bottom:1rem">
+        <div class="lbl">Alimentos recomendados</div>
+        <div class="foods-grid2">${p.foods.map(f=>`<div class="fc2"><div class="fc2-name">${f.n}</div><div class="fc2-why">${f.w}</div></div>`).join('')}</div>
+      </div>
+      <div style="margin-bottom:1rem"><div class="lbl">Evitá</div><p style="font-size:.76rem;color:var(--muted);line-height:1.6">${p.avoid}</p></div>
+      <div>
+        <div class="lbl">Plan de comidas sugerido</div>
+        <div class="meals-week">${p.meals.map(day=>`<div class="mw-day"><div class="mw-day-name">${day.d}</div><div class="mw-meals">${['🌅 Desayuno','☀️ Almuerzo','🍎 Merienda','🌙 Cena'].map((mn,i)=>`<div class="mw-meal"><span class="mw-meal-label">${mn}</span><span class="mw-meal-food">${day.f[i]||'—'}</span></div>`).join('')}</div></div>`).join('')}
+        </div>
+      </div>
+    `;
+    // Update selected state
+    document.querySelectorAll('.pc2').forEach(c=>{c.classList.remove('selected');if(c.dataset.phase===phaseId)c.classList.add('selected');});
+  }
+ 
+  el.innerHTML=`
+  <div class="nutri-card">
+    <div class="nutri-header">
+      <h2>Nutrición <em>cycle-based</em></h2>
+      <p>Recomendaciones basadas en tu fase hormonal, actividad física y objetivos. Ciclo de 21–25 días · Antojos de dulce · Retención de líquidos.</p>
+    </div>
+    <div style="padding:1.25rem 1.5rem">
+      <div class="lbl">Tu ciclo</div>
+      <div class="phase-track">${cycleOrder.map(id=>{const p=PHASES_DATA[id];return`<div class="pt-seg" style="flex:${p.days.split('–').map(Number).reduce((a,b)=>b-a+1)};background:${p.color};opacity:${id===S.cycle?1:.3}" onclick="selectPhaseNutri('${id}')"></div>`;}).join('')}</div>
+      <div class="phase-cards">${cycleOrder.map(id=>{const p=PHASES_DATA[id];return`<div class="pc2 ${id} ${id===S.cycle?'current':''} ${id===S.cycle?'selected':''}" data-phase="${id}" onclick="selectPhaseNutri('${id}')"><div class="pc2-name">${p.emoji} ${p.name}</div><div class="pc2-days">Días ${p.days}</div><div class="pc2-energy ${id}">${p.energy}</div></div>`;}).join('')}</div>
+    </div>
+    <div class="nutri-detail" id="nutri-detail-inner"></div>
+  </div>
+ 
+  <div class="sec">quema de grasa por fase</div>
+  <div class="grid g2">
+    <div class="insight sage"><div class="it">🌱 Folicular: construí músculo</div><div class="ib">El estrógeno alto mejora la síntesis muscular. Más músculo = más quema de grasa en reposo. Priorizá el entrenamiento de fuerza.</div></div>
+    <div class="insight" style="border-left-color:var(--lut)"><div class="it">🌘 Lútea: tu fase de oro para grasa</div><div class="ib">Progesterona sube el metabolismo basal. Durante cardio Z2 (60-70% FCmáx) quemás significativamente más grasa que en otras fases. Basado en Barr et al. (1995).</div></div>
+    <div class="insight sky"><div class="it">🌕 Ovulación: rendimiento máximo</div><div class="ib">HIIT y fuerza máxima son muy efectivos. Quemás más calorías por sesión. Aprovechá para tus entrenamientos más intensos.</div></div>
+    <div class="insight"><div class="it">🌑 Menstruación: recuperación activa</div><div class="ib">No es el momento para entrenar intenso. Un cuerpo bien recuperado quema más grasa en las fases siguientes.</div></div>
+  </div>
+ 
+  <div class="sec">consultá tu nutricionista</div>
+  <div class="chat-wrap">
+    <div class="chat-hdr">
+      <div class="chat-av">🌿</div>
+      <div><div class="chat-hn">Nutricionista <span class="badge bs">Cycle-Based</span></div><div class="chat-hs">Nutrición funcional · Ciclo hormonal · Rendimiento deportivo</div></div>
+    </div>
+    <div class="chat-msgs" id="chat-msgs">
+      <div class="msg bot">Hola Carol 🌿 Soy tu nutricionista especializada en nutrición funcional y ciclo menstrual. Tengo tu perfil: ciclo 21-25 días, running + ciclismo + gym, tendencia a antojos de dulce y retención de líquidos, objetivo equilibrio + quema de grasa.<br><br><strong>¿En qué te ayudo hoy?</strong></div>
+    </div>
+    <div class="chat-qqs">
+      <div class="qq" onclick="sendQ('¿Qué como antes de una salida larga de running?')">Pre-entrenamiento largo</div>
+      <div class="qq" onclick="sendQ('¿Cómo manejo los antojos de dulce en la fase lútea?')">Antojos de dulce</div>
+      <div class="qq" onclick="sendQ('¿Qué ayuda con la retención de líquidos?')">Retención de líquidos</div>
+      <div class="qq" onclick="sendQ('¿Cuándo quemo más grasa según mi ciclo?')">Quema de grasa</div>
+      <div class="qq" onclick="sendQ('¿Qué suplementos me recomendás?')">Suplementación</div>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-inp" id="chat-input" placeholder="Preguntame lo que quieras…" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-snd" id="chat-snd" onclick="sendChat()">Enviar →</button>
+    </div>
+  </div>
+  `;
+ 
+  // Init detail
+  setTimeout(()=>renderDetail(S.cycle),50);
+ 
+  window.selectPhaseNutri=id=>{
+    selectedPhase=id;
+    renderDetail(id);
+  };
+}
+ 
+// ══════════════════════════════════════════════════
+//  TAB: REPORTE (integrado deporte + nutrición + journal)
+// ══════════════════════════════════════════════════
 function buildReporte(){
-  const el=document.getElementById('tab-reporte'),acts=getFilteredActs(),series=computeCtlAtl();
+  const el=document.getElementById('tab-reporte');
+  const acts=getFiltered(),series=computeCtlAtl();
   const td=series[series.length-1]||{ctl:0,atl:0,tsb:0};
   const wHR=acts.filter(a=>a.average_heartrate>0),zD=[0,0,0,0,0,0];
   wHR.forEach(a=>{zD[getZone(a.average_heartrate)]+=a.moving_time||0;});
@@ -394,74 +899,99 @@ function buildReporte(){
   const tD=acts.reduce((s,a)=>s+(a.distance||0),0),tT=acts.reduce((s,a)=>s+(a.moving_time||0),0);
   const largos=acts.filter(a=>['Run','TrailRun','Ride','VirtualRide'].includes(a.type)&&(a.moving_time||0)>=3600);
   const avgHRL=largos.filter(a=>a.average_heartrate>0).length?Math.round(mean(largos.filter(a=>a.average_heartrate>0).map(a=>a.average_heartrate))):0;
-  const estado=td.tsb>10?'En forma y descansada':td.tsb>-10?'En balance':td.tsb>-30?'Algo cargada':'Muy cargada';
-  const stColor=td.tsb>10?'var(--green)':td.tsb>-10?'var(--amber)':td.tsb>-30?'var(--orange)':'var(--red)';
-  const periodLabel={'week':'esta semana','month':'este mes','3months':'los últimos 3 meses','year':'este año','all':'tu historial','custom':'el período seleccionado'}[S.filter.period]||'el período';
-  const fatigaT=td.tsb>10?'Estás en un buen momento de forma. Tu cuerpo está recuperado y listo para dar el máximo.':td.tsb>-10?'Tu cuerpo está en un punto neutro: ni muy descansado ni muy cargado. Buen momento para entrenar normal.':td.tsb>-30?'Estás acumulando bastante carga. Puede que notes que rendís un poco menos o tardás más en recuperarte. Es señal de que necesitás priorizar el descanso.':'La acumulación de fatiga es alta. Si sentís piernas pesadas o motivación baja, tu cuerpo está pidiendo recuperación.';
-  const zonaT=z2p>=60?`El ${z2p}% de tu tiempo estuvo en zona 2 (quema de grasa). ¡Excelente! Tu cuerpo está usando principalmente grasa como combustible, lo que mejora tu resistencia y eficiencia aeróbica.`:z2p>=40?`El ${z2p}% de tu tiempo estuvo en zona 2. Hay margen para mejorar. Idealmente deberías estar entre el 60-80% en esa zona. Probá bajar el ritmo en tus salidas largas.`:`Solo el ${z2p}% de tu tiempo estuvo en zona 2. Esto explica por qué podés terminar cansada en los largos: tu cuerpo está dependiendo demasiado de los carbohidratos, que se agotan rápido.`;
-  const largosT=!largos.length?'No tuviste entrenamientos largos (+1 hora) en este período.':avgHRL&&getZone(avgHRL)>=3?`En tus ${largos.length} entrenamiento${largos.length>1?'s':''} largo${largos.length>1?'s':''}, tu FC promedio fue ${avgHRL} bpm (${zoneLabel(getZone(avgHRL))}). Eso significa que usás principalmente carbohidratos, lo que te lleva a sentirte cansada al final. Intentá mantener tu FC por debajo de ${Math.round(S.fcmax*.7)} bpm en los largos.`:`Tus entrenamientos largos estuvieron bien distribuidos en intensidad.`;
-  el.innerHTML=`${buildFilterBar('fb-rp',4,false)}
+ 
+  // Journal insights
+  const recentJ=JOURNAL.slice(-14);
+  const avgEnergy=recentJ.length?mean(recentJ.map(j=>j.energy||5)).toFixed(1):null;
+  const avgSleep=recentJ.length?mean(recentJ.map(j=>j.sleep||5)).toFixed(1):null;
+  const topSymptoms={};recentJ.forEach(j=>(j.symptoms||[]).forEach(s=>{topSymptoms[s]=(topSymptoms[s]||0)+1;}));
+  const symList=Object.entries(topSymptoms).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([s])=>s);
+  const mealConsistency=recentJ.filter(j=>j.meals&&j.meals.breakfast&&j.meals.lunch&&j.meals.dinner).length;
+ 
+  const stColor=td.tsb>10?'var(--sage)':td.tsb>-10?'var(--dusk)':td.tsb>-30?'var(--terra)':'var(--rose)';
+  const estado=td.tsb>10?'En forma':td.tsb>-10?'En balance':td.tsb>-30?'Algo cargada':'Muy cargada';
+  const periodLabel={'week':'esta semana','month':'este mes','3months':'los últimos 3 meses','year':'este año','all':'tu historial','custom':'el período'}[S.filter.period]||'el período';
+ 
+  const fatigaT=td.tsb>10?'Tu cuerpo está recuperado y en buen momento para entrenar fuerte o competir.':td.tsb>-10?'Tu cuerpo está en balance. Podés entrenar normal sin exigirte de más.':td.tsb>-30?'Estás acumulando fatiga. Es señal de que necesitás más descanso y buena alimentación.':'La acumulación de fatiga es alta. Tu cuerpo necesita descanso antes de volver a cargar.';
+  const zonaT=z2p>=60?`El ${z2p}% de tu entrenamiento fue en Z2. Excelente — estás construyendo eficiencia aeróbica y tu cuerpo usa principalmente grasa como combustible.`:z2p>=40?`El ${z2p}% en Z2. Hay margen para mejorar. Bajá un poco el ritmo en los largos.`:`Solo el ${z2p}% en Z2. Esto explica el cansancio en los largos — demasiados carbohidratos, muy poca grasa.`;
+  const largosT=!largos.length?'No tuviste entrenamientos largos (+1 hora) en este período.':avgHRL&&getZone(avgHRL)>=3?`En los largos tu FC promedio fue ${avgHRL} bpm (${zLbl[getZone(avgHRL)]}). Estás quemando carbohidratos, lo que explica el cansancio al final. Meta: mantener FC bajo ${Math.round(S.fcmax*.7)} bpm.`:
+  `Tus ${largos.length} entrenamiento${largos.length>1?'s':''} largo${largos.length>1?'s':''} estuvieron bien en intensidad.`;
+ 
+  el.innerHTML=`${filterBar('fb-rp',6,false)}
   <div class="report-hero">
-    <h1>Tu reporte deportivo</h1>
-    <div class="date">Período: ${periodLabel} · FCmáx: ${S.fcmax} bpm</div>
-    <div class="report-score" style="background:${stColor}20;color:${stColor}"><span>●</span> Estado actual: <strong>${estado}</strong></div>
-    <div class="report-block"><h2>📊 ¿Cuánto entrenaste?</h2><p>En ${periodLabel} completaste <strong>${acts.length} actividades</strong>, recorriste <strong>${fmtDist(Math.round(tD))}</strong> y estuviste <strong>${fmtDur(tT)}</strong> en movimiento.${acts.length?` Promedio de <strong>${fmtDur(Math.round(tT/acts.length))}</strong> por sesión.`:''}</p></div>
-    <div class="report-block"><h2>⚡ ¿Cómo está tu cuerpo ahora?</h2><p>${fatigaT}</p></div>
-    <div class="report-block"><h2>🔥 ¿Quemás grasa o carbohidratos?</h2><p>${zonaT}</p></div>
-    <div class="report-block"><h2>🏃 ¿Por qué te cansás en los largos?</h2><p>${largosT}</p></div>
-    <div class="report-block"><h2>💡 ¿Qué podés hacer diferente?</h2><p>${td.tsb<-10?'<strong>Esta semana:</strong> Bajá el volumen un 20-30% y priorizá el sueño. Una sesión de recuperación activa va a ayudar más que forzar otro entrenamiento fuerte.<br><br>':''}${z2p<50?`<strong>Para quemar más grasa:</strong> En tu próxima salida larga, corré a una velocidad donde puedas mantener una conversación normal. FC objetivo: ${Math.round(S.fcmax*.6)}–${Math.round(S.fcmax*.7)} bpm.<br><br>`:''}${largos.length&&avgHRL&&getZone(avgHRL)>=3?`<strong>Para llegar menos cansada al final:</strong> En salidas +90 min, llevá energía (gel, banana, dátiles) y tomá algo cada 45 min.<br><br>`:''}${' '}<strong>A largo plazo:</strong> La consistencia gana. Entrenar 4 veces/semana moderado durante meses supera semanas muy intensas seguidas de descansos largos.</p></div>
-  </div>`;
-}
-function buildNutri(){
-  const el=document.getElementById('tab-nutri'),series=computeCtlAtl(),td=series[series.length-1]||{ctl:0,atl:0,tsb:0};
-  const CI={menstruacion:{name:'Menstruación',days:'Días 1–5',color:'var(--red)',energy:'Baja',key:'Necesitás hierro, antiinflamatorios naturales y alimentos reconfortantes.',avoid:'Sal en exceso, alcohol, cafeína en grandes cantidades, azúcar refinada.',foods:['🥬 Espinaca, lentejas (hierro)','🐟 Salmón, sardinas (omega-3)','🍌 Banana, papa (potasio)','🫚 Jengibre, cúrcuma (antiinflamatorio)','🍫 Chocolate negro 70%+ (magnesio)'],training:'Sesiones suaves: yoga, caminatas.',carbs:'Moderado–alto'},folicular:{name:'Folicular',days:'Días 6–13',color:'var(--green)',energy:'En aumento',key:'Estrógeno sube → más energía. Momento ideal para cargar entrenamientos.',avoid:'Nada en particular.',foods:['🥚 Huevos, pollo (proteína)','🥦 Brócoli, espárragos','🍓 Frutas rojas (antioxidantes)','🌾 Avena, arroz integral','🥜 Frutos secos'],training:'Ideal para intensidad: intervalos, pesas.',carbs:'Moderado'},ovulacion:{name:'Ovulación',days:'Días 14–16',color:'var(--orange)',energy:'Máxima',key:'Pico de energía y fuerza. Tu mejor momento deportivo.',avoid:'Procesados inflamatorios.',foods:['🥩 Carnes magras, legumbres','🫐 Arándanos, granada, remolacha','🥑 Palta, aceite de oliva','💧 Hidratación extra','🌿 Semillas de zapallo (zinc)'],training:'Alta intensidad, fuerza máxima, salidas largas.',carbs:'Moderado'},lutea:{name:'Lútea',days:'Días 17–28',color:'var(--purple)',energy:'Decae al final',key:'Más apetito, posible retención, fatiga cognitiva posible.',avoid:'Azúcar refinada, sal en exceso, alcohol.',foods:['🍠 Batata, avena (carbohidratos complejos)','🥦 Brócoli, coliflor','🐟 Salmón, nueces (omega-3)','🍫 Chocolate negro (magnesio)','🍋 Kiwi, naranja (vitamina C)'],training:'Moderado. Escuchá tu cuerpo.',carbs:'Alto'}};
-  const ci2=CI[S.cycle]||CI.ovulacion;
-  const feelN={energia:'con energía',cansada_fisica:'cansada físicamente',cansada_mental:'con fatiga cognitiva',hinchada:'hinchada/con retención',normal:'normal'};
-  const goalM={equilibrado:'Distribuí macros en 40% carbohidratos / 30% proteína / 30% grasas. Comé en ventanas regulares y evitá saltear comidas.',rendimiento:'Aumentá los carbohidratos en días de entreno (+50-60%) y priorizá la proteína post esfuerzo (20-30g en los primeros 30 min).',grasa:'Déficit calórico moderado (máximo -300 kcal/día), alta proteína (1.8-2g/kg), carbohidratos principalmente antes/después del entrenamiento.',musculo:'Superávit calórico leve (+200-300 kcal), proteína alta (1.8-2.2g/kg), carbohidratos en torno al entrenamiento.'}[S.goal]||'';
-  el.innerHTML=`<div class="nutri-hero"><h2>🥗 Tu Nutricionista Personal</h2><p>Recomendaciones personalizadas según tu ciclo, cómo te sentís y tu objetivo deportivo.</p></div>
-  <div class="sec">fases del ciclo</div>
-  <div class="cycle-phase">${Object.entries(CI).map(([k,v])=>`<div class="phase-card ${k===S.cycle?'active-phase':''}"><div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem"><div class="phase-dot" style="background:${v.color}"></div><div class="phase-name" style="color:${v.color}">${v.name}</div></div><div class="phase-days">${v.days}</div><div style="font-size:.68rem;color:var(--muted);margin-top:.15rem">Energía: ${v.energy}</div>${k===S.cycle?'<div style="font-size:.65rem;font-weight:500;color:var(--pink);margin-top:.3rem">← Vos estás acá</div>':''}</div>`).join('')}</div>
-  <div class="sec">recomendaciones para hoy · ${ci2.name}</div>
-  <div class="card"><div class="lbl">Qué necesita tu cuerpo</div><p style="font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:.75rem">${ci2.key}</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;font-size:.78rem"><div><div style="font-weight:500;margin-bottom:.3rem">✅ Carbohidratos hoy</div><div style="color:var(--muted)">${ci2.carbs}</div></div><div><div style="font-weight:500;margin-bottom:.3rem">🏋️ Entrenamiento ideal</div><div style="color:var(--muted)">${ci2.training}</div></div></div>${ci2.avoid?`<div style="margin-top:.75rem;font-size:.78rem"><span style="font-weight:500">⚠️ Limitá hoy:</span> <span style="color:var(--muted)">${ci2.avoid}</span></div>`:''}</div>
-  <div class="sec">alimentos recomendados</div>
-  <div class="nutri-food">${ci2.foods.map(f=>`<div class="food-card"><div style="font-size:.8rem;line-height:1.6;color:var(--muted)">${f}</div></div>`).join('')}</div>
-  <div class="sec">para tu objetivo: ${S.goal}</div>
-  <div class="insight teal"><div class="it">🎯 Estrategia nutricional</div><div class="ib">${goalM}</div></div>
-  ${td.tsb<-10?`<div class="insight purple"><div class="it">⚡ Tu fatiga de entrenamiento es alta</div><div class="ib">Con TSB de ${td.tsb}, tu cuerpo necesita recuperación. Aumentá los carbohidratos complejos y la proteína. No hagas restricción calórica cuando estás muy cargada.</div></div>`:''}
-  <div class="sec">consultá tu nutricionista IA</div>
-  <div class="nutri-input-wrap"><h3>Contame más para darte un consejo personalizado</h3>
-    <div class="check-row"><input type="checkbox" id="ch1"><label for="ch1">Tengo entrenamiento hoy</label></div>
-    <div class="check-row"><input type="checkbox" id="ch2"><label for="ch2">Entrené fuerte ayer</label></div>
-    <div class="check-row"><input type="checkbox" id="ch3"><label for="ch3">Quiero mejorar quema de grasa</label></div>
-    <div class="check-row"><input type="checkbox" id="ch4"><label for="ch4">Tengo antojos de dulce</label></div>
-    <div class="check-row"><input type="checkbox" id="ch5"><label for="ch5">Tengo un largo (+90 min) próximamente</label></div>
-    <div class="field" style="margin-top:.75rem;margin-bottom:0"><label>¿Algo más que quieras preguntarme?</label>
-      <textarea id="nutri-extra" rows="3" style="width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;background:var(--bg);color:var(--text);outline:none;resize:vertical" placeholder="Ej: ¿Qué como antes de una carrera de 10K?"></textarea>
+    <div class="rh-label">Reporte integrado · Carol</div>
+    <h1 class="rh-title">Tu semana<br>en <em>perspectiva</em></h1>
+    <div class="rh-date">${periodLabel} · ${new Date().toLocaleDateString('es-AR',{day:'numeric',month:'long',year:'numeric'})}</div>
+    <div class="rh-score" style="background:${stColor}20;color:${stColor}">● ${estado}</div>
+ 
+    <div class="report-block"><h2>🏃 Entrenamiento</h2>
+      <p>En ${periodLabel} completaste <strong>${acts.length} actividades</strong>, recorriste <strong>${fmtDist(Math.round(tD))}</strong> y estuviste <strong>${fmtDur(tT)}</strong> en movimiento.</p>
     </div>
-    <button class="nutri-btn" onclick="askNutri()">Consultarle →</button>
-    <div class="nutri-loading" id="nutri-loading"><div class="ns"></div><span>Preparando tu consejo…</span></div>
-    <div class="nutri-response" id="nutri-response"></div>
+    <div class="report-block"><h2>⚡ Forma y fatiga</h2><p>${fatigaT}</p></div>
+    <div class="report-block"><h2>🔥 Zonas y quema de grasa</h2><p>${zonaT}</p></div>
+    <div class="report-block"><h2>🏔️ Entrenamientos largos</h2><p>${largosT}</p></div>
+ 
+    ${recentJ.length?`
+    <div class="report-block"><h2>📓 Bienestar (últimos ${recentJ.length} días)</h2>
+      <p>${avgEnergy?`Energía promedio: <strong>${avgEnergy}/10</strong>. `:''} ${avgSleep?`Sueño: <strong>${avgSleep}/10</strong>. `:''}${mealConsistency>0?`Registraste comidas completas en <strong>${mealConsistency} días</strong>. `:''}${symList.length?`Los síntomas más frecuentes fueron: <strong>${symList.join(', ')}</strong>.`:''}</p>
+    </div>
+ 
+    ${symList.includes('Retención líquidos')||symList.includes('Hinchazón')?`
+    <div class="report-block"><h2>💧 Conexión nutrición–rendimiento</h2>
+      <p>Notaste <strong>retención de líquidos y/o hinchazón</strong> en el período. Esto puede afectar el peso y la sensación durante el entrenamiento. La fase lútea la amplifica. Estrategia: reducí el sodio, aumentá el potasio (banana, papa) y el magnesio (chocolate negro, semillas).</p>
+    </div>`:''}
+ 
+    ${symList.includes('Antojo dulce')?`
+    <div class="report-block"><h2>🍫 Antojos de dulce</h2>
+      <p>Los antojos frecuentes de dulce en la fase lútea son normales — la progesterona baja la serotonina. La estrategia es no resistir sino redirigir: <strong>batata, avena, banana, garbanzos y chocolate negro 70%+</strong> satisfacen el antojo sin el ciclo vicioso del azúcar refinada.</p>
+    </div>`:''}
+    `:` <div class="report-block"><h2>📓 Journal sin datos aún</h2><p>Empezá a registrar tu journal diario para ver el análisis integrado de bienestar, nutrición y deporte.</p></div>`}
+ 
+    <div class="report-block"><h2>💡 Qué podés hacer diferente</h2>
+      <p>${td.tsb<-10?'<strong>Esta semana:</strong> Bajá el volumen 20-30% y priorizá el sueño. Una sesión de recuperación activa vale más que otro entrenamiento fuerte.<br><br>':''}${z2p<50?`<strong>Para quemar más grasa:</strong> En la próxima salida larga, corré a un ritmo de conversación. FC objetivo: ${Math.round(S.fcmax*.6)}–${Math.round(S.fcmax*.7)} bpm.<br><br>`:''}${largos.length&&avgHRL&&getZone(avgHRL)>=3?'<strong>Para llegar sin cansancio al final:</strong> En salidas +90 min, consumí 30-60g de carbohidratos/hora (gel, banana, dátiles).<br><br>':''}<strong>Consistencia:</strong> Entrenar 4 veces/semana moderado durante meses supera cualquier semana muy intensa.</p>
+    </div>
   </div>`;
 }
-window.askNutri=async()=>{
-  const checks=[document.getElementById('ch1')?.checked&&'Tiene entrenamiento hoy',document.getElementById('ch2')?.checked&&'Entrenó fuerte ayer',document.getElementById('ch3')?.checked&&'Quiere mejorar quema de grasa',document.getElementById('ch4')?.checked&&'Tiene antojos de dulce',document.getElementById('ch5')?.checked&&'Tiene entrenamiento largo próximamente'].filter(Boolean);
-  const extra=document.getElementById('nutri-extra')?.value?.trim();
-  const series=computeCtlAtl(),td=series[series.length-1]||{ctl:0,atl:0,tsb:0};
-  const acts=getFilteredActs({period:'month'}),tD=acts.reduce((s,a)=>s+(a.distance||0),0);
-  const cN={menstruacion:'Menstruación (días 1-5)',folicular:'Fase folicular (días 6-13)',ovulacion:'Ovulación (días 14-16)',lutea:'Fase lútea (días 17-28)'};
-  const fN={energia:'con energía',cansada_fisica:'cansada físicamente',cansada_mental:'con fatiga cognitiva',hinchada:'hinchada/con retención',normal:'normal'};
-  const prompt=`Sos una nutricionista deportiva especializada en mujeres atletas. Respondé en español, de forma cálida, clara y sin tecnicismos innecesarios. Sé práctica y específica.\n\nPerfil de la atleta:\n- Deportes: Running, Ciclismo, Gym\n- Objetivo: ${S.goal}\n- Ciclo menstrual: ${cN[S.cycle]||S.cycle}\n- Cómo se siente hoy: ${fN[S.feeling]||S.feeling}\n- FC máxima: ${S.fcmax} bpm\n- Peso aprox: ${S.weight} kg\n- Estado forma/fatiga (TSB): ${td.tsb} (${td.tsb>10?'en forma':td.tsb>-10?'neutral':td.tsb>-30?'cargada':'muy fatigada'})\n- Distancia entrenada este mes: ${(tD/1000).toFixed(1)} km\n\nSituación:\n${checks.length?checks.map(c=>'- '+c).join('\n'):'- Sin situaciones marcadas'}${extra?'\nPregunta específica: '+extra:''}\n\nDá recomendaciones concretas para hoy. Incluí:\n1. Qué comer hoy con ejemplos de comida argentina/latinoamericana\n2. Qué evitar y por qué\n3. Un tip para su objetivo y fase del ciclo\n4. Si tiene entrenamiento, qué comer antes y después\n\nMáximo 350 palabras. Escribí directo, de persona a persona.`;
-  document.getElementById('nutri-loading').style.display='flex';
-  document.getElementById('nutri-response').style.display='none';
+ 
+// ══════════════════════════════════════════════════
+//  CHAT
+// ══════════════════════════════════════════════════
+const SYS=`Sos una nutricionista deportiva especializada en nutrición funcional y ciclo menstrual. Respondé en español, de forma cálida, directa y sin tecnicismos. Sé específica con comida argentina/latinoamericana.
+ 
+Perfil de Carol:
+- Deportes: Running, Ciclismo, Gym
+- Ciclo: 21-25 días
+- Síntomas: antojos de dulce, retención de líquidos
+- Objetivo: equilibrio + quema de grasa
+- Fase actual: ${S.cycle}
+- Come de todo
+ 
+Cuando respondas: explicá el mecanismo biológico de forma simple, usá comida concreta, sé práctica. Máximo 250 palabras.`;
+ 
+window.sendQ=t=>{document.getElementById('chat-input').value=t;sendChat();};
+window.sendChat=async()=>{
+  const inp=document.getElementById('chat-input');
+  const btn=document.getElementById('chat-snd');
+  const text=inp.value.trim();if(!text)return;
+  addMsg(text,'user');inp.value='';btn.disabled=true;
+  const typing=document.createElement('div');typing.className='typing';typing.style.display='flex';typing.innerHTML='<span></span><span></span><span></span>';
+  document.getElementById('chat-msgs').appendChild(typing);scrollChat();
+  chatHistory.push({role:'user',content:text});
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYS,messages:chatHistory.slice(-10)})});
     const d=await r.json();
-    document.getElementById('nutri-loading').style.display='none';
-    document.getElementById('nutri-response').style.display='block';
-    document.getElementById('nutri-response').textContent=d.content?.[0]?.text||'No pude generar respuesta. Intentá de nuevo.';
-  }catch(e){document.getElementById('nutri-loading').style.display='none';document.getElementById('nutri-response').style.display='block';document.getElementById('nutri-response').textContent='Error al conectar. Intentá de nuevo.';}
+    const reply=d.content?.[0]?.text||'No pude responder ahora. Intentá de nuevo.';
+    typing.remove();addMsg(reply,'bot');chatHistory.push({role:'assistant',content:reply});
+  }catch(e){typing.remove();addMsg('Error de conexión. Intentá de nuevo.','bot');}
+  btn.disabled=false;
 };
-const tabBuilders={resumen:buildResumen,actividades:buildActividades,zonas:buildZonas,forma:buildForma,reporte:buildReporte,nutri:buildNutri};
+function addMsg(text,role){const el=document.getElementById('chat-msgs');const d=document.createElement('div');d.className='msg '+role;d.innerHTML=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');el.appendChild(d);scrollChat();}
+function scrollChat(){const el=document.getElementById('chat-msgs');if(el)el.scrollTop=el.scrollHeight;}
+ 
+// ══════════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════════
+const tabBuilders={inicio:buildInicio,actividades:buildActividades,zonas:buildZonas,forma:buildForma,journal:buildJournal,nutricion:buildNutricion,reporte:buildReporte};
 const builtTabs=new Set();
 function showTab(name,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -469,9 +999,17 @@ function showTab(name,el){
   el.classList.add('active');document.getElementById('tab-'+name).classList.add('active');
   if(!builtTabs.has(name)&&tabBuilders[name]){tabBuilders[name]();builtTabs.add(name);}
 }
+ 
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
 (async()=>{
   const handled=await handleCallback();
-  if(!handled){const token=sessionStorage.getItem('pd_token'),ath=sessionStorage.getItem('pd_athlete');if(token&&ath)await boot(token,JSON.parse(ath));else showAuth();}
+  if(!handled){
+    const token=sessionStorage.getItem('cd_token'),ath=sessionStorage.getItem('cd_athlete');
+    if(token&&ath)await boot(token,JSON.parse(ath));
+    else showAuth();
+  }
 })();
 </script>
 </body>
