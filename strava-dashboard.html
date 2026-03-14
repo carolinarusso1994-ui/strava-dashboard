@@ -395,6 +395,154 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
 </div>
  
 <script>
+// ═══ CYCLE DATA (from nutricionista) ═══
+const CYCLE_LEN = 23;
+ 
+const PHASES = [
+  {
+    id:'men', name:'Menstruación', emoji:'🌑', days:[1,5], color:'var(--men)', light:'var(--men-l)', mid:'var(--men-m)',
+    energy:'Baja · Descansá', energyClass:'men',
+    headline:'Tu cuerpo libera prostaglandinas inflamatorias. El hierro baja, la energía cae.',
+    why:'Durante la menstruación, el estrógeno y la progesterona están en su punto más bajo. Las prostaglandinas generan inflamación y calambres. El hierro se pierde con el sangrado, afectando el transporte de oxígeno al músculo.',
+    keyNutrients:[
+      {icon:'🩸', name:'Hierro + Vitamina C', why:'Repone el hierro perdido. La vit C multiplica la absorción x3.', foods:'Lentejas, espinaca + kiwi o limón'},
+      {icon:'🐟', name:'Omega-3', why:'Inhibe las prostaglandinas inflamatorias. Reduce calambres.', foods:'Salmón, sardinas, nueces, chía'},
+      {icon:'🍫', name:'Magnesio', why:'Relaja la musculatura uterina. Reduce calambres y mejora el sueño.', foods:'Chocolate negro 70%+, semillas de zapallo, espinaca'},
+      {icon:'💧', name:'Potasio', why:'Reduce la retención de líquidos que empeora en esta fase.', foods:'Banana, papa con cáscara, palta'},
+    ],
+    foods:[
+      {name:'Lentejas con limón',why:'Hierro + absorción'},{name:'Salmón a la plancha',why:'Omega-3 antiinflamatorio'},
+      {name:'Porridge de avena',why:'Magnesio + saciedad'},{name:'Banana + chocolate negro',why:'Potasio + magnesio'},
+      {name:'Espinaca salteada',why:'Hierro + folatos'},{name:'Nueces',why:'Omega-3 vegetal'},
+    ],
+    avoid:['Sal en exceso → empeora la retención de líquidos','Alcohol → aumenta inflamación y fatiga','Azúcar refinada → picos de glucosa que agravan el SPM','Lácteos en exceso → pueden aumentar calambres en algunas mujeres'],
+    training:{badge:'🧘 Movimiento suave',color:'#fee2e2',text:'#991b1b',tip:'Es el peor momento para entrenar fuerte. Tu VO2 max baja, la coordinación disminuye. Priorizá yoga, caminatas, nado suave o descanso activo. Si entrenás, reducí la intensidad al 60-70%.'},
+    carbStrategy:'Moderado-alto. Tu cuerpo necesita glucosa para mantener energía y serotonina.',
+    proteinTarget:'1.6g/kg',
+    fatFocus:'Omega-3 prioritario',
+  },
+  {
+    id:'fol', name:'Fase Folicular', emoji:'🌱', days:[6,12], color:'var(--fol)', light:'var(--fol-l)', mid:'var(--fol-m)',
+    energy:'Alta y en aumento', energyClass:'fol',
+    headline:'El estrógeno sube → más energía, mejor recuperación, mayor fuerza disponible.',
+    why:'El folículo ovárico crece y produce estrógeno. Este hormona aumenta la síntesis proteica muscular, mejora la sensibilidad a la insulina y potencia el estado de ánimo vía serotonina. Es tu ventana de mayor adaptación al entrenamiento.',
+    keyNutrients:[
+      {icon:'💪', name:'Proteína alta', why:'El estrógeno + proteína = síntesis muscular máxima. Tu cuerpo responde mejor que en cualquier otra fase.', foods:'Pollo, huevos, legumbres, yogur griego'},
+      {icon:'🌾', name:'Carbohidratos complejos', why:'Sensibilidad a la insulina alta → mejor uso de la glucosa para el músculo, sin acumular grasa.', foods:'Arroz integral, batata, avena, quinoa'},
+      {icon:'🥦', name:'Crucíferas + DIM', why:'El brócoli y coliflor contienen DIM que ayuda a metabolizar el estrógeno correctamente, evitando su acumulación.', foods:'Brócoli, coliflor, repollitos de Bruselas'},
+      {icon:'🍓', name:'Antioxidantes', why:'El estrés oxidativo del entrenamiento intenso aumenta. Los antioxidantes aceleran la recuperación.', foods:'Arándanos, frutillas, granada, pimientos'},
+    ],
+    foods:[
+      {name:'Huevos + tostada integral',why:'Proteína completa + carbos'},{name:'Pollo con quinoa y brócoli',why:'Proteína + DIM'},
+      {name:'Yogur griego + arándanos',why:'Proteína + antioxidantes'},{name:'Batata asada',why:'Carbos complejos'},
+      {name:'Legumbres + arroz',why:'Proteína vegetal completa'},{name:'Smoothie verde',why:'Antioxidantes + fibra'},
+    ],
+    avoid:['Restricción calórica severa → desperdiciás la ventana anabólica','Exceso de grasas saturadas → puede afectar el metabolismo del estrógeno','Alcohol → interfiere con la síntesis proteica'],
+    training:{badge:'🏋️ Alta intensidad',color:'#dcfce7',text:'#14532d',tip:'Tu mejor ventana de entrenamiento. Ideal para pesas pesadas, intervalos, running fuerte. Tu cuerpo recupera más rápido gracias al estrógeno. Aprovechá para los entrenamientos más exigentes de la semana.'},
+    carbStrategy:'Moderado. Buena sensibilidad a la insulina, podés tolerar más carbos post-entreno.',
+    proteinTarget:'1.8g/kg',
+    fatFocus:'Grasas saludables normales',
+  },
+  {
+    id:'ovu', name:'Ovulación', emoji:'🌕', days:[13,16], color:'var(--ovu)', light:'var(--ovu-l)', mid:'var(--ovu-m)',
+    energy:'Máxima', energyClass:'ovu',
+    headline:'Pico de estrógeno + testosterona → máxima fuerza, energía y motivación.',
+    why:'El pico de LH desencadena la ovulación. El estrógeno está en su máximo y hay un pulso de testosterona. Esto se traduce en mayor fuerza muscular, mejor estado de ánimo, mayor libido y máxima energía disponible. Es tu superpoder hormonal.',
+    keyNutrients:[
+      {icon:'⚡', name:'Proteína + Zinc', why:'El zinc es cofactor de la testosterona. Maximiza el efecto anabólico del pico hormonal.', foods:'Carnes magras, mariscos, semillas de zapallo, legumbres'},
+      {icon:'🫐', name:'Antioxidantes potentes', why:'El pico de estrógeno puede generar estrés oxidativo. Los antioxidantes protegen el óvulo y reducen inflamación.', foods:'Remolacha, granada, arándanos, cacao'},
+      {icon:'🥑', name:'Grasas saludables', why:'El colesterol es precursor de las hormonas sexuales. Las grasas buenas sostienen la producción hormonal.', foods:'Palta, aceite de oliva, nueces, salmón'},
+      {icon:'💧', name:'Hidratación extra', why:'La temperatura basal sube 0.2–0.5°C durante la ovulación. Necesitás más agua para el rendimiento deportivo.', foods:'Agua, caldos, frutas con agua (melón, pepino)'},
+    ],
+    foods:[
+      {name:'Carne magra + ensalada remolacha',why:'Zinc + antioxidantes'},{name:'Palta + huevo',why:'Grasas + proteína'},
+      {name:'Salmón con quinoa',why:'Omega-3 + proteína completa'},{name:'Smoothie remolacha',why:'Nitratos → rendimiento'},
+      {name:'Nueces + frutas',why:'Grasas + antioxidantes'},{name:'Lentejas + pimiento',why:'Hierro + vitamina C'},
+    ],
+    avoid:['Comida muy procesada o inflamatoria → puede interferir con la ovulación','Restricción de grasas → bajás la producción hormonal','Exceso de azúcar → picos de insulina que afectan el equilibrio hormonal'],
+    training:{badge:'🏆 Rendimiento máximo',color:'#fed7aa',text:'#9a3412',tip:'Tu ventana de máximo rendimiento. Hacé tus PR, salidas más largas, sesiones más intensas. Tu umbral de dolor sube (estrógeno actúa como analgésico natural), tu recuperación es más rápida. ¡Aprovechalo!'},
+    carbStrategy:'Moderado. Podés tolerar bien los carbohidratos con alta actividad.',
+    proteinTarget:'1.8–2g/kg',
+    fatFocus:'Grasas saludables para sostener la producción hormonal',
+  },
+  {
+    id:'lut', name:'Fase Lútea', emoji:'🌘', days:[17,23], color:'var(--lut)', light:'var(--lut-l)', mid:'var(--lut-m)',
+    energy:'Decae hacia el final', energyClass:'lut',
+    headline:'La progesterona domina → más apetito, temperatura alta, el cuerpo quema más grasa.',
+    why:'El cuerpo amarillo produce progesterona. Esta hormona sube la temperatura basal, aumenta el metabolismo basal en ~150-300 kcal/día, disminuye la sensibilidad a la insulina y aumenta el apetito (especialmente por dulce). Es también la fase donde más grasa se oxida durante el ejercicio aeróbico de baja intensidad.',
+    keyNutrients:[
+      {icon:'🍠', name:'Carbohidratos complejos', why:'La resistencia a la insulina aumenta → preferí carbos de digestión lenta para evitar picos y controlar antojos.', foods:'Batata, avena, arroz integral, legumbres'},
+      {icon:'🧠', name:'Triptófano + B6', why:'La progesterona puede bajar la serotonina → el triptófano es su precursor. La B6 potencia la conversión.', foods:'Pavo, banana, avena, semillas de girasol'},
+      {icon:'🌿', name:'Magnesio', why:'Reduce el SPM, calambres, antojos de dulce y mejora el sueño. Muchas mujeres son deficientes.', foods:'Chocolate negro, espinaca, semillas de zapallo, palta'},
+      {icon:'💊', name:'Vitamina B6 + calcio', why:'Estudios muestran que reducen significativamente los síntomas del SPM, incluyendo retención de líquidos y cambios de humor.', foods:'Garbanzos, salmón, pollo, yogur, almendras'},
+    ],
+    foods:[
+      {name:'Porridge de avena + banana',why:'Triptófano + magnesio'},{name:'Batata al horno',why:'Carbos lentos anti-antojos'},
+      {name:'Chocolate negro 70%+',why:'Magnesio + saciedad'},{name:'Pavo o pollo',why:'Triptófano'},
+      {name:'Garbanzos al horno',why:'B6 + proteína + saciedad'},{name:'Almendras',why:'Calcio + magnesio'},
+    ],
+    avoid:['Azúcar refinada → empeora los antojos en un ciclo vicioso','Sal en exceso → dispara la retención de líquidos','Cafeína en exceso → aumenta ansiedad y calidad del sueño','Alcohol → agrava el SPM y la retención'],
+    training:{badge:'🚶 Cardio suave + fuerza moderada',color:'#ede9fe',text:'#4c1d95',tip:'Fase ideal para cardio de baja intensidad en Z2 — tu cuerpo quema más grasa que en cualquier otra fase durante esfuerzo aeróbico. Evitá los HIIT intensos en los últimos días. Escuchá tu cuerpo.'},
+    carbStrategy:'Alto (el cuerpo lo necesita y el metabolismo basal sube). Priorizá carbos complejos.',
+    proteinTarget:'1.6–1.8g/kg (alta proteína controla antojos)',
+    fatFocus:'Z2 cardio = máxima quema de grasa',
+  },
+];
+ 
+const MEAL_PLANS = {
+  men: [
+    {day:'Lunes',meals:[
+      {name:'Desayuno',main:'Porridge de avena con banana y semillas de chía',desc:'Con canela y miel (sin azúcar refinada)',why:'Magnesio + triptófano + fibra'},
+      {name:'Almuerzo',main:'Lentejas estofadas con papa y limón',desc:'Añadí pimiento rojo para vitamina C',why:'Hierro + absorción potenciada'},
+      {name:'Merienda',main:'Chocolate negro 70% + nueces',desc:'30g chocolate + 20g nueces',why:'Magnesio + omega-3'},
+      {name:'Cena',main:'Salmón a la plancha con espinaca salteada',desc:'Con aceite de oliva y ajo',why:'Omega-3 antiinflamatorio + hierro'},
+    ]},
+    {day:'Martes',meals:[
+      {name:'Desayuno',main:'Tostadas integrales con palta y huevo',desc:'2 huevos + ½ palta + limón',why:'Proteína + grasas antiinflamatorias'},
+      {name:'Almuerzo',main:'Arroz integral con pollo y brócoli',desc:'Con cúrcuma y jengibre',why:'Antiinflamatorio natural + proteína'},
+      {name:'Merienda',main:'Yogur griego con arándanos',desc:'Sin azúcar agregada',why:'Proteína + antioxidantes'},
+      {name:'Cena',main:'Sopa de vegetales con legumbres',desc:'Reconfortante y fácil de digerir',why:'Hidratación + minerales'},
+    ]},
+  ],
+  fol: [
+    {day:'Miércoles',meals:[
+      {name:'Desayuno',main:'Huevos revueltos con tostada integral y tomate',desc:'2-3 huevos + tostada de masa madre',why:'Proteína completa + carbos'},
+      {name:'Almuerzo',main:'Pollo a la plancha con quinoa y brócoli',desc:'Con aceite de oliva y limón',why:'Proteína + DIM (metabolismo estrógeno)'},
+      {name:'Merienda',main:'Smoothie de arándanos, espinaca y yogur',desc:'Sin azúcar, con jengibre',why:'Antioxidantes + proteína'},
+      {name:'Cena',main:'Pesca blanca con batata y ensalada verde',desc:'Merluza, lenguado o pejerrey',why:'Proteína ligera + carbos complejos'},
+    ]},
+    {day:'Jueves',meals:[
+      {name:'Desayuno',main:'Bowl de avena con frutillas y semillas',desc:'Con proteína en polvo opcional',why:'Fibra + antioxidantes + saciedad'},
+      {name:'Almuerzo',main:'Ensalada completa: legumbres + huevo + vegetales',desc:'Con vinagreta de mostaza',why:'Proteína vegetal + vitaminas'},
+      {name:'Merienda',main:'Puñado de nueces + fruta',desc:'Manzana, pera o naranja',why:'Grasas + fibra + energía sostenida'},
+      {name:'Cena',main:'Milanesa de soja o pollo con arroz y ensalada',desc:'Al horno, no frito',why:'Proteína + carbos + fibra'},
+    ]},
+  ],
+  ovu: [
+    {day:'Viernes',meals:[
+      {name:'Desayuno',main:'Tostadas con palta, huevo y semillas de zapallo',desc:'2 huevos + ½ palta + semillas',why:'Zinc + grasas hormonales'},
+      {name:'Almuerzo',main:'Carne magra con ensalada de remolacha',desc:'Lomo, cuadril o pollo + remolacha rallada',why:'Hierro + zinc + nitratos'},
+      {name:'Merienda',main:'Smoothie de granada, arándanos y espinaca',desc:'Con agua de coco',why:'Antioxidantes máximos + hidratación'},
+      {name:'Cena',main:'Salmón con quinoa y pimiento asado',desc:'Con limón y aceite de oliva',why:'Omega-3 + proteína + antioxidantes'},
+    ]},
+  ],
+  lut: [
+    {day:'Sábado',meals:[
+      {name:'Desayuno',main:'Porridge de avena con banana y mantequilla de almendras',desc:'Con canela + semillas de girasol',why:'Triptófano + magnesio + carbos lentos'},
+      {name:'Almuerzo',main:'Batata asada con pollo y ensalada verde',desc:'Con aceite de oliva y aguacate',why:'Carbos complejos + proteína + saciedad'},
+      {name:'Merienda',main:'Chocolate negro 70% + almendras',desc:'30g chocolate + 15 almendras',why:'Magnesio → controla antojos de dulce'},
+      {name:'Cena',main:'Garbanzos al horno con vegetales',desc:'Con pimentón y aceite de oliva',why:'B6 + proteína + fibra anti-antojos'},
+    ]},
+    {day:'Domingo',meals:[
+      {name:'Desayuno',main:'Tostadas con palta, huevo y tomate',desc:'Con orégano y limón',why:'Grasas + proteína + saciedad'},
+      {name:'Almuerzo',main:'Pescado con arroz integral y brócoli',desc:'Con jengibre y cúrcuma',why:'Omega-3 + carbos lentos + antiinflamatorio'},
+      {name:'Merienda',main:'Banana + 2 cucharadas mantequilla de maní',desc:'Sin azúcar agregada',why:'Triptófano + proteína → evita antojos'},
+      {name:'Cena',main:'Sopa de lentejas con espinaca',desc:'Con cúrcuma, comino y limón',why:'Hierro + proteína + reconfortante'},
+    ]},
+  ],
+};
+ 
+ 
 // ══════════════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════════════
@@ -673,12 +821,16 @@ function buildJournal(){
   const el=document.getElementById('tab-journal');
   const today=new Date().toISOString().slice(0,10);
   const todayEntry=JOURNAL.find(j=>j.date===today);
-  const cycleLabel={menstruacion:'Menstruación',folicular:'Folicular',ovulacion:'Ovulación',lutea:'Lútea'}[S.cycle]||'';
   const pastEntries=[...JOURNAL].reverse().slice(0,20);
+ 
+  // Build sleep/energy chart data from journal
+  const last14=[...JOURNAL].slice(-14);
+  const cSleep='cj-sleep-'+Date.now();
+  const cEnergy='cj-energy-'+Date.now();
  
   el.innerHTML=`
   <div class="journal-form">
-    <div class="jf-title">Registro de <em>hoy</em></div>
+    <div class="jf-title">Registro de <em>hoy</em> · ${new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'})}</div>
     <div style="margin-bottom:1rem">
       <div class="lbl">¿Cómo te sentís emocionalmente?</div>
       <div class="mood-selector" id="mood-sel">
@@ -686,22 +838,23 @@ function buildJournal(){
       </div>
     </div>
     <div style="margin-bottom:1rem">
-      <div class="lbl">Energía y fatiga</div>
-      <div class="slider-row"><span class="slider-lbl">Energía (1–10)</span><input type="range" id="sl-energy" min="1" max="10" value="${todayEntry?todayEntry.energy:6}" oninput="document.getElementById('sv-energy').textContent=this.value"><span class="slider-val" id="sv-energy">${todayEntry?todayEntry.energy:6}</span></div>
+      <div class="lbl">Energía, fatiga y sueño</div>
+      <div class="slider-row"><span class="slider-lbl">Energía del día (1–10)</span><input type="range" id="sl-energy" min="1" max="10" value="${todayEntry?todayEntry.energy:6}" oninput="document.getElementById('sv-energy').textContent=this.value"><span class="slider-val" id="sv-energy">${todayEntry?todayEntry.energy:6}</span></div>
       <div class="slider-row"><span class="slider-lbl">Fatiga física (1–10)</span><input type="range" id="sl-fatigue" min="1" max="10" value="${todayEntry?todayEntry.fatigue:4}" oninput="document.getElementById('sv-fatigue').textContent=this.value"><span class="slider-val" id="sv-fatigue">${todayEntry?todayEntry.fatigue:4}</span></div>
-      <div class="slider-row"><span class="slider-lbl">Calidad de sueño (1–10)</span><input type="range" id="sl-sleep" min="1" max="10" value="${todayEntry?todayEntry.sleep:7}" oninput="document.getElementById('sv-sleep').textContent=this.value"><span class="slider-val" id="sv-sleep">${todayEntry?todayEntry.sleep:7}</span></div>
+      <div class="slider-row"><span class="slider-lbl">Calidad del sueño (1–10)</span><input type="range" id="sl-sleep" min="1" max="10" value="${todayEntry?todayEntry.sleepQ:7}" oninput="document.getElementById('sv-sleep').textContent=this.value"><span class="slider-val" id="sv-sleep">${todayEntry?todayEntry.sleepQ:7}</span></div>
+      <div class="slider-row"><span class="slider-lbl">Horas dormidas</span><input type="range" id="sl-sleeph" min="3" max="12" step="0.5" value="${todayEntry?todayEntry.sleepH:7.5}" oninput="document.getElementById('sv-sleeph').textContent=this.value+'h'"><span class="slider-val" id="sv-sleeph">${todayEntry?todayEntry.sleepH+'h':'7.5h'}</span></div>
     </div>
     <div style="margin-bottom:1rem">
       <div class="lbl">¿Qué comiste hoy?</div>
       <div class="meal-input-grid">
-        <div class="meal-input-item"><label>🌅 Desayuno</label><textarea id="meal-breakfast" rows="3" placeholder="Ej: avena con banana y miel…">${todayEntry?todayEntry.meals?.breakfast||'':''}</textarea></div>
-        <div class="meal-input-item"><label>☀️ Almuerzo</label><textarea id="meal-lunch" rows="3" placeholder="Ej: pollo con quinoa y ensalada…">${todayEntry?todayEntry.meals?.lunch||'':''}</textarea></div>
-        <div class="meal-input-item"><label>🌙 Cena</label><textarea id="meal-dinner" rows="3" placeholder="Ej: salmón con batata asada…">${todayEntry?todayEntry.meals?.dinner||'':''}</textarea></div>
+        <div class="meal-input-item"><label>🌅 Desayuno</label><textarea id="meal-breakfast" rows="3" placeholder="Ej: avena con banana y miel…">${todayEntry&&todayEntry.meals?todayEntry.meals.breakfast||'':''}</textarea></div>
+        <div class="meal-input-item"><label>☀️ Almuerzo</label><textarea id="meal-lunch" rows="3" placeholder="Ej: pollo con quinoa y ensalada…">${todayEntry&&todayEntry.meals?todayEntry.meals.lunch||'':''}</textarea></div>
+        <div class="meal-input-item"><label>🌙 Cena</label><textarea id="meal-dinner" rows="3" placeholder="Ej: salmón con batata asada…">${todayEntry&&todayEntry.meals?todayEntry.meals.dinner||'':''}</textarea></div>
       </div>
       <div class="meal-input-grid" style="margin-top:.5rem">
-        <div class="meal-input-item"><label>🍎 Merienda / snacks</label><textarea id="meal-snacks" rows="2" placeholder="Ej: frutas, nueces…">${todayEntry?todayEntry.meals?.snacks||'':''}</textarea></div>
-        <div class="meal-input-item"><label>💧 Agua (vasos)</label><textarea id="meal-water" rows="2" placeholder="Ej: 8 vasos">${todayEntry?todayEntry.meals?.water||'':''}</textarea></div>
-        <div class="meal-input-item"><label>⚠️ Evitaste algo?</label><textarea id="meal-avoided" rows="2" placeholder="Ej: azúcar, sal…">${todayEntry?todayEntry.meals?.avoided||'':''}</textarea></div>
+        <div class="meal-input-item"><label>🍎 Merienda / snacks</label><textarea id="meal-snacks" rows="2" placeholder="Ej: nueces, frutas…">${todayEntry&&todayEntry.meals?todayEntry.meals.snacks||'':''}</textarea></div>
+        <div class="meal-input-item"><label>💧 Agua (vasos aprox)</label><textarea id="meal-water" rows="2" placeholder="Ej: 8 vasos">${todayEntry&&todayEntry.meals?todayEntry.meals.water||'':''}</textarea></div>
+        <div class="meal-input-item"><label>⚠️ Evitaste algo?</label><textarea id="meal-avoided" rows="2" placeholder="Ej: azúcar, sal, alcohol…">${todayEntry&&todayEntry.meals?todayEntry.meals.avoided||'':''}</textarea></div>
       </div>
     </div>
     <div style="margin-bottom:1rem">
@@ -711,8 +864,8 @@ function buildJournal(){
       </div>
     </div>
     <div class="jf-notes" style="margin-bottom:1rem">
-      <div class="lbl">Notas libres · ¿Algo que quieras recordar de hoy?</div>
-      <textarea id="journal-notes" placeholder="Cómo fue el entrenamiento, cómo te sentiste, qué notaste en tu cuerpo…">${todayEntry?todayEntry.notes||'':''}</textarea>
+      <div class="lbl">Notas libres</div>
+      <textarea id="journal-notes" placeholder="Cómo fue el entrenamiento, qué notaste en tu cuerpo, cómo te sentiste…">${todayEntry?todayEntry.notes||'':''}</textarea>
     </div>
     <div style="display:flex;align-items:center">
       <button class="save-btn" onclick="saveJournal()">Guardar registro</button>
@@ -720,14 +873,31 @@ function buildJournal(){
     </div>
   </div>
  
+  ${last14.length>=3?`
+  <div class="sec">tendencias · últimos ${last14.length} días</div>
+  <div class="grid g2">
+    <div class="chart-card">
+      <div class="ct">Sueño · calidad y horas</div>
+      <div class="cs">Calidad (1-10) y horas dormidas</div>
+      <div class="cwrap"><canvas id="${cSleep}"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">Energía vs Fatiga</div>
+      <div class="cs">Cómo se sintió tu cuerpo cada día</div>
+      <div class="cwrap"><canvas id="${cEnergy}"></canvas></div>
+    </div>
+  </div>
+  `:last14.length>0?'<div class="insight sky"><div class="it">Registrá al menos 3 días para ver tus tendencias.</div></div>':''}
+ 
   ${pastEntries.length?`
   <div class="sec">registros anteriores</div>
   ${pastEntries.map(e=>`<div class="journal-entry">
     <div class="je-header">
       <div class="je-date">${fmtDateFull(e.date)}</div>
-      <div style="display:flex;gap:.4rem;align-items:center">
-        <span class="badge bt">⚡${e.energy||'?'}</span>
-        <span class="badge bs">😴${e.sleep||'?'}</span>
+      <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap">
+        ${e.energy?`<span class="badge bt">⚡${e.energy}</span>`:''}
+        ${e.sleepQ?`<span class="badge bs">💤${e.sleepQ}</span>`:''}
+        ${e.sleepH?`<span class="badge bk">${e.sleepH}h</span>`:''}
         ${e.cycle?`<span class="badge bm">${{menstruacion:'🌑',folicular:'🌱',ovulacion:'🌕',lutea:'🌘'}[e.cycle]||'🌿'} ${e.cycleLabel||''}</span>`:''}
       </div>
     </div>
@@ -740,135 +910,268 @@ function buildJournal(){
         ${e.meals.dinner?`<div class="je-meal"><div class="je-meal-name">Cena</div><div class="je-meal-food">${e.meals.dinner}</div></div>`:''}
       </div>
     </div>`:''}
-    ${e.symptoms&&e.symptoms.length?`<div class="je-section"><div class="je-section-lbl">Síntomas</div><div class="je-moods">${e.symptoms.map(s=>`<span class="je-mood">${s}</span>`).join('')}</div></div>`:''}
+    ${e.symptoms&&e.symptoms.filter(s=>s!=='Sin síntomas').length?`<div class="je-section"><div class="je-section-lbl">Síntomas</div><div class="je-moods">${e.symptoms.filter(s=>s!=='Sin síntomas').map(s=>`<span class="je-mood">${s}</span>`).join('')}</div></div>`:''}
     ${e.notes?`<div class="je-section"><div class="je-text" style="font-style:italic;color:var(--muted)">"${e.notes}"</div></div>`:''}
   </div>`).join('')}`:''}
   `;
+ 
+  // Render sleep/energy charts
+  if(last14.length>=3){
+    setTimeout(()=>{
+      const labels=last14.map(j=>fmtDate(j.date));
+      mC(cSleep,{type:'bar',data:{labels,datasets:[
+        {label:'Calidad sueño',data:last14.map(j=>j.sleepQ||null),backgroundColor:'rgba(74,106,138,.6)',borderColor:'var(--sky)',borderWidth:1.5,borderRadius:3,yAxisID:'y'},
+        {label:'Horas',data:last14.map(j=>j.sleepH||null),type:'line',borderColor:'var(--sage)',backgroundColor:'transparent',borderWidth:2,pointRadius:3,pointBackgroundColor:'var(--sage)',yAxisID:'y2',tension:.3},
+      ]},options:{...cOpts(),scales:{
+        x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:10},color:'var(--muted)',maxTicksLimit:7}},
+        y:{grid:{color:'var(--border)'},ticks:{font:{size:10},color:'var(--muted)'},min:0,max:10,title:{display:true,text:'Calidad',font:{size:9},color:'var(--muted)'}},
+        y2:{position:'right',grid:{display:false},ticks:{font:{size:10},color:'var(--sage)'},min:0,max:12,title:{display:true,text:'Horas',font:{size:9},color:'var(--sage)'}},
+      }}});
+      mC(cEnergy,{type:'line',data:{labels,datasets:[
+        {label:'Energía',data:last14.map(j=>j.energy||null),borderColor:'var(--dusk)',backgroundColor:'rgba(184,112,64,.15)',borderWidth:2,pointRadius:3,pointBackgroundColor:'var(--dusk)',fill:true,tension:.3},
+        {label:'Fatiga',data:last14.map(j=>j.fatigue||null),borderColor:'var(--rose)',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,pointBackgroundColor:'var(--rose)',borderDash:[4,3],tension:.3},
+      ]},options:{...cOpts(),scales:{
+        x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:10},color:'var(--muted)',maxTicksLimit:7}},
+        y:{grid:{color:'var(--border)'},ticks:{font:{size:10},color:'var(--muted)'},min:1,max:10},
+      }}});
+    },80);
+  }
 }
  
-window.toggleMood=btn=>{btn.classList.toggle('selected');};
-window.toggleSymptom=btn=>{btn.classList.toggle('selected');};
- 
-window.saveJournal=()=>{
-  const today=new Date().toISOString().slice(0,10);
-  const moods=[...document.querySelectorAll('#mood-sel .mood-btn.selected')].map(b=>b.textContent);
-  const symptoms=[...document.querySelectorAll('#symptom-sel .symptom-btn.selected')].map(b=>b.textContent);
-  const entry={
-    date:today,
-    cycle:S.cycle,
-    cycleLabel:{menstruacion:'Menstruación',folicular:'Folicular',ovulacion:'Ovulación',lutea:'Lútea'}[S.cycle]||'',
-    moods,symptoms,
-    energy:parseInt(document.getElementById('sl-energy').value),
-    fatigue:parseInt(document.getElementById('sl-fatigue').value),
-    sleep:parseInt(document.getElementById('sl-sleep').value),
-    meals:{
-      breakfast:document.getElementById('meal-breakfast').value.trim(),
-      lunch:document.getElementById('meal-lunch').value.trim(),
-      dinner:document.getElementById('meal-dinner').value.trim(),
-      snacks:document.getElementById('meal-snacks').value.trim(),
-      water:document.getElementById('meal-water').value.trim(),
-      avoided:document.getElementById('meal-avoided').value.trim(),
-    },
-    notes:document.getElementById('journal-notes').value.trim(),
-  };
-  JOURNAL=JOURNAL.filter(j=>j.date!==today);
-  JOURNAL.push(entry);
-  JOURNAL.sort((a,b)=>a.date.localeCompare(b.date));
-  try{localStorage.setItem('carol_journal',JSON.stringify(JOURNAL));}catch(e){}
-  const ok=document.getElementById('save-ok');
-  ok.style.display='inline';
-  setTimeout(()=>ok.style.display='none',2500);
-  builtTabs.delete('reporte');
-};
- 
 // ══════════════════════════════════════════════════
-//  TAB: NUTRICIÓN
+//  TAB: NUTRICIÓN (full cycle-based content)
 // ══════════════════════════════════════════════════
-const PHASES_DATA={
-  menstruacion:{name:'Menstruación',emoji:'🌑',days:'1–5',color:'var(--men)',bg:'var(--men-l)',energy:'Baja',
-    why:'Las hormonas están en su mínimo. Las prostaglandinas causan inflamación. Perdés hierro con el sangrado, lo que afecta el transporte de oxígeno al músculo.',
-    foods:[{n:'Lentejas + limón',w:'Hierro + vitamina C'},{n:'Salmón',w:'Omega-3 antiinflamatorio'},{n:'Espinaca',w:'Hierro + folatos'},{n:'Chocolate negro 70%',w:'Magnesio → calambres'},{n:'Banana',w:'Potasio → reduce retención'},{n:'Jengibre + cúrcuma',w:'Antiinflamatorio natural'}],
-    avoid:'Sal, alcohol, azúcar refinada, exceso de lácteos.',
-    meals:[{d:'Lunes',f:['Porridge avena + banana + chía','Lentejas estofadas con limón','Nueces + chocolate negro','Salmón con espinaca salteada']},{d:'Martes',f:['Tostada integral + palta + huevo','Arroz integral + pollo + cúrcuma','Yogur griego + arándanos','Sopa de vegetales + legumbres']}]},
-  folicular:{name:'Folicular',emoji:'🌱',days:'6–13',color:'var(--fol)',bg:'var(--fol-l)',energy:'Alta y en aumento',
-    why:'El estrógeno sube → mejor síntesis muscular, sensibilidad a la insulina óptima, estado de ánimo positivo. Tu mejor ventana para construir fuerza y resistencia.',
-    foods:[{n:'Huevos',w:'Proteína completa + colina'},{n:'Pollo + quinoa',w:'Proteína + carbos'},{n:'Brócoli + coliflor',w:'DIM → metabolismo estrógeno'},{n:'Arándanos + frutillas',w:'Antioxidantes'},{n:'Avena',w:'Fibra + energía sostenida'},{n:'Yogur griego',w:'Proteína + probióticos'}],
-    avoid:'Restricción calórica severa. Exceso de grasas saturadas.',
-    meals:[{d:'Miércoles',f:['Huevos + tostada masa madre','Pollo + quinoa + brócoli','Smoothie arándanos + espinaca','Merluza + batata + ensalada']},{d:'Jueves',f:['Bowl avena + frutillas + semillas','Ensalada completa: legumbres + huevo','Nueces + manzana','Milanesa de pollo al horno + arroz']}]},
-  ovulacion:{name:'Ovulación',emoji:'🌕',days:'14–16',color:'var(--ovu)',bg:'var(--ovu-l)',energy:'Máxima',
-    why:'Pico de estrógeno + testosterona. Máxima fuerza, energía y motivación. Tu cuerpo responde mejor al entrenamiento intenso y necesita más antioxidantes y zinc.',
-    foods:[{n:'Carne magra + remolacha',w:'Zinc + nitratos → rendimiento'},{n:'Palta + huevo',w:'Grasas hormonales + proteína'},{n:'Salmón',w:'Omega-3 + proteína completa'},{n:'Granada + arándanos',w:'Antioxidantes máximos'},{n:'Semillas de zapallo',w:'Zinc → testosterona'},{n:'Agua de coco',w:'Hidratación extra (temp sube)'}],
-    avoid:'Comida inflamatoria y procesada. Restricción de grasas.',
-    meals:[{d:'Viernes',f:['Tostada + palta + huevo + semillas','Carne magra + remolacha rallada','Smoothie granada + arándanos + espinaca','Salmón + quinoa + pimiento asado']},{d:'Sábado',f:['Yogur griego + granola + frutas rojas','Ensalada de lentejas + huevo + palta','Fruta + chocolate negro','Pollo + batata + ensalada verde']}]},
-  lutea:{name:'Lútea',emoji:'🌘',days:'17–23',color:'var(--lut)',bg:'var(--lut-l)',energy:'Decae hacia el final',
-    why:'Progesterona domina. Sube el metabolismo basal (+150-300 kcal/día), baja la sensibilidad a la insulina, aumenta el apetito. Es la fase donde más grasa quemás en cardio Z2 (Barr et al., 1995).',
-    foods:[{n:'Batata + avena',w:'Carbos complejos → anti-antojos'},{n:'Banana + mantequilla maní',w:'Triptófano → serotonina'},{n:'Chocolate negro 70%',w:'Magnesio → reduce SPM'},{n:'Garbanzos al horno',w:'B6 → serotonina'},{n:'Salmón + nueces',w:'Omega-3 → ánimo'},{n:'Almendras',w:'Calcio + magnesio'}],
-    avoid:'Azúcar refinada (ciclo vicioso antojos), sal en exceso, alcohol.',
-    meals:[{d:'Domingo',f:['Porridge avena + banana + almendras','Batata asada + pollo + ensalada','Chocolate negro + almendras','Garbanzos al horno + vegetales']},{d:'Lunes',f:['Tostada + palta + huevo','Salmón + arroz integral + brócoli','Banana + 2 cdas mantequilla maní','Sopa lentejas + espinaca + cúrcuma']}]},
-};
- 
 function buildNutricion(){
   const el=document.getElementById('tab-nutricion');
-  const ph=PHASES_DATA[S.cycle]||PHASES_DATA.ovulacion;
-  const cycleOrder=['menstruacion','folicular','ovulacion','lutea'];
-  let selectedPhase=S.cycle;
  
-  function renderDetail(phaseId){
-    const p=PHASES_DATA[phaseId];
-    document.getElementById('nutri-detail-inner').innerHTML=`
-      <div class="nd-why" style="border-left-color:${p.color}">${p.why}</div>
-      <div style="margin-bottom:1rem">
-        <div class="lbl">Alimentos recomendados</div>
-        <div class="foods-grid2">${p.foods.map(f=>`<div class="fc2"><div class="fc2-name">${f.n}</div><div class="fc2-why">${f.w}</div></div>`).join('')}</div>
-      </div>
-      <div style="margin-bottom:1rem"><div class="lbl">Evitá</div><p style="font-size:.76rem;color:var(--muted);line-height:1.6">${p.avoid}</p></div>
-      <div>
-        <div class="lbl">Plan de comidas sugerido</div>
-        <div class="meals-week">${p.meals.map(day=>`<div class="mw-day"><div class="mw-day-name">${day.d}</div><div class="mw-meals">${['🌅 Desayuno','☀️ Almuerzo','🍎 Merienda','🌙 Cena'].map((mn,i)=>`<div class="mw-meal"><span class="mw-meal-label">${mn}</span><span class="mw-meal-food">${day.f[i]||'—'}</span></div>`).join('')}</div></div>`).join('')}
-        </div>
-      </div>
-    `;
-    // Update selected state
-    document.querySelectorAll('.pc2').forEach(c=>{c.classList.remove('selected');if(c.dataset.phase===phaseId)c.classList.add('selected');});
+  function getPhaseForDay(day){if(day<=5)return PHASES[0];if(day<=12)return PHASES[1];if(day<=16)return PHASES[2];return PHASES[3];}
+ 
+  // Current cycle day from S.cycle
+  const cycleMap={menstruacion:3,folicular:9,ovulacion:15,lutea:20};
+  let currentDay=cycleMap[S.cycle]||15;
+  let currentPhase=PHASES.find(p=>p.id===S.cycle)||PHASES[2];
+  let selectedPhase=currentPhase;
+ 
+  function renderPhases(){
+    const CYCLE_LEN_LOCAL=23;
+    const segs=PHASES.map((p,i)=>`<div style="flex:${p.days[1]-p.days[0]+1};background:${p.color};opacity:${p.id===currentPhase.id?1:.3};cursor:pointer;transition:opacity .2s" onclick="npSelectPhase('${p.id}')"></div>`);
+    document.getElementById('np-strip').innerHTML=segs.join('');
+    document.getElementById('np-grid').innerHTML=PHASES.map(p=>`
+      <div class="pc2 ${p.id} ${p.id===currentPhase.id?'current':''} ${p.id===selectedPhase.id?'selected':''}" data-phase="${p.id}" onclick="npSelectPhase('${p.id}')">
+        <div class="pc2-name">${p.emoji} ${p.name}</div>
+        <div class="pc2-days">Días ${p.days[0]}–${p.days[1]}</div>
+        <div class="pc2-energy ${p.id}">${p.energy}</div>
+      </div>`).join('');
   }
  
+  function renderDetail(ph){
+    const el2=document.getElementById('np-detail');
+    if(!el2||!ph)return;
+    // Determine dark colors adapted for carol's dark theme
+    const colMap={men:'#e87070',fol:'#70c870',ovu:'#e8a060',lut:'#a880e0'};
+    const bgMap={men:'rgba(220,80,80,.12)',fol:'rgba(80,160,80,.12)',ovu:'rgba(220,130,60,.12)',lut:'rgba(150,80,220,.12)'};
+    const c=colMap[ph.id]||'var(--terra)';
+    const bg=bgMap[ph.id]||'var(--terra-l)';
+    el2.innerHTML=`
+      <div style="background:${bg};border-left:3px solid ${c};border-radius:0 var(--radius) var(--radius) 0;padding:1rem 1.25rem;margin-bottom:1.25rem">
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem">
+          <span style="font-size:1.4rem">${ph.emoji}</span>
+          <div>
+            <div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:300;color:var(--text)">${ph.name}</div>
+            <div style="font-size:.65rem;font-weight:500;letter-spacing:.08em;color:${c};text-transform:uppercase;margin-top:.1rem">🔬 Basado en evidencia científica</div>
+          </div>
+        </div>
+        <p style="font-size:.78rem;color:var(--text2);line-height:1.65">${ph.why}</p>
+        <div style="display:flex;gap:.6rem;margin-top:.75rem;flex-wrap:wrap">
+          <div style="font-size:.7rem;padding:.25rem .7rem;border-radius:100px;background:${bg};border:1px solid ${c}40;color:${c};font-weight:500">🎯 Proteína: ${ph.proteinTarget}</div>
+          <div style="font-size:.7rem;padding:.25rem .7rem;border-radius:100px;background:${bg};border:1px solid ${c}40;color:${c};font-weight:500">🌾 ${ph.carbStrategy.split('.')[0]}</div>
+          <div style="font-size:.7rem;padding:.25rem .7rem;border-radius:100px;background:${bg};border:1px solid ${c}40;color:${c};font-weight:500">${ph.training.badge}</div>
+        </div>
+      </div>
+ 
+      <div class="grid g2" style="margin-bottom:1.25rem">
+        <div>
+          <div class="lbl">Nutrientes clave</div>
+          ${ph.keyNutrients.map(n=>`<div style="display:flex;gap:.6rem;margin-bottom:.85rem;align-items:flex-start">
+            <div style="width:30px;height:30px;border-radius:7px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">${n.icon}</div>
+            <div>
+              <div style="font-size:.8rem;font-weight:500;color:var(--text2);margin-bottom:.1rem">${n.name}</div>
+              <div style="font-size:.72rem;color:var(--muted);line-height:1.5">${n.why}</div>
+              <div style="font-size:.68rem;color:var(--teal,#0d9488);margin-top:.12rem;font-weight:500">→ ${n.foods}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+        <div>
+          <div class="lbl">Alimentos recomendados</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:1rem">
+            ${ph.foods.map(f=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.5rem .7rem">
+              <div style="font-size:.75rem;font-weight:500;color:var(--text2);margin-bottom:.08rem">${f.name}</div>
+              <div style="font-size:.64rem;color:var(--muted)">${f.why}</div>
+            </div>`).join('')}
+          </div>
+          <div class="lbl">Evitá</div>
+          ${ph.avoid.map(a=>`<div style="display:flex;gap:.45rem;align-items:flex-start;margin-bottom:.38rem;font-size:.75rem;color:var(--muted);line-height:1.5"><div style="width:5px;height:5px;border-radius:50%;background:var(--men);flex-shrink:0;margin-top:.35rem"></div><span>${a}</span></div>`).join('')}
+        </div>
+      </div>
+ 
+      <div style="background:${bg};border-radius:var(--radius-sm);padding:.85rem 1rem;border-left:2px solid ${c};margin-bottom:1.25rem">
+        <div style="font-size:.75rem;font-weight:500;color:${c};margin-bottom:.3rem">${ph.training.badge}</div>
+        <div style="font-size:.76rem;color:var(--text2);line-height:1.6">${ph.training.tip}</div>
+      </div>
+ 
+      <div class="lbl">Plan de comidas sugerido</div>
+      ${(MEAL_PLANS[ph.id]||[]).map(day=>`
+        <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:.85rem 1.1rem;margin-bottom:.5rem">
+          <div style="font-size:.68rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem">${day.day}</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem">
+            ${day.meals.map(m=>`<div>
+              <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.15rem">${m.name}</div>
+              <div style="font-size:.75rem;color:var(--text2);font-weight:500;line-height:1.35;margin-bottom:.1rem">${m.main}</div>
+              <div style="font-size:.64rem;color:var(--muted)">${m.desc}</div>
+              <div style="font-size:.62rem;color:#0d9488;margin-top:.2rem;font-weight:500">🔬 ${m.why}</div>
+            </div>`).join('')}
+          </div>
+        </div>`).join('')}
+    `;
+  }
+ 
+  function renderFatBurn(){
+    const el3=document.getElementById('np-fatburn');
+    if(!el3)return;
+    const tips=[
+      {ph:PHASES[0],title:'Recuperación activa',body:'Hormonas en mínimos. No es el momento para quemar grasa activamente. Descansá bien → tu cuerpo quema más grasa en las fases siguientes.',tip:'Come hierro + vitamina C para reponer lo perdido.',c:'rgba(220,80,80,.15)',tc:'#e87070'},
+      {ph:PHASES[1],title:'Construí músculo para quemar grasa',body:'El estrógeno mejora la síntesis muscular y la sensibilidad a la insulina. Tu cuerpo usa los carbos para músculo, no para grasa. Más músculo = más quema en reposo.',tip:'Priorizá fuerza. Cada kg de músculo quema 50-100 kcal/día extra.',c:'rgba(80,160,80,.15)',tc:'#70c870'},
+      {ph:PHASES[2],title:'Rendimiento máximo → máxima quema',body:'Pico de estrógeno + testosterona. HIIT y fuerza máxima son muy efectivos. Quemás más calorías por sesión que en cualquier otra fase.',tip:'Aprovechá para HIIT o sesiones de fuerza máxima.',c:'rgba(220,130,60,.15)',tc:'#e8a060'},
+      {ph:PHASES[3],title:'La fase de oro para quemar grasa 🏆',body:'Progesterona sube el metabolismo basal (+150-300 kcal/día). Durante cardio Z2, la tasa de oxidación de grasas es significativamente mayor (Barr et al., 1995). Tu ventana de oro.',tip:'Cardio Z2 (60-70% FCmáx) de 45-90 min = quema de grasa máxima.',c:'rgba(150,80,220,.15)',tc:'#a880e0'},
+    ];
+    el3.innerHTML=`<div class="grid g2">${tips.map(t=>`
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.3rem">
+        <div style="font-size:.65rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:${t.tc};margin-bottom:.3rem">${t.ph.emoji} ${t.ph.name}</div>
+        <div style="font-family:'Fraunces',serif;font-size:.95rem;font-weight:300;color:var(--text);margin-bottom:.5rem;line-height:1.3">${t.title}</div>
+        <div style="font-size:.76rem;color:var(--muted);line-height:1.65;margin-bottom:.65rem">${t.body}</div>
+        <div style="background:${t.c};border-radius:7px;padding:.5rem .75rem;font-size:.73rem;font-weight:500;color:${t.tc};line-height:1.5">💡 ${t.tip}</div>
+      </div>`).join('')}</div>`;
+  }
+ 
+  function renderWeekPlan(){
+    const tabEl=document.getElementById('np-week-tabs');
+    const gridEl=document.getElementById('np-week-grid');
+    if(!tabEl||!gridEl)return;
+    const dayNames=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const today2=new Date();
+    window._npWeekDays=[];
+    let tabsHTML='';
+    for(let i=0;i<7;i++){
+      const d=new Date(today2);d.setDate(today2.getDate()+i);
+      const cd=((currentDay-1+i)%CYCLE_LEN)+1;
+      const ph=getPhaseForDay(cd);
+      window._npWeekDays.push({date:d,cycleDay:cd,phase:ph,label:i===0?'Hoy':dayNames[d.getDay()]});
+      tabsHTML+=`<div class="day-tab phase-${ph.id} ${i===0?'active':''}" onclick="npSelectDay(${i},this)">${i===0?'Hoy':dayNames[d.getDay()]} <span style="font-size:.6rem;opacity:.7">D${cd}</span></div>`;
+    }
+    tabEl.innerHTML=tabsHTML;
+    npRenderMeals(0);
+  }
+ 
+  window.npSelectDay=(idx,elBtn)=>{
+    document.querySelectorAll('#np-week-tabs .day-tab').forEach(t=>t.classList.remove('active'));
+    elBtn.classList.add('active');
+    npRenderMeals(idx);
+  };
+ 
+  window.npRenderMeals=(idx)=>{
+    const{phase,cycleDay,label}=window._npWeekDays[idx];
+    const plans=MEAL_PLANS[phase.id]||[];
+    const plan=plans[idx%plans.length];
+    const gridEl=document.getElementById('np-week-grid');
+    if(!gridEl||!plan)return;
+    const macros={men:{c:'50-55%',p:'20-25%',f:'20-25%'},fol:{c:'45-50%',p:'25-30%',f:'20-25%'},ovu:{c:'40-45%',p:'25-30%',f:'25-30%'},lut:{c:'50-55%',p:'20-25%',f:'20-25%'}}[phase.id];
+    const colMap={men:'#e87070',fol:'#70c870',ovu:'#e8a060',lut:'#a880e0'};
+    const c=colMap[phase.id]||'var(--terra)';
+    gridEl.innerHTML=`
+      <div style="grid-column:1/-1;display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem;flex-wrap:wrap">
+        <span style="font-family:'Fraunces',serif;font-size:.95rem;color:var(--text2)">${label} · Día ${cycleDay} del ciclo</span>
+        <span style="font-size:.68rem;padding:.2rem .65rem;border-radius:100px;background:${c}20;color:${c};font-weight:500">${phase.emoji} ${phase.name}</span>
+        <div style="display:flex;gap:.3rem">
+          <div style="background:#1e3a8a30;color:#6a9aba;font-size:.65rem;padding:.2rem .5rem;border-radius:5px;font-weight:500">C: ${macros.c}</div>
+          <div style="background:rgba(90,122,74,.2);color:var(--sage);font-size:.65rem;padding:.2rem .5rem;border-radius:5px;font-weight:500">P: ${macros.p}</div>
+          <div style="background:rgba(184,112,64,.2);color:var(--dusk);font-size:.65rem;padding:.2rem .5rem;border-radius:5px;font-weight:500">G: ${macros.f}</div>
+        </div>
+      </div>
+      ${plan.meals.map(m=>`<div class="card">
+        <div class="lbl">${m.name}</div>
+        <div style="font-size:.85rem;font-weight:500;color:var(--text2);margin-bottom:.25rem;line-height:1.35">${m.main}</div>
+        <div style="font-size:.73rem;color:var(--muted);line-height:1.45;margin-bottom:.3rem">${m.desc}</div>
+        <div style="font-size:.66rem;color:#0d9488;font-weight:500">🔬 ${m.why}</div>
+      </div>`).join('')}
+    `;
+  };
+ 
+  window.npSelectPhase=(id)=>{
+    selectedPhase=PHASES.find(p=>p.id===id)||PHASES[2];
+    document.querySelectorAll('.pc2').forEach(c=>{c.classList.remove('selected');if(c.dataset.phase===id)c.classList.add('selected');});
+    renderDetail(selectedPhase);
+  };
+ 
   el.innerHTML=`
-  <div class="nutri-card">
+  <div class="nutri-card" style="margin-bottom:.85rem">
     <div class="nutri-header">
-      <h2>Nutrición <em>cycle-based</em></h2>
-      <p>Recomendaciones basadas en tu fase hormonal, actividad física y objetivos. Ciclo de 21–25 días · Antojos de dulce · Retención de líquidos.</p>
+      <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.4rem">
+        <span style="font-size:1.5rem">🌿</span>
+        <div>
+          <h2>Nutrición <em>cycle-based</em></h2>
+          <p style="margin-bottom:0">Recomendaciones con base científica según tu fase hormonal · Ciclo 21-25 días · Carol</p>
+        </div>
+      </div>
     </div>
     <div style="padding:1.25rem 1.5rem">
-      <div class="lbl">Tu ciclo</div>
-      <div class="phase-track">${cycleOrder.map(id=>{const p=PHASES_DATA[id];return`<div class="pt-seg" style="flex:${p.days.split('–').map(Number).reduce((a,b)=>b-a+1)};background:${p.color};opacity:${id===S.cycle?1:.3}" onclick="selectPhaseNutri('${id}')"></div>`;}).join('')}</div>
-      <div class="phase-cards">${cycleOrder.map(id=>{const p=PHASES_DATA[id];return`<div class="pc2 ${id} ${id===S.cycle?'current':''} ${id===S.cycle?'selected':''}" data-phase="${id}" onclick="selectPhaseNutri('${id}')"><div class="pc2-name">${p.emoji} ${p.name}</div><div class="pc2-days">Días ${p.days}</div><div class="pc2-energy ${id}">${p.energy}</div></div>`;}).join('')}</div>
+      <div class="lbl">Tu ciclo menstrual</div>
+      <div style="display:flex;border-radius:var(--radius-sm);overflow:hidden;height:8px;margin:.5rem 0 1rem" id="np-strip"></div>
+      <div class="phase-cards" id="np-grid"></div>
     </div>
-    <div class="nutri-detail" id="nutri-detail-inner"></div>
   </div>
  
-  <div class="sec">quema de grasa por fase</div>
-  <div class="grid g2">
-    <div class="insight sage"><div class="it">🌱 Folicular: construí músculo</div><div class="ib">El estrógeno alto mejora la síntesis muscular. Más músculo = más quema de grasa en reposo. Priorizá el entrenamiento de fuerza.</div></div>
-    <div class="insight" style="border-left-color:var(--lut)"><div class="it">🌘 Lútea: tu fase de oro para grasa</div><div class="ib">Progesterona sube el metabolismo basal. Durante cardio Z2 (60-70% FCmáx) quemás significativamente más grasa que en otras fases. Basado en Barr et al. (1995).</div></div>
-    <div class="insight sky"><div class="it">🌕 Ovulación: rendimiento máximo</div><div class="ib">HIIT y fuerza máxima son muy efectivos. Quemás más calorías por sesión. Aprovechá para tus entrenamientos más intensos.</div></div>
-    <div class="insight"><div class="it">🌑 Menstruación: recuperación activa</div><div class="ib">No es el momento para entrenar intenso. Un cuerpo bien recuperado quema más grasa en las fases siguientes.</div></div>
+  <div class="sec">tu fase actual · <em id="np-phase-title">${currentPhase.name}</em></div>
+  <div id="np-detail"></div>
+ 
+  <div class="sec">quema de grasa <em>por fase</em></div>
+  <div id="np-fatburn"></div>
+ 
+  <div class="sec">plan semanal <em>próximos 7 días</em></div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem">
+    <div class="day-tabs" id="np-week-tabs"></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-top:.75rem" id="np-week-grid"></div>
   </div>
  
-  <div class="sec">consultá tu nutricionista</div>
+  <div class="sec">fuentes <em>científicas</em></div>
+  <div class="card">
+    ${[
+      ['Oosthuyse & Bosch (2010)','The Effect of the Menstrual Cycle on Exercise Metabolism. Sports Medicine.'],
+      ['Wikström-Frisén et al. (2017)','Effects on power, strength and lean body mass of menstrual cycle based resistance training. JSMPF.'],
+      ['Barr et al. (1995)','Increased fat oxidation during the luteal phase. American Journal of Physiology.'],
+      ['Reed & Leidy (2015)','Role of dietary protein in managing food intake. Advances in Nutrition.'],
+      ['Romero-Moraleda et al. (2019)','Hormonal influences on muscle damage during the menstrual cycle. EJSS.'],
+    ].map(([auth,title],i)=>`<div style="display:flex;gap:.6rem;margin-bottom:.6rem;font-size:.74rem;line-height:1.5">
+      <div style="width:18px;height:18px;border-radius:50%;background:var(--terra);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:600;flex-shrink:0;margin-top:.1rem">${i+1}</div>
+      <div><strong style="color:var(--text2)">${auth}</strong> <span style="color:var(--muted)">— ${title}</span></div>
+    </div>`).join('')}
+  </div>
+ 
+  <div class="sec">nutricionista <em>IA</em></div>
   <div class="chat-wrap">
     <div class="chat-hdr">
       <div class="chat-av">🌿</div>
       <div><div class="chat-hn">Nutricionista <span class="badge bs">Cycle-Based</span></div><div class="chat-hs">Nutrición funcional · Ciclo hormonal · Rendimiento deportivo</div></div>
     </div>
     <div class="chat-msgs" id="chat-msgs">
-      <div class="msg bot">Hola Carol 🌿 Soy tu nutricionista especializada en nutrición funcional y ciclo menstrual. Tengo tu perfil: ciclo 21-25 días, running + ciclismo + gym, tendencia a antojos de dulce y retención de líquidos, objetivo equilibrio + quema de grasa.<br><br><strong>¿En qué te ayudo hoy?</strong></div>
+      <div class="msg bot">Hola Carol 🌿 Soy tu nutricionista especializada en nutrición funcional y ciclo menstrual.<br><br>Tengo tu perfil: ciclo 21-25 días, running + ciclismo + gym, tendencia a <strong>antojos de dulce y retención de líquidos</strong>, objetivo equilibrio + quema de grasa.<br><br><strong>¿En qué te ayudo hoy?</strong></div>
     </div>
     <div class="chat-qqs">
-      <div class="qq" onclick="sendQ('¿Qué como antes de una salida larga de running?')">Pre-entrenamiento largo</div>
-      <div class="qq" onclick="sendQ('¿Cómo manejo los antojos de dulce en la fase lútea?')">Antojos de dulce</div>
-      <div class="qq" onclick="sendQ('¿Qué ayuda con la retención de líquidos?')">Retención de líquidos</div>
+      <div class="qq" onclick="sendQ('¿Qué como antes de una salida larga de running en mi fase actual?')">Pre-entrenamiento largo</div>
+      <div class="qq" onclick="sendQ('¿Cómo manejo los antojos de dulce en la fase lútea?')">Antojos dulce</div>
+      <div class="qq" onclick="sendQ('¿Qué ayuda con la retención de líquidos?')">Retención líquidos</div>
       <div class="qq" onclick="sendQ('¿Cuándo quemo más grasa según mi ciclo?')">Quema de grasa</div>
-      <div class="qq" onclick="sendQ('¿Qué suplementos me recomendás?')">Suplementación</div>
+      <div class="qq" onclick="sendQ('¿Qué suplementos me recomendás para mi perfil?')">Suplementos</div>
+      <div class="qq" onclick="sendQ('¿Cómo afecta el sueño a mi rendimiento y metabolismo?')">Sueño y metabolismo</div>
     </div>
     <div class="chat-input-row">
       <input class="chat-inp" id="chat-input" placeholder="Preguntame lo que quieras…" onkeydown="if(event.key==='Enter')sendChat()">
@@ -877,17 +1180,17 @@ function buildNutricion(){
   </div>
   `;
  
-  // Init detail
-  setTimeout(()=>renderDetail(S.cycle),50);
- 
-  window.selectPhaseNutri=id=>{
-    selectedPhase=id;
-    renderDetail(id);
-  };
+  setTimeout(()=>{
+    renderPhases();
+    renderDetail(selectedPhase);
+    renderFatBurn();
+    renderWeekPlan();
+    document.getElementById('np-phase-title').textContent=currentPhase.name;
+  },50);
 }
  
 // ══════════════════════════════════════════════════
-//  TAB: REPORTE (integrado deporte + nutrición + journal)
+//  TAB: REPORTE (integrado deporte + nutrición + journal + sueño)
 // ══════════════════════════════════════════════════
 function buildReporte(){
   const el=document.getElementById('tab-reporte');
@@ -900,57 +1203,101 @@ function buildReporte(){
   const largos=acts.filter(a=>['Run','TrailRun','Ride','VirtualRide'].includes(a.type)&&(a.moving_time||0)>=3600);
   const avgHRL=largos.filter(a=>a.average_heartrate>0).length?Math.round(mean(largos.filter(a=>a.average_heartrate>0).map(a=>a.average_heartrate))):0;
  
-  // Journal insights
+  // ── Journal analysis ──────────────────────────────
   const recentJ=JOURNAL.slice(-14);
   const avgEnergy=recentJ.length?mean(recentJ.map(j=>j.energy||5)).toFixed(1):null;
-  const avgSleep=recentJ.length?mean(recentJ.map(j=>j.sleep||5)).toFixed(1):null;
-  const topSymptoms={};recentJ.forEach(j=>(j.symptoms||[]).forEach(s=>{topSymptoms[s]=(topSymptoms[s]||0)+1;}));
-  const symList=Object.entries(topSymptoms).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([s])=>s);
-  const mealConsistency=recentJ.filter(j=>j.meals&&j.meals.breakfast&&j.meals.lunch&&j.meals.dinner).length;
+  const avgFatigue=recentJ.length?mean(recentJ.map(j=>j.fatigue||5)).toFixed(1):null;
+  const avgSleepQ=recentJ.length?mean(recentJ.map(j=>j.sleepQ||5)).toFixed(1):null;
+  const avgSleepH=recentJ.length?mean(recentJ.filter(j=>j.sleepH).map(j=>j.sleepH)).toFixed(1):null;
+  const topSymptoms={};recentJ.forEach(j=>(j.symptoms||[]).filter(s=>s!=='Sin síntomas').forEach(s=>{topSymptoms[s]=(topSymptoms[s]||0)+1;}));
+  const symList=Object.entries(topSymptoms).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([s,n])=>({s,n}));
+  const mealDays=recentJ.filter(j=>j.meals&&(j.meals.breakfast||j.meals.lunch||j.meals.dinner)).length;
+ 
+  // ── Food log summary ─────────────────────────────
+  const allFoods=recentJ.flatMap(j=>j.meals?[j.meals.breakfast,j.meals.lunch,j.meals.dinner,j.meals.snacks].filter(Boolean):[]);
+  const foodText=allFoods.join(' ').toLowerCase();
+  const proteinFoods=['pollo','carne','huevo','legumbre','lentejas','garbanzo','salmón','atún','yogur'].filter(f=>foodText.includes(f));
+  const carbFoods=['avena','arroz','batata','papa','quinoa','pan','tostada'].filter(f=>foodText.includes(f));
+  const fatFoods=['palta','nuez','almendra','aceite','salmón','chía'].filter(f=>foodText.includes(f));
+  const antiInflam=['jengibre','cúrcuma','arándano','espinaca','brócoli','remolacha'].filter(f=>foodText.includes(f));
+ 
+  // ── Sleep correlation with performance ───────────
+  const sleepActCorr=recentJ.filter(j=>j.sleepQ&&j.energy).length;
+  const lowSleepDays=recentJ.filter(j=>(j.sleepQ||10)<5||(j.sleepH||10)<6).length;
+  const highEnergyAfterGoodSleep=recentJ.filter(j=>(j.sleepQ||0)>=7&&(j.energy||0)>=7).length;
  
   const stColor=td.tsb>10?'var(--sage)':td.tsb>-10?'var(--dusk)':td.tsb>-30?'var(--terra)':'var(--rose)';
   const estado=td.tsb>10?'En forma':td.tsb>-10?'En balance':td.tsb>-30?'Algo cargada':'Muy cargada';
   const periodLabel={'week':'esta semana','month':'este mes','3months':'los últimos 3 meses','year':'este año','all':'tu historial','custom':'el período'}[S.filter.period]||'el período';
  
-  const fatigaT=td.tsb>10?'Tu cuerpo está recuperado y en buen momento para entrenar fuerte o competir.':td.tsb>-10?'Tu cuerpo está en balance. Podés entrenar normal sin exigirte de más.':td.tsb>-30?'Estás acumulando fatiga. Es señal de que necesitás más descanso y buena alimentación.':'La acumulación de fatiga es alta. Tu cuerpo necesita descanso antes de volver a cargar.';
-  const zonaT=z2p>=60?`El ${z2p}% de tu entrenamiento fue en Z2. Excelente — estás construyendo eficiencia aeróbica y tu cuerpo usa principalmente grasa como combustible.`:z2p>=40?`El ${z2p}% en Z2. Hay margen para mejorar. Bajá un poco el ritmo en los largos.`:`Solo el ${z2p}% en Z2. Esto explica el cansancio en los largos — demasiados carbohidratos, muy poca grasa.`;
-  const largosT=!largos.length?'No tuviste entrenamientos largos (+1 hora) en este período.':avgHRL&&getZone(avgHRL)>=3?`En los largos tu FC promedio fue ${avgHRL} bpm (${zLbl[getZone(avgHRL)]}). Estás quemando carbohidratos, lo que explica el cansancio al final. Meta: mantener FC bajo ${Math.round(S.fcmax*.7)} bpm.`:
-  `Tus ${largos.length} entrenamiento${largos.length>1?'s':''} largo${largos.length>1?'s':''} estuvieron bien en intensidad.`;
+  const fatigaT=td.tsb>10?'Tu cuerpo está recuperado y en buen momento para entrenar fuerte o competir.':td.tsb>-10?'Balance entre carga y recuperación. Podés entrenar normal sin exigirte de más.':td.tsb>-30?'Estás acumulando bastante carga de entrenamiento. Es señal de que necesitás priorizar el descanso.':'La acumulación de fatiga es alta. Tu cuerpo necesita descanso antes de volver a cargar.';
+  const zonaT=z2p>=60?`El ${z2p}% en Z2 es excelente — estás construyendo eficiencia aeróbica y tu cuerpo usa principalmente grasa como combustible.`:z2p>=40?`El ${z2p}% en Z2 tiene margen de mejora. Bajá el ritmo en los largos para mantenerte en zona de grasa.`:`Solo el ${z2p}% en Z2 explica el cansancio en los entrenamientos largos — demasiados carbohidratos, poca grasa.`;
+  const largosT=!largos.length?'No tuviste entrenamientos largos (+1 hora) en este período.':avgHRL&&getZone(avgHRL)>=3?`En los largos tu FC promedio fue ${avgHRL} bpm (${zLbl[getZone(avgHRL)]}). Estás quemando carbohidratos principalmente, lo que explica la fatiga al final. Meta: mantener FC bajo ${Math.round(S.fcmax*.7)} bpm.`:`Tus ${largos.length} entrenamiento${largos.length>1?'s':''} largo${largos.length>1?'s':''} estuvieron bien en intensidad de zona.`;
+ 
+  const cR1='cr1-'+Date.now(),cR2='cr2-'+Date.now();
  
   el.innerHTML=`${filterBar('fb-rp',6,false)}
   <div class="report-hero">
-    <div class="rh-label">Reporte integrado · Carol</div>
-    <h1 class="rh-title">Tu semana<br>en <em>perspectiva</em></h1>
-    <div class="rh-date">${periodLabel} · ${new Date().toLocaleDateString('es-AR',{day:'numeric',month:'long',year:'numeric'})}</div>
-    <div class="rh-score" style="background:${stColor}20;color:${stColor}">● ${estado}</div>
+    <div class="rh-label">Reporte integrado · Carol · ${new Date().toLocaleDateString('es-AR',{day:'numeric',month:'long',year:'numeric'})}</div>
+    <h1 class="rh-title">Tu bienestar<br>en <em>perspectiva</em></h1>
+    <div class="rh-date">${periodLabel} · FCmáx: ${S.fcmax} bpm</div>
+    <div class="rh-score" style="background:${stColor}20;color:${stColor}">● Estado deportivo: ${estado}</div>
+    ${avgSleepQ?`<div class="rh-score" style="background:${parseFloat(avgSleepQ)>=7?'rgba(74,106,138,.15)':'rgba(196,80,106,.15)'};color:${parseFloat(avgSleepQ)>=7?'var(--sky)':'var(--rose)'};margin-left:.5rem">😴 Sueño promedio: ${avgSleepQ}/10 ${avgSleepH?'· '+avgSleepH+'h':''}</div>`:''}
  
-    <div class="report-block"><h2>🏃 Entrenamiento</h2>
-      <p>En ${periodLabel} completaste <strong>${acts.length} actividades</strong>, recorriste <strong>${fmtDist(Math.round(tD))}</strong> y estuviste <strong>${fmtDur(tT)}</strong> en movimiento.</p>
+    <div class="report-block"><h2>🏃 Entrenamiento en ${periodLabel}</h2>
+      <p>Completaste <strong>${acts.length} actividades</strong>, recorriste <strong>${fmtDist(Math.round(tD))}</strong> y estuviste <strong>${fmtDur(tT)}</strong> en movimiento.${acts.length?` Promedio de <strong>${fmtDur(Math.round(tT/acts.length))}</strong> por sesión.`:''}</p>
     </div>
     <div class="report-block"><h2>⚡ Forma y fatiga</h2><p>${fatigaT}</p></div>
     <div class="report-block"><h2>🔥 Zonas y quema de grasa</h2><p>${zonaT}</p></div>
     <div class="report-block"><h2>🏔️ Entrenamientos largos</h2><p>${largosT}</p></div>
  
-    ${recentJ.length?`
-    <div class="report-block"><h2>📓 Bienestar (últimos ${recentJ.length} días)</h2>
-      <p>${avgEnergy?`Energía promedio: <strong>${avgEnergy}/10</strong>. `:''} ${avgSleep?`Sueño: <strong>${avgSleep}/10</strong>. `:''}${mealConsistency>0?`Registraste comidas completas en <strong>${mealConsistency} días</strong>. `:''}${symList.length?`Los síntomas más frecuentes fueron: <strong>${symList.join(', ')}</strong>.`:''}</p>
+    ${recentJ.length>=3?`
+    <div class="report-block"><h2>😴 Sueño y rendimiento · últimos ${recentJ.length} días</h2>
+      <p>${avgSleepQ?`Calidad de sueño promedio: <strong>${avgSleepQ}/10</strong>${avgSleepH?' · '+avgSleepH+' horas promedio':''}. `:''}${lowSleepDays>0?`Tuviste <strong>${lowSleepDays} noches</strong> con sueño deficiente (menos de 6h o calidad baja). `:''}${highEnergyAfterGoodSleep>0?`En <strong>${highEnergyAfterGoodSleep} días</strong> después de buen sueño reportaste alta energía — la correlación es clara. `:''}${parseFloat(avgSleepQ||0)<6?'<strong>El sueño deficiente impacta directamente en la fatiga percibida, la recuperación muscular y los antojos.</strong> Priorizarlo es tan importante como el entrenamiento.':''}</p>
+    </div>
+    ${parseFloat(avgSleepQ||0)<6||lowSleepDays>2?`<div class="insight sky"><div class="it">😴 Estrategia para mejorar el sueño</div><div class="ib">En la <strong>fase lútea</strong> el sueño suele ser más difícil (progesterona eleva la temperatura). Estrategias: magnesio 30 min antes de dormir (chocolate negro, espinaca), cenar carbohidratos complejos (avena, batata), evitar cafeína después de las 14hs y luz azul 1h antes de acostarte.</div></div>`:''}
+ 
+    <div class="report-block"><h2>🍽️ Análisis de alimentación · ${mealDays} días registrados</h2>
+      ${mealDays>0?`<p>${proteinFoods.length>0?`<strong>Fuentes de proteína detectadas:</strong> ${proteinFoods.join(', ')}. `:'<strong>No se detectaron fuentes claras de proteína.</strong> Asegurate de incluir proteína en cada comida para la recuperación muscular. '}${carbFoods.length>0?`<strong>Carbohidratos complejos:</strong> ${carbFoods.join(', ')}. `:''}${antiInflam.length>0?`<strong>Alimentos antiinflamatorios:</strong> ${antiInflam.join(', ')} — excelente para la recuperación. `:''}${fatFoods.length===0?'<strong>No se detectaron grasas saludables.</strong> Incorporá palta, nueces, aceite de oliva o salmón para sostener la producción hormonal y la recuperación. ':''}</p>`:`<p>Registrá tu alimentación en el Journal para ver el análisis aquí. Con al menos 3 días de registros podés ver patrones de proteína, carbohidratos, grasas y alimentos antiinflamatorios.</p>`}
     </div>
  
-    ${symList.includes('Retención líquidos')||symList.includes('Hinchazón')?`
-    <div class="report-block"><h2>💧 Conexión nutrición–rendimiento</h2>
-      <p>Notaste <strong>retención de líquidos y/o hinchazón</strong> en el período. Esto puede afectar el peso y la sensación durante el entrenamiento. La fase lútea la amplifica. Estrategia: reducí el sodio, aumentá el potasio (banana, papa) y el magnesio (chocolate negro, semillas).</p>
+    ${symList.length>0?`<div class="report-block"><h2>🌿 Síntomas del ciclo</h2>
+      <p>Los síntomas más frecuentes: <strong>${symList.map(({s,n})=>`${s} (${n}x)`).join(', ')}</strong>. ${symList.some(({s})=>s==='Retención líquidos'||s==='Hinchazón')?'La retención de líquidos es normal en la fase lútea — reducí el sodio y aumentá el potasio (banana, papa) y el magnesio. ':''}${symList.some(({s})=>s==='Antojo dulce')?'Los antojos de dulce son normales cuando baja la serotonina (fase lútea) — redirigílos hacia carbohidratos complejos: batata, avena, banana, garbanzos y chocolate negro 70%+. ':''}${symList.some(({s})=>s==='Niebla mental')?'La niebla mental puede indicar falta de omega-3 (DHA para la función cognitiva), bajo nivel de hierro, o sueño insuficiente. ':''}</p>
     </div>`:''}
  
-    ${symList.includes('Antojo dulce')?`
-    <div class="report-block"><h2>🍫 Antojos de dulce</h2>
-      <p>Los antojos frecuentes de dulce en la fase lútea son normales — la progesterona baja la serotonina. La estrategia es no resistir sino redirigir: <strong>batata, avena, banana, garbanzos y chocolate negro 70%+</strong> satisfacen el antojo sin el ciclo vicioso del azúcar refinada.</p>
+    <div class="report-block"><h2>🔗 Conexión deporte · nutrición · ciclo</h2>
+      <p>${td.tsb<-10&&parseFloat(avgSleepQ||10)<6?'<strong>Combinación crítica:</strong> Alta fatiga de entrenamiento + sueño deficiente = riesgo alto de sobreentrenamiento. Esta semana bajá el volumen, priorizá el sueño y comé más carbohidratos para la recuperación. ':''
+      }${z2p<40&&symList.some(({s})=>s==='Antojo dulce')?'La baja proporción de tiempo en Z2 junto con antojos frecuentes puede indicar que tu cuerpo está dependiendo demasiado de los carbohidratos. La adaptación metabólica para quemar más grasa requiere tiempo en Z2 consistente + buena nutrición en la fase lútea. ':''
+      }${largos.length>0&&avgHRL&&getZone(avgHRL)>=3?'Para llegar sin cansancio al final de los largos: combiná entrenamiento en Z2 + consumí 30-60g de carbohidratos/hora en sesiones +90 min + hidratate bien antes (especialmente en ovulación, cuando la temperatura basal sube). ':''
+      }La consistencia es clave: entrenamiento moderado + buena alimentación por fases + sueño adecuado produce más resultados a largo plazo que semanas muy intensas seguidas de descansos largos.</p>
     </div>`:''}
-    `:` <div class="report-block"><h2>📓 Journal sin datos aún</h2><p>Empezá a registrar tu journal diario para ver el análisis integrado de bienestar, nutrición y deporte.</p></div>`}
  
-    <div class="report-block"><h2>💡 Qué podés hacer diferente</h2>
-      <p>${td.tsb<-10?'<strong>Esta semana:</strong> Bajá el volumen 20-30% y priorizá el sueño. Una sesión de recuperación activa vale más que otro entrenamiento fuerte.<br><br>':''}${z2p<50?`<strong>Para quemar más grasa:</strong> En la próxima salida larga, corré a un ritmo de conversación. FC objetivo: ${Math.round(S.fcmax*.6)}–${Math.round(S.fcmax*.7)} bpm.<br><br>`:''}${largos.length&&avgHRL&&getZone(avgHRL)>=3?'<strong>Para llegar sin cansancio al final:</strong> En salidas +90 min, consumí 30-60g de carbohidratos/hora (gel, banana, dátiles).<br><br>':''}<strong>Consistencia:</strong> Entrenar 4 veces/semana moderado durante meses supera cualquier semana muy intensa.</p>
+    <div class="report-block"><h2>💡 Acciones concretas para esta semana</h2>
+      <p>${td.tsb<-10?'<strong>1. Bajá el volumen 20-30%</strong> y priorizá sesiones de recuperación activa (caminata, yoga). <br><br>':''}${z2p<50?`<strong>${td.tsb<-10?'2':'1'}. Entrenamiento en Z2:</strong> En la próxima salida larga, corré a ritmo de conversación. FC objetivo: ${Math.round(S.fcmax*.6)}–${Math.round(S.fcmax*.7)} bpm.<br><br>`:''}${parseFloat(avgSleepQ||10)<6?`<strong>${td.tsb<-10||z2p<50?'3':'1'}. Sueño:</strong> Tomá magnesio antes de dormir (espinaca, semillas de zapallo, chocolate negro 70%). Evitá pantallas 1h antes de acostarte.<br><br>`:''}<strong>Consistencia:</strong> 4 entrenamientos/semana moderados durante meses supera cualquier semana muy intensa. Y registrar el journal te ayuda a ver las conexiones entre cómo dormís, qué comés y cómo rendís.</p>
     </div>
-  </div>`;
+  </div>
+ 
+  ${recentJ.length>=3?`
+  <div class="sec">gráficos de bienestar</div>
+  <div class="grid g2">
+    <div class="chart-card"><div class="ct">Sueño · últimos ${recentJ.length} días</div><div class="cwrap"><canvas id="${cR1}"></canvas></div></div>
+    <div class="chart-card"><div class="ct">Energía vs Fatiga</div><div class="cwrap"><canvas id="${cR2}"></canvas></div></div>
+  </div>`:''}
+  `;
+ 
+  if(recentJ.length>=3){
+    setTimeout(()=>{
+      const lbl=recentJ.map(j=>fmtDate(j.date));
+      mC(cR1,{type:'bar',data:{labels:lbl,datasets:[
+        {label:'Calidad sueño',data:recentJ.map(j=>j.sleepQ||null),backgroundColor:'rgba(74,106,138,.6)',borderColor:'var(--sky)',borderWidth:1.5,borderRadius:3,yAxisID:'y'},
+        {label:'Horas',data:recentJ.map(j=>j.sleepH||null),type:'line',borderColor:'var(--sage)',backgroundColor:'transparent',borderWidth:2,pointRadius:3,pointBackgroundColor:'var(--sage)',yAxisID:'y2',tension:.3},
+      ]},options:{...cOpts(),scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'var(--muted)',maxTicksLimit:7}},y:{grid:{color:'var(--border)'},ticks:{font:{size:10},color:'var(--muted)'},min:0,max:10},y2:{position:'right',grid:{display:false},ticks:{font:{size:10},color:'var(--sage)'},min:0,max:12}}}});
+      mC(cR2,{type:'line',data:{labels:lbl,datasets:[
+        {label:'Energía',data:recentJ.map(j=>j.energy||null),borderColor:'var(--dusk)',backgroundColor:'rgba(184,112,64,.15)',borderWidth:2,pointRadius:3,fill:true,tension:.3},
+        {label:'Fatiga',data:recentJ.map(j=>j.fatigue||null),borderColor:'var(--rose)',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,borderDash:[4,3],tension:.3},
+      ]},options:{...cOpts(),scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'var(--muted)',maxTicksLimit:7}},y:{grid:{color:'var(--border)'},ticks:{font:{size:10},color:'var(--muted)'},min:1,max:10}}}});
+    },80);
+  }
 }
  
 // ══════════════════════════════════════════════════
