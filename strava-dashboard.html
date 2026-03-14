@@ -25,38 +25,38 @@
   --red:#dc2626;
 }
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh}
-
+ 
 /* ── AUTH SCREEN ── */
 #auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
 .auth-box{max-width:480px;width:100%;text-align:center}
 .logo{font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:500;margin-bottom:.25rem}
 .logo span{color:var(--orange)}
 .logo-sub{color:var(--muted);font-size:.88rem;margin-bottom:2.5rem}
-
+ 
 .connect-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;text-align:left}
 .connect-card h2{font-size:1rem;font-weight:500;margin-bottom:.4rem}
 .connect-card p{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
-
+ 
 .field-group{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.25rem}
 .field label{display:block;font-size:.72rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem}
 .field input{width:100%;padding:.6rem .9rem;border:1px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:.88rem;background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
 .field input:focus{border-color:var(--orange)}
-
+ 
 .btn-strava{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;padding:.75rem;background:var(--orange);color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:500;cursor:pointer;transition:opacity .15s;font-family:'DM Sans',sans-serif}
 .btn-strava:hover{opacity:.88}
 .btn-strava svg{width:20px;height:20px;flex-shrink:0}
-
+ 
 .note{font-size:.75rem;color:var(--muted);margin-top:1rem;line-height:1.6;text-align:center}
-
+ 
 /* ── LOADING ── */
 #loading-screen{display:none;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;gap:1.25rem;text-align:center;padding:2rem}
 .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 #load-msg{font-size:.88rem;color:var(--muted)}
-
+ 
 /* ── DASHBOARD ── */
 #dashboard{display:none}
-
+ 
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .header-logo{font-family:'DM Mono',monospace;font-size:1rem;font-weight:500}.header-logo span{color:var(--orange)}
 .athlete-info{display:flex;align-items:center;gap:.75rem}
@@ -64,17 +64,17 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .athlete-name{font-size:.85rem;font-weight:500}
 .btn-logout{font-size:.75rem;color:var(--muted);background:none;border:1px solid var(--border);border-radius:7px;padding:.28rem .7rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
 .btn-logout:hover{color:var(--red);border-color:var(--red)}
-
+ 
 nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 2rem;overflow-x:auto}
 .tab{font-size:.78rem;font-weight:500;letter-spacing:.07em;text-transform:uppercase;padding:.72rem 1.2rem;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;margin-bottom:-1px}
 .tab:hover{color:var(--text)}
 .tab.active{color:var(--orange);border-bottom-color:var(--orange)}
-
+ 
 main{padding:2rem;max-width:1280px;margin:0 auto}
 .section{display:none}
 .section.active{display:block;animation:up .22s ease}
 @keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
+ 
 /* ── GRID & CARDS ── */
 .grid{display:grid;gap:1rem}
 .g4{grid-template-columns:repeat(4,1fr)}
@@ -82,27 +82,27 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
 .g2{grid-template-columns:repeat(2,1fr)}
 @media(max-width:960px){.g4{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.g4,.g3,.g2{grid-template-columns:1fr}main{padding:1rem}header,nav{padding:0 1rem}}
-
+ 
 .card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:1.2rem 1.4rem;overflow:hidden;position:relative}
 .card-stripe{height:3px;margin:-1.2rem -1.4rem 1.2rem;border-radius:13px 13px 0 0}
 .cs-orange{background:var(--orange)}.cs-green{background:var(--green)}.cs-blue{background:var(--blue)}
-
+ 
 .lbl{font-size:.68rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.55rem}
 .big{font-family:'DM Mono',monospace;font-size:2.2rem;font-weight:500;line-height:1;color:var(--text)}
 .unit{font-size:.85rem;font-weight:300;color:var(--muted);margin-left:.15rem}
 .sub{font-size:.76rem;color:var(--muted);margin-top:.35rem;line-height:1.4}
-
+ 
 .sec-title{font-family:'DM Mono',monospace;font-size:.85rem;color:var(--muted);margin-bottom:.9rem;margin-top:1.8rem;display:flex;align-items:center;gap:.7rem}
 .sec-title:first-child{margin-top:0}
 .sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
-
+ 
 /* ── BAR ── */
 .bar-wrap{margin-top:.7rem}
 .bar-row{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-bottom:.3rem}
 .bar-track{height:4px;background:var(--surface2);border-radius:100px;overflow:hidden}
 .bar-fill{height:100%;border-radius:100px;transition:width 1s cubic-bezier(.4,0,.2,1)}
 .bf-o{background:var(--orange)}.bf-g{background:var(--green)}.bf-b{background:var(--blue)}
-
+ 
 /* ── ACTIVITIES ── */
 .act-list{display:flex;flex-direction:column;gap:.45rem}
 .act-row{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:.85rem 1.2rem;display:grid;grid-template-columns:2.1rem 1fr auto auto auto;align-items:center;gap:.9rem;transition:border-color .15s}
@@ -113,20 +113,20 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
 .act-stat{text-align:right}
 .act-v{font-family:'DM Mono',monospace;font-size:.9rem;font-weight:500}
 .act-l{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
-
+ 
 /* ── BADGE ── */
 .badge{display:inline-flex;align-items:center;padding:.18rem .55rem;border-radius:100px;font-size:.68rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
 .bg-o{background:var(--orange-light);color:#b83700}
 .bg-g{background:var(--green-light);color:#14532d}
 .bg-b{background:var(--blue-light);color:#1e3a8a}
 .bg-m{background:var(--surface2);color:var(--muted)}
-
+ 
 /* ── CHART ── */
 .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:1.4rem}
 .chart-wrap{position:relative;height:210px;margin-top:1rem}
-
+ 
 .empty{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:2.5rem;text-align:center;color:var(--muted);font-size:.88rem;line-height:1.7}
-
+ 
 /* ── PROFILE CARD ── */
 .profile-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:1.5rem;display:flex;align-items:center;gap:1.25rem}
 .profile-avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--border);flex-shrink:0}
@@ -135,7 +135,7 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
 </style>
 </head>
 <body>
-
+ 
 <!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-box">
@@ -162,13 +162,13 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
     </div>
   </div>
 </div>
-
+ 
 <!-- LOADING -->
 <div id="loading-screen">
   <div class="spinner"></div>
   <div id="load-msg">Conectando con Strava…</div>
 </div>
-
+ 
 <!-- DASHBOARD -->
 <div id="dashboard">
   <header>
@@ -192,13 +192,13 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
     <div class="section" id="tab-profile"></div>
   </main>
 </div>
-
+ 
 <script>
 const CLIENT_ID = document.getElementById('client-id');
 const CLIENT_SECRET = document.getElementById('client-secret');
-const REDIRECT = location.href.split('?')[0].split('#')[0];
+const REDIRECT = 'https://carolinarusso1994-ui.github.io/strava-dashboard/strava-dashboard.html';
 let STATE = {};
-
+ 
 // ── OAUTH FLOW ──────────────────────────────────────────────
 function startOAuth() {
   const cid = CLIENT_ID.value.trim();
@@ -210,17 +210,17 @@ function startOAuth() {
   const url = `https://www.strava.com/oauth/authorize?client_id=${cid}&redirect_uri=${encodeURIComponent(REDIRECT)}&response_type=code&scope=${scope}&approval_prompt=auto`;
   location.href = url;
 }
-
+ 
 async function handleCallback() {
   const params = new URLSearchParams(location.search);
   const code = params.get('code');
   if (!code) return false;
   history.replaceState({}, '', location.pathname);
-
+ 
   const cid = sessionStorage.getItem('strava_cid');
   const cs = sessionStorage.getItem('strava_cs');
   if (!cid || !cs) { showAuth(); return true; }
-
+ 
   showLoading('Obteniendo token de acceso…');
   try {
     const r = await fetch('https://www.strava.com/oauth/token', {
@@ -243,7 +243,7 @@ async function handleCallback() {
   }
   return true;
 }
-
+ 
 function showAuth() {
   document.getElementById('auth-screen').style.display = '';
   document.getElementById('loading-screen').style.display = 'none';
@@ -251,19 +251,19 @@ function showAuth() {
   const cid = sessionStorage.getItem('strava_cid');
   if (cid) CLIENT_ID.value = cid;
 }
-
+ 
 function showLoading(msg) {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('loading-screen').style.display = 'flex';
   document.getElementById('load-msg').textContent = msg || 'Cargando…';
   document.getElementById('dashboard').style.display = 'none';
 }
-
+ 
 function logout() {
   sessionStorage.clear();
   showAuth();
 }
-
+ 
 // ── STRAVA API ──────────────────────────────────────────────
 async function stravaGet(endpoint, token) {
   const r = await fetch('https://www.strava.com/api/v3' + endpoint, {
@@ -272,11 +272,11 @@ async function stravaGet(endpoint, token) {
   if (!r.ok) throw new Error('Error API: ' + r.status);
   return r.json();
 }
-
+ 
 // ── LOAD DASHBOARD ──────────────────────────────────────────
 async function loadDashboard(token, athlete) {
   showLoading('Cargando actividades…');
-
+ 
   // Fetch activities (up to 200)
   let activities = [];
   try {
@@ -288,26 +288,26 @@ async function loadDashboard(token, athlete) {
       activities = [...activities, ...page2];
     }
   } catch(e) { console.error(e); }
-
+ 
   // Fetch athlete stats
   showLoading('Cargando estadísticas…');
   let stats = null;
   try { stats = await stravaGet('/athletes/' + athlete.id + '/stats', token); } catch(e) {}
-
+ 
   STATE = { token, athlete, activities, stats };
-
+ 
   // Header
   document.getElementById('header-avatar').src = athlete.profile_medium || athlete.profile || '';
   document.getElementById('header-name').textContent = athlete.firstname + ' ' + athlete.lastname;
-
+ 
   document.getElementById('loading-screen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
-
+ 
   builtTabs.clear();
   builtTabs.add('overview');
   buildOverview();
 }
-
+ 
 // ── FORMATTERS ──────────────────────────────────────────────
 const fmtDist = m => m >= 1000 ? (m/1000).toFixed(2)+' km' : Math.round(m)+' m';
 const fmtDur = s => { const h=Math.floor(s/3600),m=Math.floor((s%3600)/60); return h>0?`${h}h ${m}m`:`${m}m`; };
@@ -323,26 +323,26 @@ const actIcon = t => {
     WeightTraining:'💪',Yoga:'🧘',Rowing:'🚣',Elliptical:'〽️',StandUpPaddling:'🏄',Kayaking:'🛶'};
   return m[t] || '⚡';
 };
-
+ 
 // ── OVERVIEW ────────────────────────────────────────────────
 function buildOverview() {
   const {activities, stats} = STATE;
   const el = document.getElementById('tab-overview');
-
+ 
   const now = new Date();
   const d30 = new Date(now - 30*24*3600*1000);
   const ytd = activities.filter(a => new Date(a.start_date) >= new Date(now.getFullYear()+'-01-01'));
   const recent = activities.filter(a => new Date(a.start_date) >= d30);
-
+ 
   const totalDist = activities.reduce((s,a)=>s+(a.distance||0),0);
   const totalTime = activities.reduce((s,a)=>s+(a.moving_time||0),0);
   const totalElev = activities.reduce((s,a)=>s+(a.total_elevation_gain||0),0);
   const ytdDist = ytd.reduce((s,a)=>s+(a.distance||0),0);
-
+ 
   // By type
   const byType = {};
   activities.forEach(a=>{ byType[a.type]=(byType[a.type]||0)+1; });
-
+ 
   // Monthly chart data
   const monthly = {};
   activities.forEach(a => {
@@ -351,7 +351,7 @@ function buildOverview() {
   });
   const months = Object.keys(monthly).sort().slice(-12);
   const chartId = 'chart-ov-' + Date.now();
-
+ 
   el.innerHTML = `
     <div class="sec-title">este año (${now.getFullYear()})</div>
     <div class="grid g4">
@@ -379,7 +379,7 @@ function buildOverview() {
         <div class="sub">Elevación total</div>
       </div>
     </div>
-
+ 
     ${stats ? `
     <div class="sec-title">estadísticas de strava</div>
     <div class="grid g3">
@@ -399,12 +399,12 @@ function buildOverview() {
         <div class="sub">${stats.ytd_swim_totals.count} sesiones</div>
       </div>` : ''}
     </div>` : ''}
-
+ 
     <div class="sec-title">distancia mensual</div>
     <div class="chart-card">
       <div class="chart-wrap"><canvas id="${chartId}"></canvas></div>
     </div>
-
+ 
     <div class="sec-title">tipos de actividad</div>
     <div class="grid g3">
       ${Object.entries(byType).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([type,count])=>{
@@ -419,11 +419,11 @@ function buildOverview() {
         </div>`;
       }).join('')}
     </div>
-
+ 
     <div class="sec-title">últimas actividades</div>
     ${buildActList(activities.slice(0,6))}
   `;
-
+ 
   setTimeout(() => {
     const ctx = document.getElementById(chartId);
     if (!ctx) return;
@@ -450,21 +450,21 @@ function buildOverview() {
     });
   }, 80);
 }
-
+ 
 // ── ACTIVITIES ───────────────────────────────────────────────
 function buildActivities() {
   const {activities} = STATE;
   const el = document.getElementById('tab-activities');
-
+ 
   // Filter buttons
   const types = [...new Set(activities.map(a=>a.type))].sort();
   let filtered = activities;
-
+ 
   const render = (acts) => `
     <div class="sec-title">${acts.length} actividades</div>
     ${buildActList(acts)}
   `;
-
+ 
   el.innerHTML = `
     <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem">
       <button class="badge bg-o" style="cursor:pointer;padding:.3rem .8rem;font-size:.75rem" onclick="filterActs('all',this)">Todas (${activities.length})</button>
@@ -473,14 +473,14 @@ function buildActivities() {
     <div id="acts-list">${render(activities)}</div>
   `;
 }
-
+ 
 window.filterActs = (type, btn) => {
   document.querySelectorAll('#tab-activities .badge').forEach(b=>{ b.className='badge bg-m'; b.style.cssText='cursor:pointer;padding:.3rem .8rem;font-size:.75rem'; });
   btn.className='badge bg-o'; btn.style.cssText='cursor:pointer;padding:.3rem .8rem;font-size:.75rem';
   const acts = type==='all' ? STATE.activities : STATE.activities.filter(a=>a.type===type);
   document.getElementById('acts-list').innerHTML = `<div class="sec-title">${acts.length} actividades</div>${buildActList(acts)}`;
 };
-
+ 
 function buildActList(acts) {
   if (!acts.length) return `<div class="empty">Sin actividades para mostrar.</div>`;
   return `<div class="act-list">${acts.map(a=>`
@@ -505,16 +505,16 @@ function buildActList(acts) {
     </div>
   `).join('')}</div>`;
 }
-
+ 
 // ── RECORDS ──────────────────────────────────────────────────
 function buildRecords() {
   const {activities} = STATE;
   const el = document.getElementById('tab-records');
-
+ 
   const runs = activities.filter(a=>a.type==='Run'||a.type==='TrailRun');
   const rides = activities.filter(a=>a.type==='Ride'||a.type==='VirtualRide');
   const swims = activities.filter(a=>a.type==='Swim');
-
+ 
   const best = (arr, key, fmt) => {
     if (!arr.length) return '—';
     const v = Math.max(...arr.map(a=>a[key]||0));
@@ -524,7 +524,7 @@ function buildRecords() {
     if (!arr.length) return null;
     return arr.reduce((b,a)=>(a.distance||0)>(b.distance||0)?a:b);
   };
-
+ 
   const prs = (arr) => {
     const lb = arr.filter(a=>a.distance>=42000);
     const hm = arr.filter(a=>a.distance>=21000&&a.distance<42000);
@@ -533,11 +533,11 @@ function buildRecords() {
     const bestTime = (group) => group.length ? fmtDur(Math.min(...group.map(a=>a.moving_time||a.elapsed_time||99999))) : '—';
     return {marathon:bestTime(lb), half:bestTime(hm), ten:bestTime(t10), five:bestTime(t5)};
   };
-
+ 
   const runPR = prs(runs);
   const longestRun = longest(runs);
   const longestRide = longest(rides);
-
+ 
   el.innerHTML = `
     ${runs.length ? `
     <div class="sec-title">🏃 carrera</div>
@@ -563,7 +563,7 @@ function buildRecords() {
         <div class="big" style="font-size:1.5rem">${longestRun ? fmtDur(longestRun.moving_time) : '—'}</div>
       </div>
     </div>` : ''}
-
+ 
     ${rides.length ? `
     <div class="sec-title">🚴 ciclismo</div>
     <div class="grid g3">
@@ -578,7 +578,7 @@ function buildRecords() {
         <div class="big">${best(rides,'total_elevation_gain',v=>Math.round(v))}<span class="unit">m</span></div>
       </div>
     </div>` : ''}
-
+ 
     ${swims.length ? `
     <div class="sec-title">🏊 natación</div>
     <div class="grid g3">
@@ -589,16 +589,16 @@ function buildRecords() {
         <div class="big">${swims.length}</div>
       </div>
     </div>` : ''}
-
+ 
     ${!runs.length && !rides.length && !swims.length ? `<div class="empty">No se encontraron actividades con récords calculables.</div>` : ''}
   `;
 }
-
+ 
 // ── PROFILE ──────────────────────────────────────────────────
 function buildProfile() {
   const {athlete, stats, activities} = STATE;
   const el = document.getElementById('tab-profile');
-
+ 
   el.innerHTML = `
     <div class="sec-title">atleta</div>
     <div class="profile-card">
@@ -613,7 +613,7 @@ function buildProfile() {
         </div>
       </div>
     </div>
-
+ 
     ${stats ? `
     <div class="sec-title">totales históricos</div>
     <div class="grid g3">
@@ -635,11 +635,11 @@ function buildProfile() {
     </div>` : ''}
   `;
 }
-
+ 
 // ── TABS ─────────────────────────────────────────────────────
 const tabBuilders = {overview:buildOverview, activities:buildActivities, records:buildRecords, profile:buildProfile};
 const builtTabs = new Set();
-
+ 
 function showTab(name, el) {
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
@@ -647,7 +647,7 @@ function showTab(name, el) {
   document.getElementById('tab-'+name).classList.add('active');
   if (!builtTabs.has(name) && tabBuilders[name]) { tabBuilders[name](); builtTabs.add(name); }
 }
-
+ 
 // ── INIT ─────────────────────────────────────────────────────
 (async () => {
   const handled = await handleCallback();
