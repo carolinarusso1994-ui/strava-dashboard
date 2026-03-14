@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strava Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#faf9f7;
+  --surface:#ffffff;
+  --surface2:#f3f1ee;
+  --border:#e5e2dc;
+  --text:#1c1917;
+  --muted:#78716c;
+  --orange:#FC4C02;
+  --orange-light:#fff1ec;
+  --green:#15803d;
+  --green-light:#dcfce7;
+  --blue:#1d4ed8;
+  --blue-light:#dbeafe;
+  --red:#dc2626;
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh}
+
+/* ── AUTH SCREEN ── */
+#auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.auth-box{max-width:480px;width:100%;text-align:center}
+.logo{font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:500;margin-bottom:.25rem}
+.logo span{color:var(--orange)}
+.logo-sub{color:var(--muted);font-size:.88rem;margin-bottom:2.5rem}
+
+.connect-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;text-align:left}
+.connect-card h2{font-size:1rem;font-weight:500;margin-bottom:.4rem}
+.connect-card p{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
+
+.field-group{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.25rem}
+.field label{display:block;font-size:.72rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem}
+.field input{width:100%;padding:.6rem .9rem;border:1px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:.88rem;background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
+.field input:focus{border-color:var(--orange)}
+
+.btn-strava{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;padding:.75rem;background:var(--orange);color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:500;cursor:pointer;transition:opacity .15s;font-family:'DM Sans',sans-serif}
+.btn-strava:hover{opacity:.88}
+.btn-strava svg{width:20px;height:20px;flex-shrink:0}
+
+.note{font-size:.75rem;color:var(--muted);margin-top:1rem;line-height:1.6;text-align:center}
+
+/* ── LOADING ── */
+#loading-screen{display:none;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;gap:1.25rem;text-align:center;padding:2rem}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#load-msg{font-size:.88rem;color:var(--muted)}
+
+/* ── DASHBOARD ── */
+#dashboard{display:none}
+
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header-logo{font-family:'DM Mono',monospace;font-size:1rem;font-weight:500}.header-logo span{color:var(--orange)}
+.athlete-info{display:flex;align-items:center;gap:.75rem}
+.avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--border)}
+.athlete-name{font-size:.85rem;font-weight:500}
+.btn-logout{font-size:.75rem;color:var(--muted);background:none;border:1px solid var(--border);border-radius:7px;padding:.28rem .7rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.btn-logout:hover{color:var(--red);border-color:var(--red)}
+
+nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 2rem;overflow-x:auto}
+.tab{font-size:.78rem;font-weight:500;letter-spacing:.07em;text-transform:uppercase;padding:.72rem 1.2rem;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;margin-bottom:-1px}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+
+main{padding:2rem;max-width:1280px;margin:0 auto}
+.section{display:none}
+.section.active{display:block;animation:up .22s ease}
+@keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── GRID & CARDS ── */
+.grid{display:grid;gap:1rem}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:960px){.g4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.g4,.g3,.g2{grid-template-columns:1fr}main{padding:1rem}header,nav{padding:0 1rem}}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:1.2rem 1.4rem;overflow:hidden;position:relative}
+.card-stripe{height:3px;margin:-1.2rem -1.4rem 1.2rem;border-radius:13px 13px 0 0}
+.cs-orange{background:var(--orange)}.cs-green{background:var(--green)}.cs-blue{background:var(--blue)}
+
+.lbl{font-size:.68rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.55rem}
+.big{font-family:'DM Mono',monospace;font-size:2.2rem;font-weight:500;line-height:1;color:var(--text)}
+.unit{font-size:.85rem;font-weight:300;color:var(--muted);margin-left:.15rem}
+.sub{font-size:.76rem;color:var(--muted);margin-top:.35rem;line-height:1.4}
+
+.sec-title{font-family:'DM Mono',monospace;font-size:.85rem;color:var(--muted);margin-bottom:.9rem;margin-top:1.8rem;display:flex;align-items:center;gap:.7rem}
+.sec-title:first-child{margin-top:0}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── BAR ── */
+.bar-wrap{margin-top:.7rem}
+.bar-row{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-bottom:.3rem}
+.bar-track{height:4px;background:var(--surface2);border-radius:100px;overflow:hidden}
+.bar-fill{height:100%;border-radius:100px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.bf-o{background:var(--orange)}.bf-g{background:var(--green)}.bf-b{background:var(--blue)}
+
+/* ── ACTIVITIES ── */
+.act-list{display:flex;flex-direction:column;gap:.45rem}
+.act-row{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:.85rem 1.2rem;display:grid;grid-template-columns:2.1rem 1fr auto auto auto;align-items:center;gap:.9rem;transition:border-color .15s}
+.act-row:hover{border-color:#ccc8c2}
+.act-icon{width:2.1rem;height:2.1rem;background:var(--surface2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.act-name{font-size:.9rem;font-weight:500}
+.act-date{font-size:.7rem;color:var(--muted);margin-top:.1rem}
+.act-stat{text-align:right}
+.act-v{font-family:'DM Mono',monospace;font-size:.9rem;font-weight:500}
+.act-l{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;padding:.18rem .55rem;border-radius:100px;font-size:.68rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+.bg-o{background:var(--orange-light);color:#b83700}
+.bg-g{background:var(--green-light);color:#14532d}
+.bg-b{background:var(--blue-light);color:#1e3a8a}
+.bg-m{background:var(--surface2);color:var(--muted)}
+
+/* ── CHART ── */
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:1.4rem}
+.chart-wrap{position:relative;height:210px;margin-top:1rem}
+
+.empty{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:2.5rem;text-align:center;color:var(--muted);font-size:.88rem;line-height:1.7}
+
+/* ── PROFILE CARD ── */
+.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:1.5rem;display:flex;align-items:center;gap:1.25rem}
+.profile-avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--border);flex-shrink:0}
+.profile-name{font-size:1.2rem;font-weight:500;margin-bottom:.2rem}
+.profile-loc{font-size:.82rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="logo">strava<span>.</span>dash</div>
+    <p class="logo-sub">Tu rendimiento deportivo, en un vistazo</p>
+    <div class="connect-card">
+      <h2>Conectar con Strava</h2>
+      <p>Ingresá tus credenciales de la API de Strava para autorizar el acceso a tus actividades.</p>
+      <div class="field-group">
+        <div class="field">
+          <label>Client ID</label>
+          <input type="text" id="client-id" placeholder="Ej: 211490" value="211490">
+        </div>
+        <div class="field">
+          <label>Client Secret</label>
+          <input type="password" id="client-secret" placeholder="Tu client secret">
+        </div>
+      </div>
+      <button class="btn-strava" onclick="startOAuth()">
+        <svg viewBox="0 0 24 24" fill="white"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
+        Conectar con Strava
+      </button>
+      <p class="note">Tus credenciales nunca salen de tu navegador. Todo corre localmente.</p>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <div id="load-msg">Conectando con Strava…</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <header>
+    <div class="header-logo">strava<span>.</span>dash</div>
+    <div class="athlete-info">
+      <img class="avatar" id="header-avatar" src="" alt="">
+      <span class="athlete-name" id="header-name"></span>
+      <button class="btn-logout" onclick="logout()">Salir</button>
+    </div>
+  </header>
+  <nav>
+    <div class="tab active" onclick="showTab('overview',this)">Resumen</div>
+    <div class="tab" onclick="showTab('activities',this)">Actividades</div>
+    <div class="tab" onclick="showTab('records',this)">Récords</div>
+    <div class="tab" onclick="showTab('profile',this)">Perfil</div>
+  </nav>
+  <main>
+    <div class="section active" id="tab-overview"></div>
+    <div class="section" id="tab-activities"></div>
+    <div class="section" id="tab-records"></div>
+    <div class="section" id="tab-profile"></div>
+  </main>
+</div>
+
+<script>
+const CLIENT_ID = document.getElementById('client-id');
+const CLIENT_SECRET = document.getElementById('client-secret');
+const REDIRECT = location.href.split('?')[0].split('#')[0];
+let STATE = {};
+
+// ── OAUTH FLOW ──────────────────────────────────────────────
+function startOAuth() {
+  const cid = CLIENT_ID.value.trim();
+  const cs = CLIENT_SECRET.value.trim();
+  if (!cid || !cs) { alert('Ingresá tu Client ID y Client Secret.'); return; }
+  sessionStorage.setItem('strava_cid', cid);
+  sessionStorage.setItem('strava_cs', cs);
+  const scope = 'read,activity:read_all,profile:read_all';
+  const url = `https://www.strava.com/oauth/authorize?client_id=${cid}&redirect_uri=${encodeURIComponent(REDIRECT)}&response_type=code&scope=${scope}&approval_prompt=auto`;
+  location.href = url;
+}
+
+async function handleCallback() {
+  const params = new URLSearchParams(location.search);
+  const code = params.get('code');
+  if (!code) return false;
+  history.replaceState({}, '', location.pathname);
+
+  const cid = sessionStorage.getItem('strava_cid');
+  const cs = sessionStorage.getItem('strava_cs');
+  if (!cid || !cs) { showAuth(); return true; }
+
+  showLoading('Obteniendo token de acceso…');
+  try {
+    const r = await fetch('https://www.strava.com/oauth/token', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({client_id:cid, client_secret:cs, code, grant_type:'authorization_code'})
+    });
+    const data = await r.json();
+    if (data.access_token) {
+      sessionStorage.setItem('strava_token', data.access_token);
+      sessionStorage.setItem('strava_athlete', JSON.stringify(data.athlete));
+      await loadDashboard(data.access_token, data.athlete);
+    } else {
+      alert('Error al obtener token: ' + (data.message || JSON.stringify(data)));
+      showAuth();
+    }
+  } catch(e) {
+    alert('Error de red: ' + e.message);
+    showAuth();
+  }
+  return true;
+}
+
+function showAuth() {
+  document.getElementById('auth-screen').style.display = '';
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'none';
+  const cid = sessionStorage.getItem('strava_cid');
+  if (cid) CLIENT_ID.value = cid;
+}
+
+function showLoading(msg) {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('loading-screen').style.display = 'flex';
+  document.getElementById('load-msg').textContent = msg || 'Cargando…';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+function logout() {
+  sessionStorage.clear();
+  showAuth();
+}
+
+// ── STRAVA API ──────────────────────────────────────────────
+async function stravaGet(endpoint, token) {
+  const r = await fetch('https://www.strava.com/api/v3' + endpoint, {
+    headers: {Authorization: 'Bearer ' + token}
+  });
+  if (!r.ok) throw new Error('Error API: ' + r.status);
+  return r.json();
+}
+
+// ── LOAD DASHBOARD ──────────────────────────────────────────
+async function loadDashboard(token, athlete) {
+  showLoading('Cargando actividades…');
+
+  // Fetch activities (up to 200)
+  let activities = [];
+  try {
+    const page1 = await stravaGet('/athlete/activities?per_page=100&page=1', token);
+    activities = page1;
+    if (page1.length === 100) {
+      showLoading('Cargando más actividades…');
+      const page2 = await stravaGet('/athlete/activities?per_page=100&page=2', token);
+      activities = [...activities, ...page2];
+    }
+  } catch(e) { console.error(e); }
+
+  // Fetch athlete stats
+  showLoading('Cargando estadísticas…');
+  let stats = null;
+  try { stats = await stravaGet('/athletes/' + athlete.id + '/stats', token); } catch(e) {}
+
+  STATE = { token, athlete, activities, stats };
+
+  // Header
+  document.getElementById('header-avatar').src = athlete.profile_medium || athlete.profile || '';
+  document.getElementById('header-name').textContent = athlete.firstname + ' ' + athlete.lastname;
+
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+
+  builtTabs.clear();
+  builtTabs.add('overview');
+  buildOverview();
+}
+
+// ── FORMATTERS ──────────────────────────────────────────────
+const fmtDist = m => m >= 1000 ? (m/1000).toFixed(2)+' km' : Math.round(m)+' m';
+const fmtDur = s => { const h=Math.floor(s/3600),m=Math.floor((s%3600)/60); return h>0?`${h}h ${m}m`:`${m}m`; };
+const fmtPace = (mps,type) => {
+  if (!mps) return '—';
+  if (type && (type.toLowerCase().includes('ride')||type.toLowerCase().includes('cycl')||type.toLowerCase().includes('velom'))) return (mps*3.6).toFixed(1)+' km/h';
+  const spk=1000/mps; return `${Math.floor(spk/60)}:${String(Math.round(spk%60)).padStart(2,'0')}/km`;
+};
+const fmtDate = d => { try { return new Date(d).toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'}); } catch { return d; }};
+const mean = arr => arr.length ? arr.reduce((s,v)=>s+v,0)/arr.length : 0;
+const actIcon = t => {
+  const m={Run:'🏃',Ride:'🚴',Swim:'🏊',Walk:'🚶',Hike:'🥾',VirtualRide:'🚴',TrailRun:'⛰️',
+    WeightTraining:'💪',Yoga:'🧘',Rowing:'🚣',Elliptical:'〽️',StandUpPaddling:'🏄',Kayaking:'🛶'};
+  return m[t] || '⚡';
+};
+
+// ── OVERVIEW ────────────────────────────────────────────────
+function buildOverview() {
+  const {activities, stats} = STATE;
+  const el = document.getElementById('tab-overview');
+
+  const now = new Date();
+  const d30 = new Date(now - 30*24*3600*1000);
+  const ytd = activities.filter(a => new Date(a.start_date) >= new Date(now.getFullYear()+'-01-01'));
+  const recent = activities.filter(a => new Date(a.start_date) >= d30);
+
+  const totalDist = activities.reduce((s,a)=>s+(a.distance||0),0);
+  const totalTime = activities.reduce((s,a)=>s+(a.moving_time||0),0);
+  const totalElev = activities.reduce((s,a)=>s+(a.total_elevation_gain||0),0);
+  const ytdDist = ytd.reduce((s,a)=>s+(a.distance||0),0);
+
+  // By type
+  const byType = {};
+  activities.forEach(a=>{ byType[a.type]=(byType[a.type]||0)+1; });
+
+  // Monthly chart data
+  const monthly = {};
+  activities.forEach(a => {
+    const key = a.start_date.slice(0,7);
+    monthly[key] = (monthly[key]||0) + (a.distance||0)/1000;
+  });
+  const months = Object.keys(monthly).sort().slice(-12);
+  const chartId = 'chart-ov-' + Date.now();
+
+  el.innerHTML = `
+    <div class="sec-title">este año (${now.getFullYear()})</div>
+    <div class="grid g4">
+      <div class="card">
+        <div class="card-stripe cs-orange"></div>
+        <div class="lbl">Actividades</div>
+        <div class="big">${ytd.length}</div>
+        <div class="sub">${recent.length} en los últimos 30 días</div>
+      </div>
+      <div class="card">
+        <div class="card-stripe cs-green"></div>
+        <div class="lbl">Distancia</div>
+        <div class="big">${(ytdDist/1000).toFixed(0)}<span class="unit">km</span></div>
+        <div class="sub">Total histórico: ${(totalDist/1000).toFixed(0)} km</div>
+      </div>
+      <div class="card">
+        <div class="card-stripe cs-blue"></div>
+        <div class="lbl">Tiempo en movimiento</div>
+        <div class="big">${Math.floor(totalTime/3600)}<span class="unit">h</span></div>
+        <div class="sub">${activities.length} actividades totales</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Desnivel acumulado</div>
+        <div class="big">${(totalElev/1000).toFixed(1)}<span class="unit">km</span></div>
+        <div class="sub">Elevación total</div>
+      </div>
+    </div>
+
+    ${stats ? `
+    <div class="sec-title">estadísticas de strava</div>
+    <div class="grid g3">
+      ${stats.ytd_run_totals?.count ? `<div class="card">
+        <div class="lbl">🏃 Carrera este año</div>
+        <div class="big">${(stats.ytd_run_totals.distance/1000).toFixed(0)}<span class="unit">km</span></div>
+        <div class="sub">${stats.ytd_run_totals.count} salidas · ${fmtDur(stats.ytd_run_totals.moving_time)}</div>
+      </div>` : ''}
+      ${stats.ytd_ride_totals?.count ? `<div class="card">
+        <div class="lbl">🚴 Ciclismo este año</div>
+        <div class="big">${(stats.ytd_ride_totals.distance/1000).toFixed(0)}<span class="unit">km</span></div>
+        <div class="sub">${stats.ytd_ride_totals.count} salidas · ${fmtDur(stats.ytd_ride_totals.moving_time)}</div>
+      </div>` : ''}
+      ${stats.ytd_swim_totals?.count ? `<div class="card">
+        <div class="lbl">🏊 Natación este año</div>
+        <div class="big">${(stats.ytd_swim_totals.distance/1000).toFixed(2)}<span class="unit">km</span></div>
+        <div class="sub">${stats.ytd_swim_totals.count} sesiones</div>
+      </div>` : ''}
+    </div>` : ''}
+
+    <div class="sec-title">distancia mensual</div>
+    <div class="chart-card">
+      <div class="chart-wrap"><canvas id="${chartId}"></canvas></div>
+    </div>
+
+    <div class="sec-title">tipos de actividad</div>
+    <div class="grid g3">
+      ${Object.entries(byType).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([type,count])=>{
+        const pct = Math.round((count/activities.length)*100);
+        return `<div class="card">
+          <div class="lbl">${actIcon(type)} ${type.replace(/([A-Z])/g,' $1').trim()}</div>
+          <div class="big">${count}<span class="unit">sesiones</span></div>
+          <div class="bar-wrap">
+            <div class="bar-row"><span>${pct}% del total</span></div>
+            <div class="bar-track"><div class="bar-fill bf-o" style="width:${pct}%"></div></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="sec-title">últimas actividades</div>
+    ${buildActList(activities.slice(0,6))}
+  `;
+
+  setTimeout(() => {
+    const ctx = document.getElementById(chartId);
+    if (!ctx) return;
+    new Chart(ctx, {
+      type:'bar',
+      data:{
+        labels: months.map(m=>{ const [y,mo]=m.split('-'); return new Date(y,mo-1).toLocaleString('es-AR',{month:'short',year:'2-digit'}); }),
+        datasets:[{
+          data: months.map(m => +monthly[m].toFixed(1)),
+          backgroundColor:'#FC4C0222',
+          borderColor:'#FC4C02',
+          borderWidth:2,
+          borderRadius:5,
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:11},color:'#78716c'}},
+          y:{grid:{color:'#e5e2dc'},ticks:{font:{family:'DM Mono',size:11},color:'#78716c'}}
+        }
+      }
+    });
+  }, 80);
+}
+
+// ── ACTIVITIES ───────────────────────────────────────────────
+function buildActivities() {
+  const {activities} = STATE;
+  const el = document.getElementById('tab-activities');
+
+  // Filter buttons
+  const types = [...new Set(activities.map(a=>a.type))].sort();
+  let filtered = activities;
+
+  const render = (acts) => `
+    <div class="sec-title">${acts.length} actividades</div>
+    ${buildActList(acts)}
+  `;
+
+  el.innerHTML = `
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem">
+      <button class="badge bg-o" style="cursor:pointer;padding:.3rem .8rem;font-size:.75rem" onclick="filterActs('all',this)">Todas (${activities.length})</button>
+      ${types.map(t=>`<button class="badge bg-m" style="cursor:pointer;padding:.3rem .8rem;font-size:.75rem" onclick="filterActs('${t}',this)">${actIcon(t)} ${t.replace(/([A-Z])/g,' $1').trim()} (${activities.filter(a=>a.type===t).length})</button>`).join('')}
+    </div>
+    <div id="acts-list">${render(activities)}</div>
+  `;
+}
+
+window.filterActs = (type, btn) => {
+  document.querySelectorAll('#tab-activities .badge').forEach(b=>{ b.className='badge bg-m'; b.style.cssText='cursor:pointer;padding:.3rem .8rem;font-size:.75rem'; });
+  btn.className='badge bg-o'; btn.style.cssText='cursor:pointer;padding:.3rem .8rem;font-size:.75rem';
+  const acts = type==='all' ? STATE.activities : STATE.activities.filter(a=>a.type===type);
+  document.getElementById('acts-list').innerHTML = `<div class="sec-title">${acts.length} actividades</div>${buildActList(acts)}`;
+};
+
+function buildActList(acts) {
+  if (!acts.length) return `<div class="empty">Sin actividades para mostrar.</div>`;
+  return `<div class="act-list">${acts.map(a=>`
+    <div class="act-row">
+      <div class="act-icon">${actIcon(a.type)}</div>
+      <div>
+        <div class="act-name">${a.name}</div>
+        <div class="act-date">${fmtDate(a.start_date_local)} · <span class="badge bg-m" style="font-size:.62rem">${a.type.replace(/([A-Z])/g,' $1').trim()}</span></div>
+      </div>
+      <div class="act-stat">
+        <div class="act-v">${fmtDist(a.distance)}</div>
+        <div class="act-l">distancia</div>
+      </div>
+      <div class="act-stat">
+        <div class="act-v">${fmtDur(a.moving_time)}</div>
+        <div class="act-l">duración</div>
+      </div>
+      <div class="act-stat">
+        <div class="act-v">${a.average_heartrate ? Math.round(a.average_heartrate)+' bpm' : fmtPace(a.average_speed, a.type)}</div>
+        <div class="act-l">${a.average_heartrate ? 'FC prom' : 'ritmo/vel'}</div>
+      </div>
+    </div>
+  `).join('')}</div>`;
+}
+
+// ── RECORDS ──────────────────────────────────────────────────
+function buildRecords() {
+  const {activities} = STATE;
+  const el = document.getElementById('tab-records');
+
+  const runs = activities.filter(a=>a.type==='Run'||a.type==='TrailRun');
+  const rides = activities.filter(a=>a.type==='Ride'||a.type==='VirtualRide');
+  const swims = activities.filter(a=>a.type==='Swim');
+
+  const best = (arr, key, fmt) => {
+    if (!arr.length) return '—';
+    const v = Math.max(...arr.map(a=>a[key]||0));
+    return v ? fmt(v) : '—';
+  };
+  const longest = (arr) => {
+    if (!arr.length) return null;
+    return arr.reduce((b,a)=>(a.distance||0)>(b.distance||0)?a:b);
+  };
+
+  const prs = (arr) => {
+    const lb = arr.filter(a=>a.distance>=42000);
+    const hm = arr.filter(a=>a.distance>=21000&&a.distance<42000);
+    const t10 = arr.filter(a=>a.distance>=9500&&a.distance<11000);
+    const t5 = arr.filter(a=>a.distance>=4500&&a.distance<5500);
+    const bestTime = (group) => group.length ? fmtDur(Math.min(...group.map(a=>a.moving_time||a.elapsed_time||99999))) : '—';
+    return {marathon:bestTime(lb), half:bestTime(hm), ten:bestTime(t10), five:bestTime(t5)};
+  };
+
+  const runPR = prs(runs);
+  const longestRun = longest(runs);
+  const longestRide = longest(rides);
+
+  el.innerHTML = `
+    ${runs.length ? `
+    <div class="sec-title">🏃 carrera</div>
+    <div class="grid g4">
+      <div class="card"><div class="card-stripe cs-orange"></div><div class="lbl">Mayor distancia</div>
+        <div class="big">${longestRun ? (longestRun.distance/1000).toFixed(1) : '—'}<span class="unit">km</span></div>
+        <div class="sub">${longestRun ? longestRun.name : ''}</div>
+      </div>
+      <div class="card"><div class="lbl">Mejor maratón</div><div class="big" style="font-size:1.6rem">${runPR.marathon}</div></div>
+      <div class="card"><div class="lbl">Mejor media maratón</div><div class="big" style="font-size:1.6rem">${runPR.half}</div></div>
+      <div class="card"><div class="lbl">Mejor 10K</div><div class="big" style="font-size:1.6rem">${runPR.ten}</div>
+        <div class="sub">5K: ${runPR.five}</div>
+      </div>
+    </div>
+    <div class="grid g3" style="margin-top:1rem">
+      <div class="card"><div class="lbl">FC máxima registrada</div>
+        <div class="big">${best(runs,'max_heartrate',v=>Math.round(v))}<span class="unit">bpm</span></div>
+      </div>
+      <div class="card"><div class="lbl">Mayor desnivel</div>
+        <div class="big">${best(runs,'total_elevation_gain',v=>Math.round(v))}<span class="unit">m</span></div>
+      </div>
+      <div class="card"><div class="lbl">Salida más larga</div>
+        <div class="big" style="font-size:1.5rem">${longestRun ? fmtDur(longestRun.moving_time) : '—'}</div>
+      </div>
+    </div>` : ''}
+
+    ${rides.length ? `
+    <div class="sec-title">🚴 ciclismo</div>
+    <div class="grid g3">
+      <div class="card"><div class="card-stripe cs-blue"></div><div class="lbl">Mayor distancia</div>
+        <div class="big">${longestRide ? (longestRide.distance/1000).toFixed(1) : '—'}<span class="unit">km</span></div>
+        <div class="sub">${longestRide ? longestRide.name : ''}</div>
+      </div>
+      <div class="card"><div class="lbl">Velocidad máxima</div>
+        <div class="big">${best(rides,'max_speed',v=>(v*3.6).toFixed(1))}<span class="unit">km/h</span></div>
+      </div>
+      <div class="card"><div class="lbl">Mayor desnivel</div>
+        <div class="big">${best(rides,'total_elevation_gain',v=>Math.round(v))}<span class="unit">m</span></div>
+      </div>
+    </div>` : ''}
+
+    ${swims.length ? `
+    <div class="sec-title">🏊 natación</div>
+    <div class="grid g3">
+      <div class="card"><div class="lbl">Mayor distancia</div>
+        <div class="big">${best(swims,'distance',v=>(v/1000).toFixed(2))}<span class="unit">km</span></div>
+      </div>
+      <div class="card"><div class="lbl">Sesiones totales</div>
+        <div class="big">${swims.length}</div>
+      </div>
+    </div>` : ''}
+
+    ${!runs.length && !rides.length && !swims.length ? `<div class="empty">No se encontraron actividades con récords calculables.</div>` : ''}
+  `;
+}
+
+// ── PROFILE ──────────────────────────────────────────────────
+function buildProfile() {
+  const {athlete, stats, activities} = STATE;
+  const el = document.getElementById('tab-profile');
+
+  el.innerHTML = `
+    <div class="sec-title">atleta</div>
+    <div class="profile-card">
+      <img class="profile-avatar" src="${athlete.profile||''}" alt="">
+      <div>
+        <div class="profile-name">${athlete.firstname} ${athlete.lastname}</div>
+        <div class="profile-loc">${[athlete.city, athlete.state, athlete.country].filter(Boolean).join(', ') || 'Ubicación no especificada'}</div>
+        <div style="margin-top:.5rem;display:flex;gap:.5rem;flex-wrap:wrap">
+          ${athlete.sex === 'M' ? '<span class="badge bg-b">Masculino</span>' : athlete.sex === 'F' ? '<span class="badge bg-o">Femenino</span>' : ''}
+          ${athlete.premium ? '<span class="badge bg-g">Strava Summit</span>' : ''}
+          <span class="badge bg-m">${activities.length} actividades cargadas</span>
+        </div>
+      </div>
+    </div>
+
+    ${stats ? `
+    <div class="sec-title">totales históricos</div>
+    <div class="grid g3">
+      ${stats.all_run_totals?.count ? `<div class="card">
+        <div class="lbl">🏃 Carrera total</div>
+        <div class="big">${(stats.all_run_totals.distance/1000).toFixed(0)}<span class="unit">km</span></div>
+        <div class="sub">${stats.all_run_totals.count} actividades · ${fmtDur(stats.all_run_totals.moving_time)}</div>
+      </div>` : ''}
+      ${stats.all_ride_totals?.count ? `<div class="card">
+        <div class="lbl">🚴 Ciclismo total</div>
+        <div class="big">${(stats.all_ride_totals.distance/1000).toFixed(0)}<span class="unit">km</span></div>
+        <div class="sub">${stats.all_ride_totals.count} actividades · ${fmtDur(stats.all_ride_totals.moving_time)}</div>
+      </div>` : ''}
+      ${stats.all_swim_totals?.count ? `<div class="card">
+        <div class="lbl">🏊 Natación total</div>
+        <div class="big">${(stats.all_swim_totals.distance/1000).toFixed(2)}<span class="unit">km</span></div>
+        <div class="sub">${stats.all_swim_totals.count} sesiones</div>
+      </div>` : ''}
+    </div>` : ''}
+  `;
+}
+
+// ── TABS ─────────────────────────────────────────────────────
+const tabBuilders = {overview:buildOverview, activities:buildActivities, records:buildRecords, profile:buildProfile};
+const builtTabs = new Set();
+
+function showTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if (!builtTabs.has(name) && tabBuilders[name]) { tabBuilders[name](); builtTabs.add(name); }
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+(async () => {
+  const handled = await handleCallback();
+  if (!handled) {
+    const token = sessionStorage.getItem('strava_token');
+    const athleteStr = sessionStorage.getItem('strava_athlete');
+    if (token && athleteStr) {
+      const athlete = JSON.parse(athleteStr);
+      await loadDashboard(token, athlete);
+    } else {
+      showAuth();
+    }
+  }
+})();
+</script>
+</body>
+</html>
