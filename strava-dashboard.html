@@ -815,6 +815,82 @@ function buildForma(){
 }
  
 // ══════════════════════════════════════════════════
+//  JOURNAL HELPERS (global scope)
+// ══════════════════════════════════════════════════
+function toggleMood(btn){
+  btn.classList.toggle('selected');
+}
+function toggleSymptom(btn){
+  btn.classList.toggle('selected');
+}
+function saveJournal(){
+  const today=new Date().toISOString().slice(0,10);
+  const moods=[...document.querySelectorAll('#mood-sel .mood-btn.selected')].map(b=>b.textContent.trim());
+  const symptoms=[...document.querySelectorAll('#symptom-sel .symptom-btn.selected')].map(b=>b.textContent.trim());
+  const entry={
+    date:today,
+    cycle:S.cycle,
+    cycleLabel:{menstruacion:'Menstruación',folicular:'Folicular',ovulacion:'Ovulación',lutea:'Lútea'}[S.cycle]||'',
+    moods, symptoms,
+    energy:parseInt(document.getElementById('sl-energy')?.value||6),
+    fatigue:parseInt(document.getElementById('sl-fatigue')?.value||4),
+    sleepQ:parseInt(document.getElementById('sl-sleep')?.value||7),
+    sleepH:parseFloat(document.getElementById('sl-sleeph')?.value||7.5),
+    meals:{
+      breakfast:(document.getElementById('meal-breakfast')?.value||'').trim(),
+      lunch:(document.getElementById('meal-lunch')?.value||'').trim(),
+      dinner:(document.getElementById('meal-dinner')?.value||'').trim(),
+      snacks:(document.getElementById('meal-snacks')?.value||'').trim(),
+      water:(document.getElementById('meal-water')?.value||'').trim(),
+      avoided:(document.getElementById('meal-avoided')?.value||'').trim(),
+    },
+    notes:(document.getElementById('journal-notes')?.value||'').trim(),
+  };
+  JOURNAL=JOURNAL.filter(j=>j.date!==today);
+  JOURNAL.push(entry);
+  JOURNAL.sort((a,b)=>a.date.localeCompare(b.date));
+  try{localStorage.setItem('carol_journal',JSON.stringify(JOURNAL));}catch(e){console.warn('localStorage unavailable');}
+  const ok=document.getElementById('save-ok');
+  if(ok){ok.style.display='inline';setTimeout(()=>{ok.style.display='none';},2500);}
+  // Refresh journal view to show updated entry
+  builtTabs.delete('journal');
+  builtTabs.delete('reporte');
+  buildJournal();
+  builtTabs.add('journal');
+}
+ 
+ 
+function exportJournalCSV(){
+  if(!JOURNAL||!JOURNAL.length){alert('No hay registros para exportar todavía. Guardá al menos un registro primero.');return;}
+  const headers=['Fecha','Fase del ciclo','Estado emocional','Energía (1-10)','Fatiga (1-10)','Calidad sueño (1-10)','Horas dormidas','Desayuno','Almuerzo','Cena','Merienda/snacks','Agua','Evitaste','Síntomas ciclo','Notas'];
+  const rows=JOURNAL.map(j=>[
+    j.date||'',
+    j.cycleLabel||j.cycle||'',
+    (j.moods||[]).join(' | '),
+    j.energy||'',
+    j.fatigue||'',
+    j.sleepQ||'',
+    j.sleepH||'',
+    j.meals?.breakfast||'',
+    j.meals?.lunch||'',
+    j.meals?.dinner||'',
+    j.meals?.snacks||'',
+    j.meals?.water||'',
+    j.meals?.avoided||'',
+    (j.symptoms||[]).filter(s=>s!=='Sin síntomas').join(' | '),
+    (j.notes||'').replace(/\n/g,' '),
+  ].map(v=>'"'+String(v).replace(/"/g,'""')+'"'));
+  const csv='\uFEFF'+[headers.map(h=>'"'+h+'"'),...rows].map(r=>r.join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='carol-journal-'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+ 
+// ══════════════════════════════════════════════════
 //  TAB: JOURNAL
 // ══════════════════════════════════════════════════
 function buildJournal(){
@@ -870,6 +946,7 @@ function buildJournal(){
     <div style="display:flex;align-items:center">
       <button class="save-btn" onclick="saveJournal()">Guardar registro</button>
       <span class="save-ok" id="save-ok">✓ Guardado</span>
+      <button class="save-btn" onclick="exportJournalCSV()" style="margin-left:.75rem;background:var(--sage)">↓ Exportar CSV</button>
     </div>
   </div>
  
@@ -1320,16 +1397,53 @@ window.sendChat=async()=>{
   const inp=document.getElementById('chat-input');
   const btn=document.getElementById('chat-snd');
   const text=inp.value.trim();if(!text)return;
+ 
+  // Check for Gemini API key
+  let geminiKey=localStorage.getItem('carol_gemini_key');
+  if(!geminiKey){
+    geminiKey=prompt('Para usar la nutricionista IA necesitás una API key gratuita de Google.\n\n1. Entrá a aistudio.google.com\n2. Hacé clic en "Get API Key"\n3. Copiá la key y pegala aquí:\n\n(Es gratuita, no requiere tarjeta)');
+    if(!geminiKey){return;}
+    localStorage.setItem('carol_gemini_key',geminiKey.trim());
+  }
+ 
   addMsg(text,'user');inp.value='';btn.disabled=true;
   const typing=document.createElement('div');typing.className='typing';typing.style.display='flex';typing.innerHTML='<span></span><span></span><span></span>';
   document.getElementById('chat-msgs').appendChild(typing);scrollChat();
-  chatHistory.push({role:'user',content:text});
+ 
+  // Build conversation for Gemini
+  const contents=[];
+  if(chatHistory.length>0){
+    chatHistory.slice(-8).forEach(m=>{
+      contents.push({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]});
+    });
+  }
+  contents.push({role:'user',parts:[{text:text}]});
+ 
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYS,messages:chatHistory.slice(-10)})});
+    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        systemInstruction:{parts:[{text:SYS}]},
+        contents,
+        generationConfig:{maxOutputTokens:800,temperature:0.7}
+      })
+    });
     const d=await r.json();
-    const reply=d.content?.[0]?.text||'No pude responder ahora. Intentá de nuevo.';
-    typing.remove();addMsg(reply,'bot');chatHistory.push({role:'assistant',content:reply});
-  }catch(e){typing.remove();addMsg('Error de conexión. Intentá de nuevo.','bot');}
+    if(d.error){
+      if(d.error.code===400||d.error.code===401||d.error.code===403){
+        localStorage.removeItem('carol_gemini_key');
+        typing.remove();addMsg('API key inválida. Recargá la página e intentá de nuevo con una key correcta.','bot');
+      } else {
+        typing.remove();addMsg('Error: '+d.error.message,'bot');
+      }
+    } else {
+      const reply=d.candidates?.[0]?.content?.parts?.[0]?.text||'No pude responder. Intentá de nuevo.';
+      typing.remove();addMsg(reply,'bot');
+      chatHistory.push({role:'user',content:text});
+      chatHistory.push({role:'assistant',content:reply});
+    }
+  }catch(e){typing.remove();addMsg('Error de conexión. Verificá tu internet e intentá de nuevo.','bot');}
   btn.disabled=false;
 };
 function addMsg(text,role){const el=document.getElementById('chat-msgs');const d=document.createElement('div');d.className='msg '+role;d.innerHTML=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');el.appendChild(d);scrollChat();}
@@ -1361,3 +1475,4 @@ function showTab(name,el){
 </script>
 </body>
 </html>
+ 
