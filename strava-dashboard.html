@@ -382,15 +382,15 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
   <nav>
     <div class="tab active" onclick="showTab('inicio',this)">🏃 Actividades</div>
     <div class="tab" onclick="showTab('forma',this)">⚡ Forma</div>
-    <div class="tab" onclick="showTab('journal',this)">📓 Journal</div>
     <div class="tab" onclick="showTab('nutricion',this)">🌿 Nutrición</div>
+    <div class="tab" onclick="showTab('reporte',this)">🌄 Reporte</div>
     <div class="tab" onclick="showTab('perfil',this)">👤 Mi Perfil</div>
   </nav>
   <main>
     <div class="section active" id="tab-inicio"></div>
     <div class="section" id="tab-forma"></div>
-    <div class="section" id="tab-journal"></div>
     <div class="section" id="tab-nutricion"></div>
+    <div class="section" id="tab-reporte"></div>
     <div class="section" id="tab-perfil"></div>
   </main>
 </div>
@@ -813,7 +813,7 @@ function filterBar(id,fnIdx,showType=true){
 window.sf=(key,val,fnIdx,extra='')=>{
   if(key==='period'&&val==='custom'){S.filter.period='custom';S.filter.month=extra;}else S.filter[key]=val;
   const names=['inicio','actividades','zonas','forma','journal','nutricion','reporte'];
-  const fns=[buildInicio,buildActividades,buildZonas,buildForma,buildJournal,buildNutricion,buildReporte];
+  const fns=[buildInicio,buildForma,buildNutricion,buildReporte,buildPerfil];
   builtTabs.delete(names[fnIdx]);fns[fnIdx]();builtTabs.add(names[fnIdx]);
 };
 function actList(acts){
@@ -887,6 +887,14 @@ window.toggleDayFilter=function(day){
   else S.dayFilter.push(day);
   builtTabs.delete('inicio');buildInicio();
 };
+function buildCycleCombo(cycle, tsb) {
+  const tsbOk = tsb > 5 && tsb < 30;
+  if (cycle === "ovulacion" && tsbOk) return "🏆 Máximo rendimiento — todo alineado";
+  if (cycle === "folicular" && tsbOk) return "💪 Ventana anabólica + forma óptima";
+  if (cycle === "lutea" && tsb > -10) return "🔥 Cardio Z2 = quema de grasa máxima";
+  if (cycle === "menstruacion") return "🧘 Movimiento suave y recuperación";
+  return "Ajustá la intensidad según cómo te sentís";
+}
 function buildCycleBlock(cycle, tsb) {
   const PD = {
     menstruacion:{emoji:"🌑",name:"Menstruación",days:"Días 1–5",color:"var(--men)",bg:"var(--men-l)",energy:"Baja · Descansá",tip:"Reducí la intensidad al 60-70%. Priorizá hierro + vitamina C. El magnesio ayuda con los calambres.",train:"Yoga, caminata, nado suave"},
@@ -939,21 +947,36 @@ function buildForma(){
   const td=series[series.length-1]||{ctl:0,atl:0,tsb:0},wk=series[series.length-8]||{ctl:0,atl:0,tsb:0};
   const st=td.tsb>10?{l:'Forma óptima ✦',c:'var(--sage)',msg:'Estás descansada y lista para dar el máximo.'}:td.tsb>-10?{l:'Forma neutra',c:'var(--dusk)',msg:'Balance entre carga y recuperación.'}:td.tsb>-30?{l:'Carga alta',c:'var(--terra)',msg:'Bajá el volumen y priorizá sueño.'}:{l:'Sobreentrenamiento',c:'var(--rose)',msg:'Necesitás 3-5 días de descanso activo.'};
   const c1='cf1-'+Date.now(),c2='cf2-'+Date.now();
+  // Build cycle mini-card for the top grid
+  const cycleEmojis={menstruacion:"🌑",folicular:"🌱",ovulacion:"🌕",lutea:"🌘"};
+  const cycleNames={menstruacion:"Menstruación",folicular:"Folicular",ovulacion:"Ovulación",lutea:"Lútea"};
+  const cycleDays={menstruacion:"D 1-5",folicular:"D 6-12",ovulacion:"D 13-16",lutea:"D 17-28"};
+  const cycleColors={menstruacion:"var(--men)",folicular:"var(--fol)",ovulacion:"var(--ovu)",lutea:"var(--lut)"};
+  const cc=cycleColors[S.cycle]||"var(--ovu)";
+  const ce=cycleEmojis[S.cycle]||"🌕";
+  const cn=cycleNames[S.cycle]||"Ovulación";
+  const cd=cycleDays[S.cycle]||"D 13-16";
   el.innerHTML=`<div class="sec">estado hoy</div>
   <div class="grid g4">
-    <div class="card"><div class="card-accent ca-sky"></div><div class="lbl">Fitness (CTL)</div><div class="big">${td.ctl}</div><div class="sub">${td.ctl>=wk.ctl?'↑':'↓'} ${Math.abs(td.ctl-wk.ctl)} vs semana pasada</div></div>
-    <div class="card"><div class="card-accent ca-terra"></div><div class="lbl">Fatiga (ATL)</div><div class="big">${td.atl}</div><div class="sub">${td.atl>wk.atl?'↑ Más cargada':'↓ Recuperando'}</div></div>
-    <div class="card"><div class="card-accent" style="background:${st.c}"></div><div class="lbl">Forma (TSB)</div><div style="font-family:'Fraunces',serif;font-size:1.7rem;font-weight:300;color:${st.c}">${td.tsb>0?'+':''}${td.tsb}</div><div style="margin-top:.35rem;font-size:.72rem;color:${st.c};font-weight:500">${st.l}</div></div>
+    <div class="card"><div class="card-accent ca-sky"></div><div class="lbl">Fitness (CTL)</div><div class="big">${td.ctl}</div><div class="sub">${td.ctl>=wk.ctl?"↑":"↓"} ${Math.abs(td.ctl-wk.ctl)} vs semana pasada</div></div>
+    <div class="card"><div class="card-accent ca-terra"></div><div class="lbl">Fatiga (ATL)</div><div class="big">${td.atl}</div><div class="sub">${td.atl>wk.atl?"↑ Más cargada":"↓ Recuperando"}</div></div>
+    <div class="card"><div class="card-accent" style="background:${st.c}"></div><div class="lbl">Forma (TSB)</div><div class="big" style="color:${st.c}">${td.tsb>0?"+":""}${td.tsb}</div><div style="margin-top:.35rem;font-size:.72rem;color:${st.c};font-weight:500">${st.l}</div></div>
     <div class="card"><div class="lbl">Carga 7 días</div><div class="big xs">${series.slice(-7).reduce((s,d)=>s+d.load,0)}<span class="unit">TRIMP</span></div><div class="sub">vs ${series.slice(-14,-7).reduce((s,d)=>s+d.load,0)} sem. ant.</div></div>
   </div>
-  <div class="insight" style="border-left-color:${st.c}"><div class="it">${st.l}</div><div class="ib">${st.msg}</div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-top:.85rem">
+    <div class="insight" style="border-left-color:${st.c};margin:0"><div class="it">${st.l}</div><div class="ib">${st.msg}</div></div>
+    <div class="card" style="display:flex;align-items:center;gap:.85rem;padding:.85rem 1rem">
+      <span style="font-size:2rem">${ce}</span>
+      <div>
+        <div style="font-size:.62rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:${cc};margin-bottom:.2rem">${cd}</div>
+        <div style="font-size:1rem;font-weight:300;color:var(--text)">${cn}</div>
+        <div style="font-size:.7rem;color:var(--muted);margin-top:.15rem">${buildCycleCombo(S.cycle,td.tsb)}</div>
+      </div>
+    </div>
+  </div>
   <div class="sec">evolución 60 días</div>
   <div class="chart-card"><div class="ct">Fitness vs Fatiga</div><div class="cs">CTL (azul) sube lento. ATL (naranja) fluctúa con cada entrenamiento.</div><div class="cwrap tall"><canvas id="${c1}"></canvas></div></div>
   <div class="chart-card" style="margin-top:.85rem"><div class="ct">Forma deportiva (TSB)</div><div class="cwrap"><canvas id="${c2}"></canvas></div></div>
-
-  <!-- Fase del ciclo menstrual -->
-  <div class="sec">ciclo menstrual · hoy</div>
-  ${buildCycleBlock(S.cycle, td.tsb)}
   `;
   setTimeout(()=>{
     const lbl=l60.map(d=>fmtDate(d.date));
@@ -1328,6 +1351,12 @@ function scrollChat(){const el=document.getElementById('chat-msgs');if(el)el.scr
 // ══════════════════════════════════════════════════
 function buildPerfil(){
   const el=document.getElementById('tab-perfil');
+  el.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:300px;flex-direction:column;gap:1rem;color:var(--muted)">
+    <div style="font-size:2.5rem">👤</div>
+    <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:300">Mi Perfil</div>
+    <div style="font-size:.8rem">Próximamente — se cargará con los datos del bot</div>
+  </div>`;
+  return;
   const prof=JSON.parse(localStorage.getItem('carol_profile')||'{}');
   const cycleOpts=[['menstruacion','🌑 Menstruación (días 1-5)'],['folicular','🌱 Folicular (días 6-13)'],['ovulacion','🌕 Ovulación (días 14-16)'],['lutea','🌘 Lútea (días 17-28)']];
   el.innerHTML=`
@@ -1424,7 +1453,7 @@ window.savePerfil=function(){
 // ══════════════════════════════════════════════════
 //  TABS
 // ══════════════════════════════════════════════════
-const tabBuilders={inicio:buildInicio,forma:buildForma,journal:buildJournal,nutricion:buildNutricion,perfil:buildPerfil};
+const tabBuilders={inicio:buildInicio,forma:buildForma,nutricion:buildNutricion,reporte:buildReporte,perfil:buildPerfil};
 const builtTabs=new Set();
 function showTab(name,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
