@@ -612,8 +612,93 @@ function buildForma(){
 
   setTimeout(()=>{
     const lbl=l60.map(d=>fmtDate(d.date));
-    mC(c1,{type:'line',data:{labels:lbl,datasets:[{label:'Fitness (CTL)',data:l60.map(d=>d.ctl),borderColor:'var(--sky)',backgroundColor:'rgba(74,106,138,.12)',borderWidth:2,pointRadius:0,fill:true,tension:.3},{label:'Fatiga (ATL)',data:l60.map(d=>d.atl),borderColor:'var(--terra)',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:.3,borderDash:[4,3]}]},options:cOpts()});
-    mC(c2,{type:'bar',data:{labels:lbl,datasets:[{label:'Forma (TSB)',data:l60.map(d=>d.tsb),backgroundColor:l60.map(d=>d.tsb>=0?'rgba(90,122,74,.7)':'rgba(196,80,106,.7)'),borderRadius:2}]},options:{...cOpts(false)}});
+
+    // Build cycle phase as a background dataset using bar chart layered behind
+    // We use a Chart.js plugin to draw colored background zones per phase
+    const cycleZoneColors={menstruacion:'rgba(224,80,80,.13)',folicular:'rgba(90,138,80,.13)',ovulacion:'rgba(208,112,48,.13)',lutea:'rgba(122,90,170,.13)'};
+    const cycleLabels={menstruacion:'Mens.',folicular:'Fol.',ovulacion:'Ovu.',lutea:'Lutea'};
+
+    // Build per-day cycle phase data based on today's cycle + 60 days back
+    // We don't have historical cycle data, so we approximate based on current phase
+    // by cycling backwards from today
+    const todayIdx = l60.length - 1;
+    const CLEN = 23;
+    const phaseOrder = ['menstruacion','folicular','ovulacion','lutea'];
+    const phaseLens = {menstruacion:5, folicular:7, ovulacion:4, lutea:7};
+    // Find current day in cycle
+    const cycleStartDay = {menstruacion:1,folicular:6,ovulacion:13,lutea:17};
+    const currentCycleDay = cycleStartDay[S.cycle] || 13;
+
+    // Build cycle day for each of the 60 days
+    function getPhaseForCycleDay(cd){
+      const d = ((cd-1) % CLEN) + 1;
+      if(d<=5)return'menstruacion';if(d<=12)return'folicular';if(d<=16)return'ovulacion';return'lutea';
+    }
+    const cycleDays = l60.map((_,i)=>{
+      const offset = todayIdx - i;
+      const cd = ((currentCycleDay - 1 - offset) % CLEN + CLEN) % CLEN + 1;
+      return getPhaseForCycleDay(cd);
+    });
+
+    // Create background color annotation plugin
+    const cyclePlugin = {
+      id: 'cycleBackground',
+      beforeDraw(chart) {
+        const {ctx, chartArea, scales} = chart;
+        if(!chartArea) return;
+        const xScale = scales.x;
+        ctx.save();
+        cycleDays.forEach((phase, i) => {
+          const x0 = xScale.getPixelForValue(i) - (i>0?(xScale.getPixelForValue(i)-xScale.getPixelForValue(i-1))/2:0);
+          const x1 = xScale.getPixelForValue(i) + (i<cycleDays.length-1?(xScale.getPixelForValue(i+1)-xScale.getPixelForValue(i))/2:0);
+          ctx.fillStyle = cycleZoneColors[phase] || 'transparent';
+          ctx.fillRect(x0, chartArea.top, x1-x0, chartArea.height);
+        });
+        ctx.restore();
+      }
+    };
+
+    // Find phase transition points to draw labels
+    const phaseTransitions = [];
+    let lastPhase = null;
+    cycleDays.forEach((phase, i) => {
+      if(phase !== lastPhase) {
+        phaseTransitions.push({phase, idx: i});
+        lastPhase = phase;
+      }
+    });
+
+    const labelPlugin = {
+      id: 'cycleLabels',
+      afterDraw(chart) {
+        const {ctx, chartArea, scales} = chart;
+        if(!chartArea) return;
+        const phaseEmojis = {menstruacion:'🌑',folicular:'🌱',ovulacion:'🌕',lutea:'🌘'};
+        ctx.save();
+        ctx.font = '10px DM Sans';
+        ctx.fillStyle = 'rgba(255,255,255,0.45)';
+        ctx.textAlign = 'center';
+        phaseTransitions.forEach((t, ti) => {
+          const nextIdx = ti < phaseTransitions.length-1 ? phaseTransitions[ti+1].idx : cycleDays.length-1;
+          const midIdx = Math.round((t.idx + nextIdx) / 2);
+          const x = scales.x.getPixelForValue(midIdx);
+          ctx.fillText(phaseEmojis[t.phase] || '', x, chartArea.top + 14);
+        });
+        ctx.restore();
+      }
+    };
+
+    const opts1 = {
+      ...cOpts(),
+      plugins: {
+        ...cOpts().plugins,
+        cycleBackground: true,
+        cycleLabels: true,
+      }
+    };
+
+    mC(c1,{type:'line',plugins:[cyclePlugin,labelPlugin],data:{labels:lbl,datasets:[{label:'Fitness (CTL)',data:l60.map(d=>d.ctl),borderColor:'var(--sky)',backgroundColor:'rgba(74,106,138,.12)',borderWidth:2,pointRadius:0,fill:true,tension:.3},{label:'Fatiga (ATL)',data:l60.map(d=>d.atl),borderColor:'var(--terra)',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:.3,borderDash:[4,3]}]},options:opts1});
+    mC(c2,{type:'bar',plugins:[cyclePlugin,labelPlugin],data:{labels:lbl,datasets:[{label:'Forma (TSB)',data:l60.map(d=>d.tsb),backgroundColor:l60.map(d=>d.tsb>=0?'rgba(90,122,74,.7)':'rgba(196,80,106,.7)'),borderRadius:2}]},options:{...cOpts(false)}});
   },80);
 }
 
