@@ -18,7 +18,7 @@
 }
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
- 
+
 /* ══ AUTH ══════════════════════════════════════════ */
 #auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;z-index:1}
 #auth-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%,rgba(196,98,45,.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(90,122,74,.1) 0%,transparent 50%);pointer-events:none}
@@ -42,13 +42,13 @@ body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xm
 .btn-strava:hover{opacity:.85}
 .btn-strava svg{width:16px;height:16px;flex-shrink:0}
 .auth-note{font-size:.68rem;color:var(--muted2);text-align:center;margin-top:.75rem;line-height:1.6}
- 
+
 /* ══ LOADING ══════════════════════════════════════ */
 #loading-screen{display:none;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;gap:1.25rem;text-align:center;padding:2rem;position:relative;z-index:1}
 .spinner{width:32px;height:32px;border:2px solid var(--border2);border-top-color:var(--terra);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 #load-msg{font-size:.8rem;color:var(--muted)}
- 
+
 /* ══ SHELL ════════════════════════════════════════ */
 #app{display:none;position:relative;z-index:1}
 header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;backdrop-filter:blur(12px)}
@@ -67,7 +67,7 @@ main{padding:1.75rem 2rem;max-width:1300px;margin:0 auto}
 .section{display:none}
 .section.active{display:block;animation:fadeUp .25s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
- 
+
 /* ══ LAYOUT ════════════════════════════════════ */
 .grid{display:grid;gap:.85rem}
 .g4{grid-template-columns:repeat(4,1fr)}
@@ -77,7 +77,7 @@ main{padding:1.75rem 2rem;max-width:1300px;margin:0 auto}
 .g12{grid-template-columns:1fr 2fr}
 @media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g21,.g12{grid-template-columns:1fr}}
 @media(max-width:620px){.g4,.g3,.g2{grid-template-columns:1fr}main{padding:1rem}header,nav{padding:0 1rem}.frow,.frow2{grid-template-columns:1fr}}
- 
+
 /* ══ CARDS ═══════════════════════════════════ */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.3rem;overflow:hidden}
 .card-accent{height:2px;margin:-1.1rem -1.3rem 1rem;border-radius:var(--radius) var(--radius) 0 0}
@@ -90,7 +90,7 @@ main{padding:1.75rem 2rem;max-width:1300px;margin:0 auto}
 .sec{font-family:'Fraunces',serif;font-size:.9rem;font-weight:300;font-style:italic;color:var(--muted);margin-bottom:.85rem;margin-top:1.75rem;display:flex;align-items:center;gap:.75rem}
 .sec:first-child{margin-top:0}
 .sec::after{content:'';flex:1;height:1px;background:var(--border)}
- 
+
 /* ══ FILTER BAR ══════════════════════════════ */
 .filter-bar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem;padding:.75rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
 .flbl{font-size:.65rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
@@ -100,7 +100,7 @@ main{padding:1.75rem 2rem;max-width:1300px;margin:0 auto}
 .fsep{width:1px;height:16px;background:var(--border)}
 .fsel{padding:.25rem .65rem;border:1px solid var(--border);border-radius:100px;font-size:.72rem;background:var(--surface);color:var(--text2);outline:none;cursor:pointer;font-family:'DM Sans',sans-serif}
 .fsel option{background:var(--surface2)}
- 
+
 /* ══ ACTIVITY LIST ═══════════════════════════ */
 .act-list{display:flex;flex-direction:column;gap:.38rem}
 .act-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.75rem 1.1rem;display:grid;grid-template-columns:1.9rem 1fr repeat(4,auto);align-items:center;gap:.75rem;transition:border-color .15s}
@@ -111,28 +111,28 @@ main{padding:1.75rem 2rem;max-width:1300px;margin:0 auto}
 .astat{text-align:right;min-width:58px}
 .av{font-family:'Fraunces',serif;font-size:.88rem;font-weight:300;color:var(--text)}
 .al{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:1px}
- 
+
 /* ══ BADGE ═══════════════════════════════════ */
 .badge{display:inline-flex;align-items:center;padding:.13rem .48rem;border-radius:100px;font-size:.62rem;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
 .bt{background:var(--terra-l);color:#e8845a}.bs{background:var(--sage-l);color:#7ab060}.bd{background:var(--dusk-l);color:#d09060}.bk{background:var(--sky-l);color:#6a9aba}.br{background:var(--rose-l);color:#d4708a}.bm{background:var(--surface2);color:var(--muted)}
- 
+
 /* ══ CHART ═══════════════════════════════════ */
 .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
 .ct{font-size:.8rem;font-weight:500;color:var(--text2)}
 .cs{font-size:.68rem;color:var(--muted);margin-top:.1rem;margin-bottom:.75rem}
 .cwrap{position:relative;height:185px}
 .cwrap.tall{height:230px}
- 
+
 /* ══ INSIGHT ════════════════════════════════ */
 .insight{background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--terra);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:.85rem 1rem;margin-bottom:.55rem}
 .insight.sage{border-left-color:var(--sage)}.insight.sky{border-left-color:var(--sky)}.insight.lut{border-left-color:var(--lut)}.insight.rose{border-left-color:var(--rose)}
 .it{font-size:.78rem;font-weight:500;margin-bottom:.2rem;color:var(--text2)}
 .ib{font-size:.74rem;color:var(--muted);line-height:1.65}
- 
+
 /* ══ BAR ══════════════════════════════════════*/
 .btrack{height:4px;background:var(--surface2);border-radius:100px;overflow:hidden;margin-top:.5rem}
 .bfill{height:100%;border-radius:100px;transition:width 1s cubic-bezier(.4,0,.2,1)}
- 
+
 /* ══ ZONE BARS ══════════════════════════════ */
 .zrow{display:flex;align-items:center;gap:.65rem;margin-bottom:.42rem}
 .zlbl{font-size:.68rem;font-weight:500;min-width:40px}
@@ -141,7 +141,7 @@ main{padding:1.75rem 2rem;max-width:1300px;margin:0 auto}
 .zfill{height:100%;border-radius:100px;transition:width 1s}
 .zpct{font-size:.68rem;min-width:28px;text-align:right;color:var(--muted)}
 .z1c{background:#60a5fa}.z2c{background:#34d399}.z3c{background:#fbbf24}.z4c{background:#f97316}.z5c{background:#ef4444}
- 
+
 /* ══ REPORT ══════════════════════════════════ */
 .report-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1rem}
 .rh-label{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--terra);font-weight:500;margin-bottom:.5rem}
@@ -153,7 +153,7 @@ main{padding:1.75rem 2rem;max-width:1300px;margin:0 auto}
 .report-block h2{font-family:'Fraunces',serif;font-size:1rem;font-weight:300;margin-bottom:.45rem;color:var(--text2);display:flex;align-items:center;gap:.5rem}
 .report-block p{font-size:.84rem;color:var(--muted);line-height:1.75}
 .report-block p strong{color:var(--text);font-weight:500}
- 
+
 /* ══ JOURNAL ════════════════════════════════ */
 .journal-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:.55rem;transition:border-color .15s}
 .journal-entry:hover{border-color:var(--border2)}
@@ -169,7 +169,7 @@ main{padding:1.75rem 2rem;max-width:1300px;margin:0 auto}
 .je-meal{background:var(--surface2);border-radius:7px;padding:.45rem .6rem}
 .je-meal-name{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.15rem}
 .je-meal-food{font-size:.74rem;color:var(--text2)}
- 
+
 /* ══ JOURNAL FORM ════════════════════════════ */
 .journal-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.25rem}
 .jf-title{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:300;margin-bottom:1.25rem;color:var(--text)}
@@ -196,7 +196,7 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
 .save-btn{padding:.6rem 1.5rem;background:var(--terra);color:#fff;border:none;border-radius:var(--radius-sm);font-size:.82rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s}
 .save-btn:hover{opacity:.85}
 .save-ok{display:none;font-size:.75rem;color:var(--sage);margin-left:.75rem}
- 
+
 /* ══ NUTRI REAL DATA — nuevo ═══════════════════════ */
 .nutri-real{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
 .nr-header{background:var(--surface2);border-bottom:1px solid var(--border);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
@@ -207,7 +207,7 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
 .nr-dot{width:5px;height:5px;border-radius:50%;background:var(--sage);animation:pulse2 2s infinite}
 @keyframes pulse2{0%,100%{opacity:1}50%{opacity:.3}}
 .nr-body{padding:1.1rem 1.25rem}
- 
+
 /* Anillo calórico */
 .nr-ring-row{display:flex;align-items:center;gap:1.25rem;margin-bottom:1.1rem}
 .nr-ring{position:relative;flex-shrink:0}
@@ -220,7 +220,7 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
 .nr-cal-key{color:var(--muted)}
 .nr-cal-val{font-family:'Fraunces',serif;font-weight:300;color:var(--text2)}
 .nr-cal-val.pos{color:var(--sage)}.nr-cal-val.neg{color:var(--men)}.nr-cal-val.neu{color:var(--dusk)}
- 
+
 /* Macros mini */
 .nr-macros{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1rem}
 .nr-macro{background:var(--surface2);border-radius:9px;padding:.65rem .75rem}
@@ -229,7 +229,7 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
 .nr-macro-sub{font-size:.62rem;color:var(--muted);margin-top:.15rem}
 .nr-bar{height:2px;background:var(--border);border-radius:1px;margin-top:.5rem;overflow:hidden}
 .nr-bar-fill{height:100%;border-radius:1px;transition:width 1s cubic-bezier(.4,0,.2,1)}
- 
+
 /* Wellness chips */
 .nr-wellness{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
 .nr-chip{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .65rem;border-radius:100px;font-size:.7rem;font-weight:500;border:1px solid transparent}
@@ -240,7 +240,7 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
 .nr-chip.ciclo.foli{background:var(--fol-l);border-color:#1e4a18;color:#70c870}
 .nr-chip.ciclo.ovu{background:var(--ovu-l);border-color:#5a3a10;color:#e8a060}
 .nr-chip.ciclo.lute{background:var(--lut-l);border-color:#3a2858;color:#a880e0}
- 
+
 /* Log de comidas */
 .nr-log{display:flex;flex-direction:column;gap:.3rem}
 .nr-log-item{display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;background:var(--surface2);border-radius:8px;transition:background .15s}
@@ -256,7 +256,7 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
 .nr-log-g{font-size:.68rem;color:var(--muted);flex-shrink:0}
 .nr-log-kcal{font-size:.75rem;color:var(--dusk);font-family:'Fraunces',serif;font-weight:300;flex-shrink:0;min-width:52px;text-align:right}
 .nr-log-macros{font-size:.62rem;color:var(--muted);flex-shrink:0;text-align:right;line-height:1.4;min-width:72px}
- 
+
 /* Semana mini */
 .nr-week{display:flex;align-items:flex-end;gap:4px;height:50px;margin-bottom:.4rem}
 .nr-week-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
@@ -266,7 +266,7 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
 .nr-week-bar.over{background:rgba(224,80,80,.5)}
 .nr-week-lbl{font-size:.6rem;color:var(--muted);letter-spacing:.3px}
 .nr-week-lbl.today{color:var(--dusk)}
- 
+
 /* Empty / loading / error */
 .nr-empty{text-align:center;padding:2rem;color:var(--muted);font-size:.8rem;line-height:1.7}
 .nr-loading{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:2rem;color:var(--muted);font-size:.75rem}
@@ -274,7 +274,7 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
 .nr-loading-dot:nth-child(2){animation-delay:.15s}.nr-loading-dot:nth-child(3){animation-delay:.3s}
 @keyframes bounce2{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
 .nr-error{background:rgba(224,80,80,.08);border:1px solid rgba(224,80,80,.2);border-radius:8px;padding:.75rem 1rem;font-size:.75rem;color:#e87070;margin:.5rem 0}
- 
+
 /* ══ NUTRI CYCLE (original) ════════════════ */
 .nutri-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:.85rem}
 .nutri-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);background:var(--surface2)}
@@ -309,7 +309,7 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
 .mw-meal{font-size:.72rem;line-height:1.45}
 .mw-meal-label{font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);display:block;margin-bottom:.1rem}
 .mw-meal-food{color:var(--text2)}
- 
+
 /* ══ CHAT ════════════════════════════════════ */
 .chat-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
 .chat-hdr{padding:.9rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.7rem;background:var(--surface2)}
@@ -336,7 +336,7 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
 @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
 .empty{padding:2.5rem;text-align:center;color:var(--muted);font-size:.82rem;line-height:1.7;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
 @media(max-width:620px){.act-row{grid-template-columns:1.9rem 1fr auto}.act-row .astat:nth-child(n+5){display:none}.je-meals{grid-template-columns:1fr}.meal-input-grid{grid-template-columns:1fr}}
- 
+
 /* day tabs */
 .day-tabs{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.75rem}
 .day-tab{padding:.3rem .75rem;border:1px solid var(--border);border-radius:100px;font-size:.7rem;cursor:pointer;color:var(--muted);transition:all .15s;font-family:'DM Sans',sans-serif}
@@ -344,7 +344,7 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
 </style>
 </head>
 <body>
- 
+
 <!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-wrap">
@@ -378,10 +378,10 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
     </div>
   </div>
 </div>
- 
+
 <!-- LOADING -->
 <div id="loading-screen"><div class="spinner"></div><div id="load-msg">Conectando…</div></div>
- 
+
 <!-- APP -->
 <div id="app">
   <header>
@@ -393,25 +393,19 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
     </div>
   </header>
   <nav>
-    <div class="tab active" onclick="showTab('inicio',this)">🏠 Inicio</div>
-    <div class="tab" onclick="showTab('actividades',this)">🏃 Actividades</div>
-    <div class="tab" onclick="showTab('zonas',this)">❤️ Zonas FC</div>
+    <div class="tab active" onclick="showTab('inicio',this)">🏃 Actividades</div>
     <div class="tab" onclick="showTab('forma',this)">⚡ Forma</div>
     <div class="tab" onclick="showTab('journal',this)">📓 Journal</div>
     <div class="tab" onclick="showTab('nutricion',this)">🌿 Nutrición</div>
-    <div class="tab" onclick="showTab('reporte',this)">🌄 Mi Reporte</div>
   </nav>
   <main>
     <div class="section active" id="tab-inicio"></div>
-    <div class="section" id="tab-actividades"></div>
-    <div class="section" id="tab-zonas"></div>
     <div class="section" id="tab-forma"></div>
     <div class="section" id="tab-journal"></div>
     <div class="section" id="tab-nutricion"></div>
-    <div class="section" id="tab-reporte"></div>
   </main>
 </div>
- 
+
 <script>
 // ══════════════════════════════════════════════════
 //  NUTRITION SHEET CONFIG
@@ -420,7 +414,7 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
 const NUTRI_CONFIG = {
   // URL pública CSV del sheet (Archivo → Compartir → Publicar en la web → CSV)
   SHEET_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGBZ172IdFEj878LM9tr_Vyt2wGzsKS8JVB8mfuHDSsUe7m7QFrjl9i9olCPyi321X1EtygH7l5PKn/pub?gid=0&single=true&output=csv',
- 
+
   metas: {
     kcal:     2100,
     proteina: 120,
@@ -429,10 +423,10 @@ const NUTRI_CONFIG = {
     agua_ml:  2500,
   },
 };
- 
+
 // Cache en memoria
 let _nutriCache = { rows: null, ts: 0 };
- 
+
 async function fetchNutritionRows(force = false) {
   const now = Date.now();
   if (!force && _nutriCache.rows && (now - _nutriCache.ts) < 5 * 60 * 1000) {
@@ -466,11 +460,11 @@ async function fetchNutritionRows(force = false) {
   _nutriCache = { rows, ts: now };
   return rows;
 }
- 
+
 function todayAR() {
   return new Date().toLocaleDateString('es-AR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
- 
+
 function sumNutri(rows) {
   return rows.reduce((a, r) => ({
     kcal:     a.kcal     + r.kcal,
@@ -480,7 +474,7 @@ function sumNutri(rows) {
     agua_ml:  a.agua_ml  + r.agua_ml,
   }), { kcal:0, proteina:0, carbos:0, grasas:0, agua_ml:0 });
 }
- 
+
 function buildWeekNutri(allRows) {
   const days = [];
   for (let i = 6; i >= 0; i--) {
@@ -492,7 +486,7 @@ function buildWeekNutri(allRows) {
   }
   return days;
 }
- 
+
 function renderNutriReal(container, allRows) {
   const today    = todayAR();
   const todayRows= allRows.filter(r => r.fecha === today);
@@ -500,18 +494,18 @@ function renderNutriReal(container, allRows) {
   const metas    = NUTRI_CONFIG.metas;
   const weekData = buildWeekNutri(allRows);
   const maxKcal  = Math.max(...weekData.map(d => d.kcal), metas.kcal, 100);
- 
+
   // Wellness data (toma el último registro no vacío)
   const fase   = [...allRows].reverse().find(r => r.fase_ciclo)?.fase_ciclo || '';
   const energia= todayRows.find(r => r.energia)?.energia || '';
   const sueno  = todayRows.find(r => r.sueno_h > 0)?.sueno_h || 0;
- 
+
   // Ring arc
   const R = 40, circ = 2 * Math.PI * R;
   const pct  = Math.min(totals.kcal / metas.kcal, 1);
   const color= totals.kcal > metas.kcal ? '#e05050' : '#b87040';
   const arcOffset = circ - pct * circ;
- 
+
   // Fase badge
   const faseMap = {
     menstruacion: { cls:'mens', label:'Menstruación' },
@@ -520,13 +514,13 @@ function renderNutriReal(container, allRows) {
     lutea:        { cls:'lute', label:'Lútea' },
   };
   const faseInfo = faseMap[fase?.toLowerCase()] || null;
- 
+
   // Food log (non-zero kcal or water)
   const logRows = todayRows.filter(r => r.kcal > 0 || r.agua_ml > 0);
- 
+
   const strava = window.STRAVA_KCAL_TODAY || 0;
   const balance= strava - Math.round(totals.kcal);
- 
+
   container.innerHTML = `
     <div class="nutri-real">
       <div class="nr-header">
@@ -536,7 +530,7 @@ function renderNutriReal(container, allRows) {
         </div>
       </div>
       <div class="nr-body">
- 
+
         <!-- Anillo + meta -->
         <div class="nr-ring-row">
           <div class="nr-ring">
@@ -566,7 +560,7 @@ function renderNutriReal(container, allRows) {
             </div>
           </div>
         </div>
- 
+
         <!-- Macros -->
         <div class="nr-macros">
           ${[
@@ -581,7 +575,7 @@ function renderNutriReal(container, allRows) {
               <div class="nr-bar"><div class="nr-bar-fill" data-pct="${Math.min(m.val/m.meta*100,100).toFixed(0)}" style="width:0%;background:${m.color}"></div></div>
             </div>`).join('')}
         </div>
- 
+
         <!-- Wellness chips -->
         <div class="nr-wellness">
           ${totals.agua_ml > 0 ? `<span class="nr-chip agua">💧 ${Math.round(totals.agua_ml)} ml agua</span>` : ''}
@@ -589,7 +583,7 @@ function renderNutriReal(container, allRows) {
           ${energia ? `<span class="nr-chip energia">⚡ Energía ${energia}</span>` : ''}
           ${faseInfo ? `<span class="nr-chip ciclo ${faseInfo.cls}">🌿 ${faseInfo.label}</span>` : ''}
         </div>
- 
+
         <!-- Gráfico semanal -->
         <div class="lbl" style="margin-bottom:.5rem">últimos 7 días · kcal</div>
         <div class="nr-week" id="nr-week-wrap">
@@ -601,7 +595,7 @@ function renderNutriReal(container, allRows) {
               <div class="nr-week-lbl ${d.isToday ? 'today' : ''}">${d.lbl}</div>
             </div>`).join('')}
         </div>
- 
+
         <!-- Log del día -->
         ${logRows.length ? `
           <div class="lbl" style="margin:1rem 0 .5rem">registro del día</div>
@@ -624,12 +618,12 @@ function renderNutriReal(container, allRows) {
       </div>
     </div>
   `;
- 
+
   // Animar anillo
   requestAnimationFrame(() => {
     const arc = document.getElementById('nr-arc');
     if (arc) arc.style.strokeDashoffset = arcOffset.toFixed(1);
- 
+
     // Contador animado
     const kcalEl = document.getElementById('nr-kcal-count');
     if (kcalEl) {
@@ -637,25 +631,25 @@ function renderNutriReal(container, allRows) {
       let cur = 0, step = Math.max(1, Math.round(target / 40));
       const t = setInterval(() => { cur = Math.min(cur + step, target); kcalEl.textContent = cur; if (cur >= target) clearInterval(t); }, 25);
     }
- 
+
     // Barras macros
     document.querySelectorAll('.nr-bar-fill[data-pct]').forEach(el => {
       el.style.width = el.dataset.pct + '%';
     });
- 
+
     // Barras semana
     document.querySelectorAll('.nr-week-bar[data-h]').forEach(el => {
       el.style.height = el.dataset.h + '%';
     });
   });
 }
- 
+
 // Workaround for template literal with CSS var
 // (la variable estaba rota en el template literal anterior)
 function fixCssVarInTemplate(html) {
   return html;
 }
- 
+
 window.reloadNutri = async function() {
   _nutriCache.rows = null;
   const el = document.querySelector('#tab-nutricion .nutri-real');
@@ -669,7 +663,7 @@ window.reloadNutri = async function() {
     if (wrap) wrap.innerHTML = `<div class="nr-error">Error al sincronizar: ${e.message}. Verificá que el sheet esté publicado.</div>`;
   }
 };
- 
+
 // ══════════════════════════════════════════════════
 //  CYCLE DATA
 // ══════════════════════════════════════════════════
@@ -708,14 +702,14 @@ const PHASES = [
    training:{badge:'🚶 Cardio suave + fuerza moderada',color:'#ede9fe',text:'#4c1d95',tip:'Fase ideal para cardio de baja intensidad en Z2 — tu cuerpo quema más grasa que en cualquier otra fase durante esfuerzo aeróbico. Evitá los HIIT intensos en los últimos días. Escuchá tu cuerpo.'},
    carbStrategy:'Alto (el cuerpo lo necesita y el metabolismo basal sube). Priorizá carbos complejos.',proteinTarget:'1.6–1.8g/kg (alta proteína controla antojos)',fatFocus:'Z2 cardio = máxima quema de grasa'},
 ];
- 
+
 const MEAL_PLANS = {
   men:[{day:'Lunes',meals:[{name:'Desayuno',main:'Porridge de avena con banana y semillas de chía',desc:'Con canela y miel (sin azúcar refinada)',why:'Magnesio + triptófano + fibra'},{name:'Almuerzo',main:'Lentejas estofadas con papa y limón',desc:'Añadí pimiento rojo para vitamina C',why:'Hierro + absorción potenciada'},{name:'Merienda',main:'Chocolate negro 70% + nueces',desc:'30g chocolate + 20g nueces',why:'Magnesio + omega-3'},{name:'Cena',main:'Salmón a la plancha con espinaca salteada',desc:'Con aceite de oliva y ajo',why:'Omega-3 antiinflamatorio + hierro'}]},{day:'Martes',meals:[{name:'Desayuno',main:'Tostadas integrales con palta y huevo',desc:'2 huevos + ½ palta + limón',why:'Proteína + grasas antiinflamatorias'},{name:'Almuerzo',main:'Arroz integral con pollo y brócoli',desc:'Con cúrcuma y jengibre',why:'Antiinflamatorio natural + proteína'},{name:'Merienda',main:'Yogur griego con arándanos',desc:'Sin azúcar agregada',why:'Proteína + antioxidantes'},{name:'Cena',main:'Sopa de vegetales con legumbres',desc:'Reconfortante y fácil de digerir',why:'Hidratación + minerales'}]}],
   fol:[{day:'Miércoles',meals:[{name:'Desayuno',main:'Huevos revueltos con tostada integral y tomate',desc:'2-3 huevos + tostada de masa madre',why:'Proteína completa + carbos'},{name:'Almuerzo',main:'Pollo a la plancha con quinoa y brócoli',desc:'Con aceite de oliva y limón',why:'Proteína + DIM (metabolismo estrógeno)'},{name:'Merienda',main:'Smoothie de arándanos, espinaca y yogur',desc:'Sin azúcar, con jengibre',why:'Antioxidantes + proteína'},{name:'Cena',main:'Pesca blanca con batata y ensalada verde',desc:'Merluza, lenguado o pejerrey',why:'Proteína ligera + carbos complejos'}]},{day:'Jueves',meals:[{name:'Desayuno',main:'Bowl de avena con frutillas y semillas',desc:'Con proteína en polvo opcional',why:'Fibra + antioxidantes + saciedad'},{name:'Almuerzo',main:'Ensalada completa: legumbres + huevo + vegetales',desc:'Con vinagreta de mostaza',why:'Proteína vegetal + vitaminas'},{name:'Merienda',main:'Puñado de nueces + fruta',desc:'Manzana, pera o naranja',why:'Grasas + fibra + energía sostenida'},{name:'Cena',main:'Milanesa de soja o pollo con arroz y ensalada',desc:'Al horno, no frito',why:'Proteína + carbos + fibra'}]}],
   ovu:[{day:'Viernes',meals:[{name:'Desayuno',main:'Tostadas con palta, huevo y semillas de zapallo',desc:'2 huevos + ½ palta + semillas',why:'Zinc + grasas hormonales'},{name:'Almuerzo',main:'Carne magra con ensalada de remolacha',desc:'Lomo, cuadril o pollo + remolacha rallada',why:'Hierro + zinc + nitratos'},{name:'Merienda',main:'Smoothie de granada, arándanos y espinaca',desc:'Con agua de coco',why:'Antioxidantes máximos + hidratación'},{name:'Cena',main:'Salmón con quinoa y pimiento asado',desc:'Con limón y aceite de oliva',why:'Omega-3 + proteína + antioxidantes'}]}],
   lut:[{day:'Sábado',meals:[{name:'Desayuno',main:'Porridge de avena con banana y mantequilla de almendras',desc:'Con canela + semillas de girasol',why:'Triptófano + magnesio + carbos lentos'},{name:'Almuerzo',main:'Batata asada con pollo y ensalada verde',desc:'Con aceite de oliva y aguacate',why:'Carbos complejos + proteína + saciedad'},{name:'Merienda',main:'Chocolate negro 70% + almendras',desc:'30g chocolate + 15 almendras',why:'Magnesio → controla antojos de dulce'},{name:'Cena',main:'Garbanzos al horno con vegetales',desc:'Con pimentón y aceite de oliva',why:'B6 + proteína + fibra anti-antojos'}]},{day:'Domingo',meals:[{name:'Desayuno',main:'Tostadas con palta, huevo y tomate',desc:'Con orégano y limón',why:'Grasas + proteína + saciedad'},{name:'Almuerzo',main:'Pescado con arroz integral y brócoli',desc:'Con jengibre y cúrcuma',why:'Omega-3 + carbos lentos + antiinflamatorio'},{name:'Merienda',main:'Banana + 2 cucharadas mantequilla de maní',desc:'Sin azúcar agregada',why:'Triptófano + proteína → evita antojos'},{name:'Cena',main:'Sopa de lentejas con espinaca',desc:'Con cúrcuma, comino y limón',why:'Hierro + proteína + reconfortante'}]}],
 };
- 
+
 // ══════════════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════════════
@@ -723,7 +717,7 @@ const REDIRECT='https://carolinarusso1994-ui.github.io/strava-dashboard/strava-d
 let S={token:null,athlete:null,activities:[],fcmax:180,age:30,weight:58,cycle:'ovulacion',feeling:'energia',filter:{period:'month',type:'all',month:new Date().toISOString().slice(0,7)}};
 let JOURNAL=[];
 let chatHistory=[];
- 
+
 // ══════════════════════════════════════════════════
 //  AUTH
 // ══════════════════════════════════════════════════
@@ -754,7 +748,7 @@ function showAuth(){document.getElementById('auth-screen').style.display='';docu
 function showLoad(m){document.getElementById('auth-screen').style.display='none';document.getElementById('loading-screen').style.display='flex';document.getElementById('load-msg').textContent=m||'Cargando…';document.getElementById('app').style.display='none';}
 function logout(){sessionStorage.clear();showAuth();}
 const api=async ep=>{const r=await fetch('https://www.strava.com/api/v3'+ep,{headers:{Authorization:'Bearer '+S.token}});if(!r.ok)throw new Error(r.status);return r.json();};
- 
+
 // ══════════════════════════════════════════════════
 //  BOOT
 // ══════════════════════════════════════════════════
@@ -778,7 +772,7 @@ async function boot(token,athlete){
   builtTabs.clear();builtTabs.add('inicio');
   buildInicio();
 }
- 
+
 // ══════════════════════════════════════════════════
 //  HELPERS
 // ══════════════════════════════════════════════════
@@ -836,65 +830,74 @@ window.sf=(key,val,fnIdx,extra='')=>{
 function actList(acts){
   if(!acts.length)return`<div class="empty">Sin actividades para este filtro.</div>`;
   return`<div class="act-list">${acts.map(a=>{const z=a.average_heartrate?getZone(a.average_heartrate):0;const pace=a.average_speed&&['Run','TrailRun'].includes(a.type)?(s=>`${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}/km`)(1000/a.average_speed):a.average_speed&&['Ride','VirtualRide'].includes(a.type)?(a.average_speed*3.6).toFixed(1)+' km/h':'—';return`<div class="act-row"><div class="act-icon" style="background:${actCol(a.type)}20">${actIcon(a.type)}</div><div><div class="act-name">${a.name}</div><div class="act-meta">${fmtDateFull(a.start_date_local)}${z?` · <span class="badge ${zBadge[z]}">${zLbl[z]}</span>`:''}</div></div><div class="astat"><div class="av">${fmtDist(a.distance)}</div><div class="al">dist</div></div><div class="astat"><div class="av">${fmtDur(a.moving_time)}</div><div class="al">duración</div></div><div class="astat"><div class="av">${a.average_heartrate?Math.round(a.average_heartrate)+' bpm':pace}</div><div class="al">${a.average_heartrate?'fc prom':'ritmo'}</div></div><div class="astat"><div class="av">${a.total_elevation_gain?Math.round(a.total_elevation_gain)+'m':'—'}</div><div class="al">desnivel</div></div></div>`;}).join('')}</div>`;}
- 
+
 // ══════════════════════════════════════════════════
 //  TABS: INICIO / ACTIVIDADES / ZONAS / FORMA
 // ══════════════════════════════════════════════════
 function buildInicio(){
   const el=document.getElementById('tab-inicio');
-  const acts=getFiltered(),series=computeCtlAtl(),td=series[series.length-1]||{ctl:0,atl:0,tsb:0};
+  const acts=getFiltered();
   const tD=acts.reduce((s,a)=>s+(a.distance||0),0),tT=acts.reduce((s,a)=>s+(a.moving_time||0),0);
   const wHR=acts.filter(a=>a.average_heartrate>0),avgHR=wHR.length?Math.round(mean(wHR.map(a=>a.average_heartrate))):0;
-  const phaseName={menstruacion:'Menstruación',folicular:'Fase Folicular',ovulacion:'Ovulación',lutea:'Fase Lútea'}[S.cycle]||'';
-  const stColor=td.tsb>10?'var(--sage)':td.tsb>-10?'var(--dusk)':td.tsb>-30?'var(--terra)':'var(--rose)';
-  const stLabel=td.tsb>10?'En forma ✦':td.tsb>-10?'En balance':td.tsb>-30?'Cargada':'Muy fatigada';
-  const lastEntry=JOURNAL.length?JOURNAL[JOURNAL.length-1]:null;
-  const weekly={};acts.forEach(a=>{const d=new Date(a.start_date),mon=new Date(d);mon.setDate(d.getDate()-d.getDay()+1);const k=mon.toISOString().slice(0,10);weekly[k]=(weekly[k]||0)+(a.distance||0)/1000;});
-  const weeks=Object.keys(weekly).sort().slice(-8);const c1='ci-wk-'+Date.now();
+  const wHRz=acts.filter(a=>a.average_heartrate>0),zD=[0,0,0,0,0,0];
+  wHRz.forEach(a=>{zD[getZone(a.average_heartrate)]+=a.moving_time||0;});
+  const tot=zD.reduce((s,v)=>s+v,0),z2p=tot?Math.round(zD[2]/tot*100):0;
+  const fatP=tot?Math.round(wHRz.reduce((s,a)=>{const z=getZone(a.average_heartrate);return s+(a.moving_time||0)*[0,.95,.85,.50,.25,.05][z];},0)/tot*100):0;
+  const zClrArr=['var(--z1c)','var(--z2c)','var(--z3c)','var(--z4c)','var(--z5c)'];
+  const zones=[{z:1,l:'Recuperación',f:'95%'},{z:2,l:'Quema de grasa',f:'85%'},{z:3,l:'Aeróbico',f:'50%'},{z:4,l:'Umbral',f:'25%'},{z:5,l:'Máximo',f:'5%'}];
+  const czId='cz-'+Date.now();
+
+  // Day filter state
+  const DAYS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  if(!S.dayFilter) S.dayFilter=[];
+  const filteredByDay=S.dayFilter.length?acts.filter(a=>S.dayFilter.includes(new Date(a.start_date).getDay())):acts;
+
   el.innerHTML=`
     ${filterBar('fb-i',0,true)}
-    <div style="display:flex;align-items:baseline;gap:.75rem;margin-bottom:1.5rem;flex-wrap:wrap">
-      <span style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:300;color:var(--text)">Hola, <em style="font-style:italic;color:var(--dusk)">Carol</em> 🌿</span>
-      <span style="font-size:.78rem;color:var(--muted)">${phaseName} · ${new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'})}</span>
+
+    <!-- Filtro por día de semana -->
+    <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem">
+      <span style="font-size:.65rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)">Día</span>
+      ${DAYS.map((d,i)=>`<button class="fchip${S.dayFilter.includes(i)?' active':''}" onclick="toggleDayFilter(${i})">${d}</button>`).join('')}
+      ${S.dayFilter.length?`<button class="fchip" onclick="S.dayFilter=[];builtTabs.delete('inicio');buildInicio();" style="opacity:.6">✕ Limpiar</button>`:''}
     </div>
-    <div class="grid g4">
-      <div class="card"><div class="card-accent ca-terra"></div><div class="lbl">Actividades</div><div class="big">${acts.length}</div><div class="sub">En el período seleccionado</div></div>
-      <div class="card"><div class="card-accent ca-sage"></div><div class="lbl">Distancia</div><div class="big sm">${fmtDist(Math.round(tD))}</div><div class="sub">Tiempo: ${fmtDur(tT)}</div></div>
+
+    <!-- Stats -->
+    <div class="grid g4" style="margin-bottom:1rem">
+      <div class="card"><div class="card-accent ca-terra"></div><div class="lbl">Actividades</div><div class="big">${filteredByDay.length}</div><div class="sub">${S.dayFilter.length?DAYS.filter((_,i)=>S.dayFilter.includes(i)).join(', '):'Todos los días'}</div></div>
+      <div class="card"><div class="card-accent ca-sage"></div><div class="lbl">Distancia</div><div class="big sm">${fmtDist(Math.round(filteredByDay.reduce((s,a)=>s+(a.distance||0),0)))}</div><div class="sub">Tiempo: ${fmtDur(filteredByDay.reduce((s,a)=>s+(a.moving_time||0),0))}</div></div>
       <div class="card"><div class="card-accent ca-sky"></div><div class="lbl">FC promedio</div><div class="big sm">${avgHR||'—'}${avgHR?'<span class="unit">bpm</span>':''}</div>${avgHR?`<div style="margin-top:.4rem"><span class="badge ${zBadge[getZone(avgHR)]}">${zLbl[getZone(avgHR)]}</span></div>`:''}</div>
-      <div class="card"><div class="lbl">Forma (TSB)</div><div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:300;color:${stColor}">${td.tsb>0?'+':''}${td.tsb}</div><div style="margin-top:.35rem;font-size:.72rem;color:${stColor};font-weight:500">${stLabel}</div></div>
+      <div class="card"><div class="lbl">Con FC registrada</div><div class="big sm">${wHRz.length}<span class="unit">/${acts.length}</span></div></div>
     </div>
-    ${lastEntry?`<div class="sec">último registro del journal</div><div class="journal-entry" style="cursor:pointer" onclick="showTab('journal',document.querySelector('[onclick*=journal]'))"><div class="je-header"><div class="je-date">${fmtDateFull(lastEntry.date)}</div><span class="je-phase badge bt">${{menstruacion:'🌑',folicular:'🌱',ovulacion:'🌕',lutea:'🌘'}[lastEntry.cycle]||'🌿'} ${lastEntry.cycleLabel||''}</span></div><div class="je-moods">${(lastEntry.moods||[]).map(m=>`<span class="je-mood">${m}</span>`).join('')}</div>${lastEntry.notes?`<div class="je-section"><div class="je-text" style="font-style:italic;color:var(--muted)">"${lastEntry.notes.slice(0,120)}${lastEntry.notes.length>120?'…':''}"</div></div>`:''}</div>`:''}
-    <div class="sec">últimas actividades</div>${actList(acts.slice(0,5))}
-    <div class="sec">volumen semanal</div>
-    <div class="chart-card"><div class="cwrap"><canvas id="${c1}"></canvas></div></div>`;
-  setTimeout(()=>{const fmtW=w=>new Date(w).toLocaleDateString('es-AR',{day:'2-digit',month:'short'});mC(c1,{type:'bar',data:{labels:weeks.map(fmtW),datasets:[{data:weeks.map(w=>+weekly[w].toFixed(1)),backgroundColor:'rgba(196,98,45,.25)',borderColor:'var(--terra)',borderWidth:1.5,borderRadius:4}]},options:{...cOpts(false)}});},80);
+
+    <!-- Zonas FC -->
+    <div class="sec">zonas de frecuencia cardíaca</div>
+    <div class="grid g3" style="margin-bottom:.85rem">
+      <div class="card"><div class="card-accent ca-sage"></div><div class="lbl">Tiempo en Z2 — quema grasa</div><div class="big sm">${fmtDur(zD[2])}</div><div class="sub">${z2p}% del tiempo total</div><div class="btrack"><div class="bfill" style="background:var(--sage);width:${z2p}%"></div></div></div>
+      <div class="card"><div class="card-accent ca-dusk"></div><div class="lbl">Energía de grasas est.</div><div class="big sm">${fatP}<span class="unit">%</span></div><div class="sub">Resto: carbohidratos</div></div>
+      <div class="card"><div class="lbl">Tu rango Z2</div><div class="big xs">${Math.round(S.fcmax*.6)}–${Math.round(S.fcmax*.7)}<span class="unit">bpm</span></div><div class="sub">FCmáx: ${S.fcmax}</div></div>
+    </div>
+    <div class="grid g21" style="margin-bottom:.85rem">
+      <div class="card"><div class="lbl" style="margin-bottom:.75rem">Distribución por zona</div>
+        ${zones.map(z=>{const p=tot?Math.round(zD[z.z]/tot*100):0;return`<div class="zrow"><div class="zlbl" style="color:${zClrArr[z.z-1]}">Z${z.z}</div><div class="zdesc">${z.l}</div><div class="ztrack"><div class="zfill ${['z1c','z2c','z3c','z4c','z5c'][z.z-1]}" style="width:${p}%"></div></div><div class="zpct">${p}%</div><div style="font-size:.63rem;color:var(--muted);min-width:55px;text-align:right">🔥 ${z.f}</div></div>`;}).join('')}
+      </div>
+      <div class="chart-card"><div class="ct">Minutos por zona</div><div class="cwrap"><canvas id="${czId}"></canvas></div></div>
+    </div>
+    ${z2p<50?`<div class="insight"><div class="it">⚠️ Solo ${z2p}% en Z2</div><div class="ib">Para quemar más grasa y llegar menos cansada a los largos, buscá que el 70-80% del volumen esté en Z2 (${Math.round(S.fcmax*.6)}–${Math.round(S.fcmax*.7)} bpm).</div></div>`:`<div class="insight sage"><div class="it">✅ ${z2p}% en Z2 — buena base aeróbica</div><div class="ib">Tu cuerpo está usando principalmente grasa como combustible. Seguí así.</div></div>`}
+
+    <!-- Lista de actividades -->
+    <div class="sec">${filteredByDay.length} actividades</div>
+    ${actList(filteredByDay)}
+  `;
+  setTimeout(()=>{
+    mC(czId,{type:'bar',data:{labels:['Z1','Z2','Z3','Z4','Z5'],datasets:[{data:[1,2,3,4,5].map(z=>Math.round(zD[z]/60)),backgroundColor:zClrArr,borderRadius:4}]},options:{...cOpts(false),scales:{x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:11},color:'var(--muted)'}},y:{grid:{color:'var(--border)'},ticks:{font:{size:10},color:'var(--muted)'},title:{display:true,text:'min',font:{size:10},color:'var(--muted)'}}}}});
+  },80);
 }
-function buildActividades(){const el=document.getElementById('tab-actividades'),acts=getFiltered();el.innerHTML=`${filterBar('fb-a',1,true)}<div class="sec">${acts.length} actividades</div>${actList(acts)}`;}
-function buildZonas(){
-  const el=document.getElementById('tab-zonas'),acts=getFiltered();
-  const wHR=acts.filter(a=>a.average_heartrate>0),zD=[0,0,0,0,0,0];
-  wHR.forEach(a=>{zD[getZone(a.average_heartrate)]+=a.moving_time||0;});
-  const tot=zD.reduce((s,v)=>s+v,0),z2p=tot?Math.round(zD[2]/tot*100):0;
-  const fatP=tot?Math.round(wHR.reduce((s,a)=>{const z=getZone(a.average_heartrate);return s+(a.moving_time||0)*[0,.95,.85,.50,.25,.05][z];},0)/tot*100):0;
-  const c1='cz-'+Date.now();
-  const zones=[{z:1,l:'Recuperación',f:'95%'},{z:2,l:'Quema de grasa',f:'85%'},{z:3,l:'Aeróbico',f:'50%'},{z:4,l:'Umbral',f:'25%'},{z:5,l:'Máximo',f:'5%'}];
-  const zClrArr=['var(--z1c)','var(--z2c)','var(--z3c)','var(--z4c)','var(--z5c)'];
-  el.innerHTML=`${filterBar('fb-z',2,true)}<div class="sec">resumen de zonas</div>
-  <div class="grid g3">
-    <div class="card"><div class="card-accent ca-sage"></div><div class="lbl">Tiempo en Z2 (quema grasa)</div><div class="big sm">${fmtDur(zD[2])}</div><div class="sub">${z2p}% del tiempo total</div><div class="btrack"><div class="bfill" style="background:var(--sage);width:${z2p}%"></div></div></div>
-    <div class="card"><div class="card-accent ca-dusk"></div><div class="lbl">Energía de grasas est.</div><div class="big sm">${fatP}<span class="unit">%</span></div><div class="sub">Resto: carbohidratos</div></div>
-    <div class="card"><div class="lbl">Con FC registrada</div><div class="big sm">${wHR.length}<span class="unit">/${acts.length}</span></div></div>
-  </div>
-  <div class="grid g21" style="margin-top:.85rem">
-    <div class="card"><div class="lbl">Distribución por zona</div><div style="margin-top:.75rem">
-      ${zones.map(z=>{const p=tot?Math.round(zD[z.z]/tot*100):0;return`<div class="zrow"><div class="zlbl" style="color:${zClrArr[z.z-1]}">Z${z.z}</div><div class="zdesc">${z.l}</div><div class="ztrack"><div class="zfill ${['z1c','z2c','z3c','z4c','z5c'][z.z-1]}" style="width:${p}%"></div></div><div class="zpct">${p}%</div><div style="font-size:.63rem;color:var(--muted);min-width:62px;text-align:right">🔥 ${z.f}</div></div>`;}).join('')}
-    </div></div>
-    <div class="chart-card"><div class="ct">Minutos por zona</div><div class="cwrap"><canvas id="${c1}"></canvas></div></div>
-  </div>
-  ${z2p<50?`<div class="insight"><div class="it">⚠️ Solo ${z2p}% en Z2</div><div class="ib">Para quemar más grasa y llegar menos cansada a los largos, buscá que el 70-80% de tu volumen esté en Z2 (${Math.round(S.fcmax*.6)}–${Math.round(S.fcmax*.7)} bpm).</div></div>`:`<div class="insight sage"><div class="it">✅ ${z2p}% en Z2 — buena distribución</div><div class="ib">Estás construyendo una sólida base aeróbica.</div></div>`}
-  <div class="insight sky"><div class="it">Tu rango Z2: ${Math.round(S.fcmax*.6)}–${Math.round(S.fcmax*.7)} bpm (FCmáx: ${S.fcmax})</div><div class="ib">Mantené ese rango en los entrenamientos largos.</div></div>`;
-  setTimeout(()=>{mC(c1,{type:'bar',data:{labels:['Z1','Z2','Z3','Z4','Z5'],datasets:[{data:[1,2,3,4,5].map(z=>Math.round(zD[z]/60)),backgroundColor:zClrArr,borderRadius:4}]},options:{...cOpts(false),scales:{x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:11},color:'var(--muted)'}},y:{grid:{color:'var(--border)'},ticks:{font:{size:10},color:'var(--muted)'},title:{display:true,text:'minutos',font:{size:10},color:'var(--muted)'}}}}});},80);
-}
+window.toggleDayFilter=function(day){
+  if(S.dayFilter.includes(day)) S.dayFilter=S.dayFilter.filter(d=>d!==day);
+  else S.dayFilter.push(day);
+  builtTabs.delete('inicio');buildInicio();
+};
 function buildForma(){
   const el=document.getElementById('tab-forma'),series=computeCtlAtl(),l60=series.slice(-60);
   const td=series[series.length-1]||{ctl:0,atl:0,tsb:0},wk=series[series.length-8]||{ctl:0,atl:0,tsb:0};
@@ -910,14 +913,58 @@ function buildForma(){
   <div class="insight" style="border-left-color:${st.c}"><div class="it">${st.l}</div><div class="ib">${st.msg}</div></div>
   <div class="sec">evolución 60 días</div>
   <div class="chart-card"><div class="ct">Fitness vs Fatiga</div><div class="cs">CTL (azul) sube lento. ATL (naranja) fluctúa con cada entrenamiento.</div><div class="cwrap tall"><canvas id="${c1}"></canvas></div></div>
-  <div class="chart-card" style="margin-top:.85rem"><div class="ct">Forma deportiva (TSB)</div><div class="cwrap"><canvas id="${c2}"></canvas></div></div>`;
+  <div class="chart-card" style="margin-top:.85rem"><div class="ct">Forma deportiva (TSB)</div><div class="cwrap"><canvas id="${c2}"></canvas></div></div>
+
+  <!-- Fase del ciclo menstrual -->
+  <div class="sec">ciclo menstrual · hoy</div>
+  ${(()=>{
+    const phaseData={
+      menstruacion:{emoji:'🌑',name:'Menstruación',days:'Días 1–5',color:'var(--men)',bg:'var(--men-l)',energy:'Baja · Descansá',tip:'Reducí la intensidad al 60-70%. Priorizá hierro + vitamina C. El magnesio ayuda con los calambres.',train:'Yoga, caminata, nado suave'},
+      folicular:{emoji:'🌱',name:'Fase Folicular',days:'Días 6–12',color:'var(--fol)',bg:'var(--fol-l)',energy:'Alta y en aumento',tip:'Tu ventana de mayor adaptación al entrenamiento. Ideal para pesas y sesiones intensas.',train:'Fuerza, intervalos, running fuerte'},
+      ovulacion:{emoji:'🌕',name:'Ovulación',days:'Días 13–16',color:'var(--ovu)',bg:'var(--ovu-l)',energy:'Máxima ✦',tip:'Pico de estrógeno + testosterona. Momento ideal para PRs, salidas largas y sesiones más exigentes.',train:'Rendimiento máximo · PRs'},
+      lutea:{emoji:'🌘',name:'Fase Lútea',days:'Días 17–28',color:'var(--lut)',bg:'var(--lut-l)',energy:'Decae hacia el final',tip:'Cardio Z2 es tu superpoder — quemás más grasa que en cualquier otra fase. Evitá HIIT los últimos días.',train:'Z2 cardio · fuerza moderada'},
+    };
+    const p=phaseData[S.cycle]||phaseData.ovulacion;
+    const tsb=td.tsb;
+    const tsbOk=tsb>5&&tsb<30;
+    return \`<div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem">
+      <div style="background:\${p.bg};border:1px solid \${p.color}40;border-radius:var(--radius);padding:1.25rem">
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem">
+          <span style="font-size:1.8rem">\${p.emoji}</span>
+          <div>
+            <div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:300;color:var(--text)">\${p.name}</div>
+            <div style="font-size:.65rem;color:\${p.color};font-weight:500;letter-spacing:.06em;text-transform:uppercase">\${p.days} · \${p.energy}</div>
+          </div>
+        </div>
+        <div style="font-size:.76rem;color:var(--text2);line-height:1.65;margin-bottom:.75rem">\${p.tip}</div>
+        <div style="display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .75rem;border-radius:100px;background:\${p.color}20;border:1px solid \${p.color}40;font-size:.7rem;font-weight:500;color:\${p.color}">🏋️ \${p.train}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.6rem">
+        <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:.85rem 1rem;flex:1">
+          <div style="font-size:.62rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem">Forma hoy · TSB \${tsb>0?'+':''}\${tsb}</div>
+          <div style="font-size:.82rem;color:var(--text2);line-height:1.6">\${tsbOk?'<span style="color:var(--sage);font-weight:500">✓ Forma óptima para entrenar fuerte o competir</span>':tsb>0?'Estás fresca, buen momento para una sesión de calidad.':tsb>-15?'Carga moderada. Entrenás bien, escuchá el cuerpo.':'Carga alta. Priorizá recuperación y sueño.'}</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:.85rem 1rem">
+          <div style="font-size:.62rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem">Combinación hoy</div>
+          <div style="font-size:.78rem;color:var(--text2);line-height:1.6">\${
+            S.cycle==='ovulacion'&&tsbOk?'🏆 Máximo rendimiento posible — todo alineado.':
+            S.cycle==='folicular'&&tsbOk?'💪 Ventana anabólica + forma óptima = sesión de fuerza ideal.':
+            S.cycle==='lutea'&&tsb>-10?'🔥 Fase lútea + buena forma = cardio Z2 y quema de grasa máxima.':
+            S.cycle==='menstruacion'?'🧘 Fase de recuperación. Movimiento suave y nutrición de calidad.':
+            'Ajustá la intensidad según cómo te sentís.'
+          }</div>
+        </div>
+      </div>
+    </div>\`;
+  })()}
+  `;
   setTimeout(()=>{
     const lbl=l60.map(d=>fmtDate(d.date));
     mC(c1,{type:'line',data:{labels:lbl,datasets:[{label:'Fitness (CTL)',data:l60.map(d=>d.ctl),borderColor:'var(--sky)',backgroundColor:'rgba(74,106,138,.12)',borderWidth:2,pointRadius:0,fill:true,tension:.3},{label:'Fatiga (ATL)',data:l60.map(d=>d.atl),borderColor:'var(--terra)',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:.3,borderDash:[4,3]}]},options:cOpts()});
     mC(c2,{type:'bar',data:{labels:lbl,datasets:[{label:'Forma (TSB)',data:l60.map(d=>d.tsb),backgroundColor:l60.map(d=>d.tsb>=0?'rgba(90,122,74,.7)':'rgba(196,80,106,.7)'),borderRadius:2}]},options:{...cOpts(false)}});
   },80);
 }
- 
+
 // ══════════════════════════════════════════════════
 //  JOURNAL
 // ══════════════════════════════════════════════════
@@ -931,7 +978,7 @@ function saveJournal(){
   JOURNAL=JOURNAL.filter(j=>j.date!==today);JOURNAL.push(entry);JOURNAL.sort((a,b)=>a.date.localeCompare(b.date));
   try{localStorage.setItem('carol_journal',JSON.stringify(JOURNAL));}catch(e){}
   const ok=document.getElementById('save-ok');if(ok){ok.style.display='inline';setTimeout(()=>{ok.style.display='none';},2500);}
-  builtTabs.delete('journal');builtTabs.delete('reporte');buildJournal();builtTabs.add('journal');
+  builtTabs.delete('journal');buildJournal();builtTabs.add('journal');
 }
 function exportJournalCSV(){
   if(!JOURNAL||!JOURNAL.length){alert('No hay registros para exportar.');return;}
@@ -978,21 +1025,21 @@ function buildJournal(){
   ${pastEntries.length?`<div class="sec">registros anteriores</div>${pastEntries.map(e=>`<div class="journal-entry"><div class="je-header"><div class="je-date">${fmtDateFull(e.date)}</div><div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap">${e.energy?`<span class="badge bt">⚡${e.energy}</span>`:''} ${e.sleepQ?`<span class="badge bs">💤${e.sleepQ}</span>`:''} ${e.sleepH?`<span class="badge bk">${e.sleepH}h</span>`:''}</div></div>${e.moods&&e.moods.length?`<div class="je-moods">${e.moods.map(m=>`<span class="je-mood">${m}</span>`).join('')}</div>`:''} ${e.notes?`<div class="je-section"><div class="je-text" style="font-style:italic;color:var(--muted)">"${e.notes}"</div></div>`:''}</div>`).join('')}`:''}`;
   if(last14.length>=3){setTimeout(()=>{const lbl=last14.map(j=>fmtDate(j.date));mC(cSleep,{type:'bar',data:{labels:lbl,datasets:[{label:'Calidad sueño',data:last14.map(j=>j.sleepQ||null),backgroundColor:'rgba(74,106,138,.6)',borderColor:'var(--sky)',borderWidth:1.5,borderRadius:3,yAxisID:'y'},{label:'Horas',data:last14.map(j=>j.sleepH||null),type:'line',borderColor:'var(--sage)',backgroundColor:'transparent',borderWidth:2,pointRadius:3,pointBackgroundColor:'var(--sage)',yAxisID:'y2',tension:.3}]},options:{...cOpts(),scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'var(--muted)',maxTicksLimit:7}},y:{grid:{color:'var(--border)'},ticks:{font:{size:10},color:'var(--muted)'},min:0,max:10},y2:{position:'right',grid:{display:false},ticks:{font:{size:10},color:'var(--sage)'},min:0,max:12}}}});mC(cEnergy,{type:'line',data:{labels:lbl,datasets:[{label:'Energía',data:last14.map(j=>j.energy||null),borderColor:'var(--dusk)',backgroundColor:'rgba(184,112,64,.15)',borderWidth:2,pointRadius:3,pointBackgroundColor:'var(--dusk)',fill:true,tension:.3},{label:'Fatiga',data:last14.map(j=>j.fatigue||null),borderColor:'var(--rose)',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,pointBackgroundColor:'var(--rose)',borderDash:[4,3],tension:.3}]},options:{...cOpts(),scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'var(--muted)',maxTicksLimit:7}},y:{grid:{color:'var(--border)'},ticks:{font:{size:10},color:'var(--muted)'},min:1,max:10}}}});},80);}
 }
- 
+
 // ══════════════════════════════════════════════════
 //  TAB: NUTRICIÓN — con datos reales del bot
 // ══════════════════════════════════════════════════
 async function buildNutricion(){
   const el = document.getElementById('tab-nutricion');
- 
+
   // Determinar fase actual
   const cycleMap={menstruacion:3,folicular:9,ovulacion:15,lutea:20};
   let currentDay = cycleMap[S.cycle] || 15;
   let currentPhase = PHASES.find(p=>p.id===S.cycle) || PHASES[2];
   let selectedPhase = currentPhase;
- 
+
   function getPhaseForDay(day){if(day<=5)return PHASES[0];if(day<=12)return PHASES[1];if(day<=16)return PHASES[2];return PHASES[3];}
- 
+
   // ── Render inicial con placeholder para los datos reales ──
   el.innerHTML = `
     <!-- DATOS REALES DEL BOT -->
@@ -1004,7 +1051,7 @@ async function buildNutricion(){
         <span style="margin-left:.5rem;font-size:.75rem;color:var(--muted)">Cargando datos del bot…</span>
       </div>
     </div>
- 
+
     <!-- NUTRICIÓN POR CICLO (original mejorado) -->
     <div class="nutri-card" style="margin-bottom:.85rem">
       <div class="nutri-header">
@@ -1022,24 +1069,24 @@ async function buildNutricion(){
         <div class="phase-cards" id="np-grid"></div>
       </div>
     </div>
- 
+
     <div class="sec">tu fase actual · <em id="np-phase-title">${currentPhase.name}</em></div>
     <div id="np-detail"></div>
- 
+
     <div class="sec">quema de grasa <em>por fase</em></div>
     <div id="np-fatburn"></div>
- 
+
     <div class="sec">plan semanal <em>próximos 7 días</em></div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem">
       <div class="day-tabs" id="np-week-tabs"></div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-top:.75rem" id="np-week-grid"></div>
     </div>
- 
+
     <div class="sec">fuentes <em>científicas</em></div>
     <div class="card">
       ${[['Oosthuyse & Bosch (2010)','The Effect of the Menstrual Cycle on Exercise Metabolism.'],['Wikström-Frisén et al. (2017)','Effects on power, strength and lean body mass of menstrual cycle based resistance training.'],['Barr et al. (1995)','Increased fat oxidation during the luteal phase.'],['Reed & Leidy (2015)','Role of dietary protein in managing food intake.'],['Romero-Moraleda et al. (2019)','Hormonal influences on muscle damage during the menstrual cycle.']].map(([auth,title],i)=>`<div style="display:flex;gap:.6rem;margin-bottom:.6rem;font-size:.74rem;line-height:1.5"><div style="width:18px;height:18px;border-radius:50%;background:var(--terra);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:600;flex-shrink:0;margin-top:.1rem">${i+1}</div><div><strong style="color:var(--text2)">${auth}</strong> <span style="color:var(--muted)">— ${title}</span></div></div>`).join('')}
     </div>
- 
+
     <div class="sec">nutricionista <em>IA</em></div>
     <div class="chat-wrap">
       <div class="chat-hdr"><div class="chat-av">🌿</div><div><div class="chat-hn">Nutricionista <span class="badge bs">Cycle-Based</span></div><div class="chat-hs">Nutrición funcional · Ciclo hormonal · Rendimiento deportivo</div></div></div>
@@ -1059,7 +1106,7 @@ async function buildNutricion(){
       </div>
     </div>
   `;
- 
+
   // ── Cargar datos reales del Sheet ──
   const wrap = document.getElementById('nr-real-wrap');
   try {
@@ -1082,7 +1129,7 @@ async function buildNutricion(){
         <div style="font-size:.7rem;color:var(--muted2);margin-top:.4rem">${e.message}</div>
       </div>`;
   }
- 
+
   // ── Render cycle content ──
   setTimeout(()=>{
     renderPhases();
@@ -1091,7 +1138,7 @@ async function buildNutricion(){
     renderWeekPlan();
     document.getElementById('np-phase-title').textContent = currentPhase.name;
   }, 50);
- 
+
   function renderPhases(){
     document.getElementById('np-strip').innerHTML = PHASES.map(p=>`<div style="flex:${p.days[1]-p.days[0]+1};background:${p.color};opacity:${p.id===currentPhase.id?1:.3};cursor:pointer;transition:opacity .2s" onclick="npSelectPhase('${p.id}')"></div>`).join('');
     document.getElementById('np-grid').innerHTML = PHASES.map(p=>`
@@ -1101,7 +1148,7 @@ async function buildNutricion(){
         <div class="pc2-energy ${p.id}">${p.energy}</div>
       </div>`).join('');
   }
- 
+
   function renderDetail(ph){
     const el2=document.getElementById('np-detail');if(!el2||!ph)return;
     const colMap={men:'#e87070',fol:'#70c870',ovu:'#e8a060',lut:'#a880e0'};
@@ -1155,7 +1202,7 @@ async function buildNutricion(){
           </div>
         </div>`).join('')}`;
   }
- 
+
   function renderFatBurn(){
     const el3=document.getElementById('np-fatburn');if(!el3)return;
     const tips=[
@@ -1172,7 +1219,7 @@ async function buildNutricion(){
         <div style="background:${t.c};border-radius:7px;padding:.5rem .75rem;font-size:.73rem;font-weight:500;color:${t.tc};line-height:1.5">💡 ${t.tip}</div>
       </div>`).join('')}</div>`;
   }
- 
+
   function renderWeekPlan(){
     const tabEl=document.getElementById('np-week-tabs'),gridEl=document.getElementById('np-week-grid');
     if(!tabEl||!gridEl)return;
@@ -1187,7 +1234,7 @@ async function buildNutricion(){
     }
     tabEl.innerHTML=tabsHTML;npRenderMeals(0);
   }
- 
+
   window.npSelectDay=(idx,elBtn)=>{document.querySelectorAll('#np-week-tabs .day-tab').forEach(t=>t.classList.remove('active'));elBtn.classList.add('active');npRenderMeals(idx);};
   window.npRenderMeals=(idx)=>{
     const{phase,cycleDay,label}=window._npWeekDays[idx];
@@ -1198,14 +1245,14 @@ async function buildNutricion(){
     gridEl.innerHTML=`<div style="grid-column:1/-1;display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem;flex-wrap:wrap"><span style="font-family:'Fraunces',serif;font-size:.95rem;color:var(--text2)">${label} · Día ${cycleDay} del ciclo</span><span style="font-size:.68rem;padding:.2rem .65rem;border-radius:100px;background:${c}20;color:${c};font-weight:500">${phase.emoji} ${phase.name}</span><div style="display:flex;gap:.3rem"><div style="background:#1e3a8a30;color:#6a9aba;font-size:.65rem;padding:.2rem .5rem;border-radius:5px;font-weight:500">C: ${macros.c}</div><div style="background:rgba(90,122,74,.2);color:var(--sage);font-size:.65rem;padding:.2rem .5rem;border-radius:5px;font-weight:500">P: ${macros.p}</div><div style="background:rgba(184,112,64,.2);color:var(--dusk);font-size:.65rem;padding:.2rem .5rem;border-radius:5px;font-weight:500">G: ${macros.f}</div></div></div>
     ${plan.meals.map(m=>`<div class="card"><div class="lbl">${m.name}</div><div style="font-size:.85rem;font-weight:500;color:var(--text2);margin-bottom:.25rem;line-height:1.35">${m.main}</div><div style="font-size:.73rem;color:var(--muted);line-height:1.45;margin-bottom:.3rem">${m.desc}</div><div style="font-size:.66rem;color:#0d9488;font-weight:500">🔬 ${m.why}</div></div>`).join('')}`;
   };
- 
+
   window.npSelectPhase=(id)=>{
     selectedPhase=PHASES.find(p=>p.id===id)||PHASES[2];
     document.querySelectorAll('.pc2').forEach(c=>{c.classList.remove('selected');if(c.dataset.phase===id)c.classList.add('selected');});
     renderDetail(selectedPhase);
   };
 }
- 
+
 // ══════════════════════════════════════════════════
 //  REPORTE
 // ══════════════════════════════════════════════════
@@ -1250,7 +1297,7 @@ function buildReporte(){
   ${recentJ.length>=3?`<div class="sec">gráficos de bienestar</div><div class="grid g2"><div class="chart-card"><div class="ct">Sueño</div><div class="cwrap"><canvas id="${cR1}"></canvas></div></div><div class="chart-card"><div class="ct">Energía vs Fatiga</div><div class="cwrap"><canvas id="${cR2}"></canvas></div></div></div>`:''}`;
   if(recentJ.length>=3){setTimeout(()=>{const lbl=recentJ.map(j=>fmtDate(j.date));mC(cR1,{type:'bar',data:{labels:lbl,datasets:[{label:'Calidad sueño',data:recentJ.map(j=>j.sleepQ||null),backgroundColor:'rgba(74,106,138,.6)',borderColor:'var(--sky)',borderWidth:1.5,borderRadius:3,yAxisID:'y'},{label:'Horas',data:recentJ.map(j=>j.sleepH||null),type:'line',borderColor:'var(--sage)',backgroundColor:'transparent',borderWidth:2,pointRadius:3,pointBackgroundColor:'var(--sage)',yAxisID:'y2',tension:.3}]},options:{...cOpts(),scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'var(--muted)',maxTicksLimit:7}},y:{grid:{color:'var(--border)'},ticks:{font:{size:10},color:'var(--muted)'},min:0,max:10},y2:{position:'right',grid:{display:false},ticks:{font:{size:10},color:'var(--sage)'},min:0,max:12}}}});mC(cR2,{type:'line',data:{labels:lbl,datasets:[{label:'Energía',data:recentJ.map(j=>j.energy||null),borderColor:'var(--dusk)',backgroundColor:'rgba(184,112,64,.15)',borderWidth:2,pointRadius:3,fill:true,tension:.3},{label:'Fatiga',data:recentJ.map(j=>j.fatigue||null),borderColor:'var(--rose)',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,borderDash:[4,3],tension:.3}]},options:{...cOpts(),scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'var(--muted)',maxTicksLimit:7}},y:{grid:{color:'var(--border)'},ticks:{font:{size:10},color:'var(--muted)'},min:1,max:10}}}});},80);}
 }
- 
+
 // ══════════════════════════════════════════════════
 //  CHAT
 // ══════════════════════════════════════════════════
@@ -1278,11 +1325,11 @@ window.sendChat=async()=>{
 };
 function addMsg(text,role){const el=document.getElementById('chat-msgs');const d=document.createElement('div');d.className='msg '+role;d.innerHTML=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');el.appendChild(d);scrollChat();}
 function scrollChat(){const el=document.getElementById('chat-msgs');if(el)el.scrollTop=el.scrollHeight;}
- 
+
 // ══════════════════════════════════════════════════
 //  TABS
 // ══════════════════════════════════════════════════
-const tabBuilders={inicio:buildInicio,actividades:buildActividades,zonas:buildZonas,forma:buildForma,journal:buildJournal,nutricion:buildNutricion,reporte:buildReporte};
+const tabBuilders={inicio:buildInicio,forma:buildForma,journal:buildJournal,nutricion:buildNutricion};
 const builtTabs=new Set();
 function showTab(name,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -1294,7 +1341,7 @@ function showTab(name,el){
     builtTabs.add(name);
   }
 }
- 
+
 // ══════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════
@@ -1305,4 +1352,3 @@ function showTab(name,el){
 </script>
 </body>
 </html>
- 
