@@ -353,23 +353,10 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
       <div class="auth-brand-sub">Entrenamiento · Nutrición · Bienestar</div>
     </div>
     <div class="auth-card">
-      <h2>Hola Carol, conectá tu Strava</h2>
-      <p>Ingresá tus datos para activar el dashboard personalizado con análisis deportivo, nutrición por ciclo y journal diario.</p>
-      <div class="field"><label>Client ID Strava</label><input type="text" id="cid" value="211490"></div>
-      <div class="field"><label>Client Secret Strava</label><input type="password" id="cs" placeholder="Tu client secret"></div>
-      <div class="frow">
-        <div class="field"><label>Edad</label><input type="number" id="age" placeholder="Ej: 29"><div class="hint">Para FC máx estimada</div></div>
-        <div class="field"><label>FC Máxima</label><input type="number" id="fcmax" placeholder="Opcional"></div>
-        <div class="field"><label>Peso (kg)</label><input type="number" id="weight" placeholder="Ej: 58"></div>
-      </div>
-      <div class="frow2">
-        <div class="field"><label>Fase del ciclo hoy</label>
-          <select id="cycle"><option value="menstruacion">Menstruación (1-5)</option><option value="folicular">Folicular (6-13)</option><option value="ovulacion" selected>Ovulación (14-16)</option><option value="lutea">Lútea (17-28)</option></select>
-        </div>
-        <div class="field"><label>Cómo te sentís</label>
-          <select id="feeling"><option value="energia" selected>Con energía</option><option value="cansada_fisica">Cansada físicamente</option><option value="cansada_mental">Fatiga mental</option><option value="hinchada">Hinchada</option><option value="normal">Normal</option></select>
-        </div>
-      </div>
+      <h2>Hola Carol 🌿</h2>
+      <p>Ingresá tu Client Secret de Strava para entrar. Tus datos personales los completás adentro.</p>
+      <input type="hidden" id="cid" value="211490">
+      <div class="field"><label>Client Secret Strava</label><input type="password" id="cs" placeholder="Pegá tu client secret acá" autofocus></div>
       <button class="btn-strava" onclick="startOAuth()">
         <svg viewBox="0 0 24 24" fill="white"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
         Conectar con Strava
@@ -397,12 +384,14 @@ input[type=range]{flex:1;accent-color:var(--terra);cursor:pointer}
     <div class="tab" onclick="showTab('forma',this)">⚡ Forma</div>
     <div class="tab" onclick="showTab('journal',this)">📓 Journal</div>
     <div class="tab" onclick="showTab('nutricion',this)">🌿 Nutrición</div>
+    <div class="tab" onclick="showTab('perfil',this)">👤 Mi Perfil</div>
   </nav>
   <main>
     <div class="section active" id="tab-inicio"></div>
     <div class="section" id="tab-forma"></div>
     <div class="section" id="tab-journal"></div>
     <div class="section" id="tab-nutricion"></div>
+    <div class="section" id="tab-perfil"></div>
   </main>
 </div>
 
@@ -722,14 +711,11 @@ let chatHistory=[];
 //  AUTH
 // ══════════════════════════════════════════════════
 function startOAuth(){
-  const cid=document.getElementById('cid').value.trim(),cs=document.getElementById('cs').value.trim();
-  if(!cid||!cs){alert('Ingresá Client ID y Client Secret.');return;}
-  const age=parseInt(document.getElementById('age').value)||30;
-  const fcmax=parseInt(document.getElementById('fcmax').value)||(220-age);
-  const weight=parseFloat(document.getElementById('weight').value)||58;
-  const cycle=document.getElementById('cycle').value,feeling=document.getElementById('feeling').value;
-  Object.entries({cid,cs,age,fcmax,weight,cycle,feeling}).forEach(([k,v])=>sessionStorage.setItem('cd_'+k,v));
-  location.href=`https://www.strava.com/oauth/authorize?client_id=${cid}&redirect_uri=${encodeURIComponent(REDIRECT)}&response_type=code&scope=read,activity:read_all,profile:read_all&approval_prompt=auto`;
+  const cid='211490',cs=document.getElementById('cs').value.trim();
+  if(!cs){alert('Ingresá tu Client Secret de Strava.');return;}
+  sessionStorage.setItem('cd_cid',cid);
+  sessionStorage.setItem('cd_cs',cs);
+  location.href='https://www.strava.com/oauth/authorize?client_id='+cid+'&redirect_uri='+encodeURIComponent(REDIRECT)+'&response_type=code&scope=read,activity:read_all,profile:read_all&approval_prompt=auto';
 }
 async function handleCallback(){
   const p=new URLSearchParams(location.search),code=p.get('code');
@@ -754,11 +740,14 @@ const api=async ep=>{const r=await fetch('https://www.strava.com/api/v3'+ep,{hea
 // ══════════════════════════════════════════════════
 async function boot(token,athlete){
   S.token=token;S.athlete=athlete;
-  S.age=parseInt(sessionStorage.getItem('cd_age'))||30;
-  S.fcmax=parseInt(sessionStorage.getItem('cd_fcmax'))||(220-S.age);
-  S.weight=parseFloat(sessionStorage.getItem('cd_weight'))||58;
-  S.cycle=sessionStorage.getItem('cd_cycle')||'ovulacion';
-  S.feeling=sessionStorage.getItem('cd_feeling')||'energia';
+  // Load profile from localStorage (set in Mi Perfil tab)
+  const prof=JSON.parse(localStorage.getItem('carol_profile')||'{}');
+  S.age=prof.age||30;
+  S.fcmax=prof.fcmax||(220-S.age);
+  S.weight=prof.weight||58;
+  S.cycle=prof.cycle||'ovulacion';
+  S.vo2max=prof.vo2max||null;
+  S.feeling=prof.feeling||'energia';
   try{const j=localStorage.getItem('carol_journal');if(j)JOURNAL=JSON.parse(j);}catch(e){}
   showLoad('Cargando actividades…');
   let acts=[];
@@ -898,6 +887,53 @@ window.toggleDayFilter=function(day){
   else S.dayFilter.push(day);
   builtTabs.delete('inicio');buildInicio();
 };
+function buildCycleBlock(cycle, tsb) {
+  const PD = {
+    menstruacion:{emoji:"🌑",name:"Menstruación",days:"Días 1–5",color:"var(--men)",bg:"var(--men-l)",energy:"Baja · Descansá",tip:"Reducí la intensidad al 60-70%. Priorizá hierro + vitamina C. El magnesio ayuda con los calambres.",train:"Yoga, caminata, nado suave"},
+    folicular:{emoji:"🌱",name:"Fase Folicular",days:"Días 6–12",color:"var(--fol)",bg:"var(--fol-l)",energy:"Alta y en aumento",tip:"Tu ventana de mayor adaptación al entrenamiento. Ideal para pesas y sesiones intensas.",train:"Fuerza, intervalos, running fuerte"},
+    ovulacion:{emoji:"🌕",name:"Ovulación",days:"Días 13–16",color:"var(--ovu)",bg:"var(--ovu-l)",energy:"Máxima ❆",tip:"Pico de estrógeno + testosterona. Momento ideal para PRs, salidas largas y sesiones más exigentes.",train:"Rendimiento máximo · PRs"},
+    lutea:{emoji:"🌘",name:"Fase Lútea",days:"Días 17–28",color:"var(--lut)",bg:"var(--lut-l)",energy:"Decae hacia el final",tip:"Cardio Z2 es tu superpoder — quemás más grasa que en cualquier otra fase. Evitá HIIT los últimos días.",train:"Z2 cardio · fuerza moderada"},
+  };
+  const p = PD[cycle] || PD.ovulacion;
+  const tsbOk = tsb > 5 && tsb < 30;
+  const tsbMsg = tsbOk
+    ? "<span style=\"color:var(--sage);font-weight:500\">\u2713 Forma óptima para entrenar fuerte o competir</span>"
+    : tsb > 0 ? "Estás fresca, buen momento para una sesión de calidad."
+    : tsb > -15 ? "Carga moderada. Entrenás bien, escuchá el cuerpo."
+    : "Carga alta. Priorizá recuperación y sueño.";
+  const combo = cycle === "ovulacion" && tsbOk ? "🏆 Máximo rendimiento posible — todo alineado."
+    : cycle === "folicular" && tsbOk ? "💪 Ventana anabólica + forma óptima = sesión de fuerza ideal."
+    : cycle === "lutea" && tsb > -10 ? "🔥 Fase lútea + buena forma = cardio Z2 y quema de grasa máxima."
+    : cycle === "menstruacion" ? "🧘 Fase de recuperación. Movimiento suave y nutrición de calidad."
+    : "Ajustá la intensidad según cómo te sentís.";
+  const d = document.createElement("div");
+  d.innerHTML = [
+    "<div style=\"display:grid;grid-template-columns:1fr 1fr;gap:.85rem\">",
+      "<div style=\"background:" + p.bg + ";border:1px solid " + p.color + "40;border-radius:var(--radius);padding:1.25rem\">",
+        "<div style=\"display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem\">",
+          "<span style=\"font-size:1.8rem\">" + p.emoji + "</span>",
+          "<div>",
+            "<div class=\"cycle-name\">" + p.name + "</div>",
+            "<div style=\"font-size:.65rem;color:" + p.color + ";font-weight:500;letter-spacing:.06em;text-transform:uppercase\">" + p.days + " · " + p.energy + "</div>",
+          "</div>",
+        "</div>",
+        "<div style=\"font-size:.76rem;color:var(--text2);line-height:1.65;margin-bottom:.75rem\">" + p.tip + "</div>",
+        "<div style=\"display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .75rem;border-radius:100px;background:" + p.color + "20;border:1px solid " + p.color + "40;font-size:.7rem;font-weight:500;color:" + p.color + "\">🏋️ " + p.train + "</div>",
+      "</div>",
+      "<div style=\"display:flex;flex-direction:column;gap:.6rem\">",
+        "<div style=\"background:var(--surface2);border-radius:var(--radius-sm);padding:.85rem 1rem;flex:1\">",
+          "<div style=\"font-size:.62rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem\">Forma hoy · TSB " + (tsb > 0 ? "+" : "") + tsb + "</div>",
+          "<div style=\"font-size:.82rem;color:var(--text2);line-height:1.6\">" + tsbMsg + "</div>",
+        "</div>",
+        "<div style=\"background:var(--surface2);border-radius:var(--radius-sm);padding:.85rem 1rem\">",
+          "<div style=\"font-size:.62rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem\">Combinación hoy</div>",
+          "<div style=\"font-size:.78rem;color:var(--text2);line-height:1.6\">" + combo + "</div>",
+        "</div>",
+      "</div>",
+    "</div>"
+  ].join("");
+  return d.innerHTML;
+}
 function buildForma(){
   const el=document.getElementById('tab-forma'),series=computeCtlAtl(),l60=series.slice(-60);
   const td=series[series.length-1]||{ctl:0,atl:0,tsb:0},wk=series[series.length-8]||{ctl:0,atl:0,tsb:0};
@@ -917,46 +953,7 @@ function buildForma(){
 
   <!-- Fase del ciclo menstrual -->
   <div class="sec">ciclo menstrual · hoy</div>
-  ${(()=>{
-    const phaseData={
-      menstruacion:{emoji:'🌑',name:'Menstruación',days:'Días 1–5',color:'var(--men)',bg:'var(--men-l)',energy:'Baja · Descansá',tip:'Reducí la intensidad al 60-70%. Priorizá hierro + vitamina C. El magnesio ayuda con los calambres.',train:'Yoga, caminata, nado suave'},
-      folicular:{emoji:'🌱',name:'Fase Folicular',days:'Días 6–12',color:'var(--fol)',bg:'var(--fol-l)',energy:'Alta y en aumento',tip:'Tu ventana de mayor adaptación al entrenamiento. Ideal para pesas y sesiones intensas.',train:'Fuerza, intervalos, running fuerte'},
-      ovulacion:{emoji:'🌕',name:'Ovulación',days:'Días 13–16',color:'var(--ovu)',bg:'var(--ovu-l)',energy:'Máxima ✦',tip:'Pico de estrógeno + testosterona. Momento ideal para PRs, salidas largas y sesiones más exigentes.',train:'Rendimiento máximo · PRs'},
-      lutea:{emoji:'🌘',name:'Fase Lútea',days:'Días 17–28',color:'var(--lut)',bg:'var(--lut-l)',energy:'Decae hacia el final',tip:'Cardio Z2 es tu superpoder — quemás más grasa que en cualquier otra fase. Evitá HIIT los últimos días.',train:'Z2 cardio · fuerza moderada'},
-    };
-    const p=phaseData[S.cycle]||phaseData.ovulacion;
-    const tsb=td.tsb;
-    const tsbOk=tsb>5&&tsb<30;
-    return \`<div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem">
-      <div style="background:\${p.bg};border:1px solid \${p.color}40;border-radius:var(--radius);padding:1.25rem">
-        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem">
-          <span style="font-size:1.8rem">\${p.emoji}</span>
-          <div>
-            <div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:300;color:var(--text)">\${p.name}</div>
-            <div style="font-size:.65rem;color:\${p.color};font-weight:500;letter-spacing:.06em;text-transform:uppercase">\${p.days} · \${p.energy}</div>
-          </div>
-        </div>
-        <div style="font-size:.76rem;color:var(--text2);line-height:1.65;margin-bottom:.75rem">\${p.tip}</div>
-        <div style="display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .75rem;border-radius:100px;background:\${p.color}20;border:1px solid \${p.color}40;font-size:.7rem;font-weight:500;color:\${p.color}">🏋️ \${p.train}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:.6rem">
-        <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:.85rem 1rem;flex:1">
-          <div style="font-size:.62rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem">Forma hoy · TSB \${tsb>0?'+':''}\${tsb}</div>
-          <div style="font-size:.82rem;color:var(--text2);line-height:1.6">\${tsbOk?'<span style="color:var(--sage);font-weight:500">✓ Forma óptima para entrenar fuerte o competir</span>':tsb>0?'Estás fresca, buen momento para una sesión de calidad.':tsb>-15?'Carga moderada. Entrenás bien, escuchá el cuerpo.':'Carga alta. Priorizá recuperación y sueño.'}</div>
-        </div>
-        <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:.85rem 1rem">
-          <div style="font-size:.62rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem">Combinación hoy</div>
-          <div style="font-size:.78rem;color:var(--text2);line-height:1.6">\${
-            S.cycle==='ovulacion'&&tsbOk?'🏆 Máximo rendimiento posible — todo alineado.':
-            S.cycle==='folicular'&&tsbOk?'💪 Ventana anabólica + forma óptima = sesión de fuerza ideal.':
-            S.cycle==='lutea'&&tsb>-10?'🔥 Fase lútea + buena forma = cardio Z2 y quema de grasa máxima.':
-            S.cycle==='menstruacion'?'🧘 Fase de recuperación. Movimiento suave y nutrición de calidad.':
-            'Ajustá la intensidad según cómo te sentís.'
-          }</div>
-        </div>
-      </div>
-    </div>\`;
-  })()}
+  ${buildCycleBlock(S.cycle, td.tsb)}
   `;
   setTimeout(()=>{
     const lbl=l60.map(d=>fmtDate(d.date));
@@ -1327,9 +1324,107 @@ function addMsg(text,role){const el=document.getElementById('chat-msgs');const d
 function scrollChat(){const el=document.getElementById('chat-msgs');if(el)el.scrollTop=el.scrollHeight;}
 
 // ══════════════════════════════════════════════════
+//  TAB: MI PERFIL
+// ══════════════════════════════════════════════════
+function buildPerfil(){
+  const el=document.getElementById('tab-perfil');
+  const prof=JSON.parse(localStorage.getItem('carol_profile')||'{}');
+  const cycleOpts=[['menstruacion','🌑 Menstruación (días 1-5)'],['folicular','🌱 Folicular (días 6-13)'],['ovulacion','🌕 Ovulación (días 14-16)'],['lutea','🌘 Lútea (días 17-28)']];
+  el.innerHTML=`
+    <div style="max-width:600px">
+      <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:300;color:var(--text);margin-bottom:.35rem">Mi <em style="font-style:italic;color:var(--dusk)">perfil</em></div>
+      <div style="font-size:.75rem;color:var(--muted);margin-bottom:1.5rem">Estos datos se usan en los análisis de forma, zonas y nutrición. Se guardan en tu navegador.</div>
+
+      <div class="card" style="margin-bottom:.85rem">
+        <div class="lbl" style="margin-bottom:1rem">Datos físicos</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+          <div class="field"><label>Edad</label><input type="number" id="p-age" class="field input" style="width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none" value="${prof.age||''}" placeholder="Ej: 30"></div>
+          <div class="field"><label>Peso (kg)</label><input type="number" id="p-weight" style="width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none" value="${prof.weight||''}" placeholder="Ej: 58"></div>
+          <div class="field"><label>Altura (cm)</label><input type="number" id="p-height" style="width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none" value="${prof.height||''}" placeholder="Ej: 165"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+          <div class="field"><label>FC Máxima (bpm)</label><input type="number" id="p-fcmax" style="width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none" value="${prof.fcmax||''}" placeholder="Ej: 190 (o dejá vacío para calcular)"><div style="font-size:.66rem;color:var(--muted2);margin-top:.2rem">Vacío = 220 - edad</div></div>
+          <div class="field"><label>FC Reposo (bpm)</label><input type="number" id="p-fcrep" style="width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none" value="${prof.fcrep||''}" placeholder="Ej: 52"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:.85rem">
+        <div class="lbl" style="margin-bottom:1rem">Rendimiento</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+          <div class="field"><label>VO2max (ml/kg/min)</label><input type="number" id="p-vo2max" style="width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none" value="${prof.vo2max||''}" placeholder="Ej: 52"><div style="font-size:.66rem;color:var(--muted2);margin-top:.2rem">Lo carga el bot automáticamente</div></div>
+          <div class="field"><label>FTP Ciclismo (W)</label><input type="number" id="p-ftp" style="width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none" value="${prof.ftp||''}" placeholder="Ej: 180"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+          <div class="field"><label>Ritmo umbral running (min/km)</label><input type="text" id="p-pace" style="width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none" value="${prof.pace||''}" placeholder="Ej: 5:30"></div>
+          <div class="field"><label>TDEE estimado (kcal/día)</label><input type="number" id="p-tdee" style="width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none" value="${prof.tdee||2100}" placeholder="Ej: 2100"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:.85rem">
+        <div class="lbl" style="margin-bottom:1rem">Ciclo menstrual</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+          <div class="field"><label>Fase actual</label>
+            <select id="p-cycle" style="width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;appearance:none;cursor:pointer">
+              ${cycleOpts.map(([v,l])=>'<option value="'+v+'"'+(prof.cycle===v?' selected':'')+'>'+l+'</option>').join('')}
+            </select>
+          </div>
+          <div class="field"><label>Duración del ciclo (días)</label><input type="number" id="p-cyclelen" style="width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none" value="${prof.cyclelen||28}" placeholder="Ej: 28"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.25rem">
+        <div class="lbl" style="margin-bottom:.5rem">Objetivo principal</div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          ${[['rendimiento','🏆 Rendimiento'],['salud','💚 Salud general'],['composicion','⚖️ Composición corporal'],['recuperacion','🧘 Recuperación']].map(([v,l])=>'<button class="fchip obj-btn'+(prof.objetivo===v?' active':'')+'" data-val="'+v+'" onclick="toggleObjetivo(this)">'+l+'</button>').join('')}
+        </div>
+        <input type="hidden" id="p-objetivo" value="${prof.objetivo||'rendimiento'}">
+      </div>
+
+      <div style="display:flex;align-items:center;gap:.75rem">
+        <button onclick="savePerfil()" style="padding:.65rem 1.75rem;background:var(--terra);color:#fff;border:none;border-radius:var(--radius-sm);font-size:.85rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s">Guardar perfil</button>
+        <span id="perfil-ok" style="display:none;font-size:.75rem;color:var(--sage)">✓ Guardado</span>
+      </div>
+    </div>
+  `;
+}
+window.toggleObjetivo=function(btn){
+  document.querySelectorAll('#tab-perfil .obj-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('p-objetivo').value=btn.dataset.val;
+};
+window.savePerfil=function(){
+  const age=parseInt(document.getElementById('p-age').value)||30;
+  const prof={
+    age,
+    weight:parseFloat(document.getElementById('p-weight').value)||58,
+    height:parseInt(document.getElementById('p-height').value)||165,
+    fcmax:parseInt(document.getElementById('p-fcmax').value)||(220-age),
+    fcrep:parseInt(document.getElementById('p-fcrep').value)||55,
+    vo2max:parseFloat(document.getElementById('p-vo2max').value)||null,
+    ftp:parseInt(document.getElementById('p-ftp').value)||null,
+    pace:document.getElementById('p-pace').value.trim()||null,
+    tdee:parseInt(document.getElementById('p-tdee').value)||2100,
+    cycle:document.getElementById('p-cycle').value,
+    cyclelen:parseInt(document.getElementById('p-cyclelen').value)||28,
+    objetivo:document.getElementById('p-objetivo').value,
+  };
+  localStorage.setItem('carol_profile',JSON.stringify(prof));
+  // Update S with new values
+  S.age=prof.age; S.fcmax=prof.fcmax; S.weight=prof.weight;
+  S.cycle=prof.cycle; S.vo2max=prof.vo2max;
+  // Update header phase
+  const phaseName={menstruacion:'🌑 Menstruación',folicular:'🌱 Folicular',ovulacion:'🌕 Ovulación',lutea:'🌘 Lútea'}[prof.cycle]||'';
+  document.getElementById('h-phase').textContent=phaseName;
+  // Refresh affected tabs
+  ['inicio','forma'].forEach(t=>builtTabs.delete(t));
+  const ok=document.getElementById('perfil-ok');
+  ok.style.display='inline';setTimeout(()=>ok.style.display='none',2500);
+};
+
+// ══════════════════════════════════════════════════
 //  TABS
 // ══════════════════════════════════════════════════
-const tabBuilders={inicio:buildInicio,forma:buildForma,journal:buildJournal,nutricion:buildNutricion};
+const tabBuilders={inicio:buildInicio,forma:buildForma,journal:buildJournal,nutricion:buildNutricion,perfil:buildPerfil};
 const builtTabs=new Set();
 function showTab(name,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
