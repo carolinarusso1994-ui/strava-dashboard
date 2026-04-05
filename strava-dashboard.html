@@ -294,7 +294,8 @@ main{padding:1.75rem 2rem;max-width:1300px;margin:0 auto}
   <header>
     <div class="hbrand"><em>carol</em>.dash</div>
     <div class="hright">
-      <div class="hday" id="h-phase">—</div>
+      <div class="hday" id="h-phase" style="cursor:pointer" onclick="toggleCyclePicker()" title="Cambiar fase">—</div>
+      <div id="cycle-picker" style="display:none;position:fixed;top:58px;right:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.5rem;z-index:300;box-shadow:0 8px 24px rgba(0,0,0,.4);min-width:200px"></div>
       <img class="havatar" id="h-avatar" src="" alt="">
       <button class="hbtn" onclick="logout()">Salir</button>
     </div>
@@ -615,7 +616,7 @@ function buildForma(){
 
     // Build cycle phase as a background dataset using bar chart layered behind
     // We use a Chart.js plugin to draw colored background zones per phase
-    const cycleZoneColors={menstruacion:'rgba(224,80,80,.13)',folicular:'rgba(90,138,80,.13)',ovulacion:'rgba(208,112,48,.13)',lutea:'rgba(122,90,170,.13)'};
+    const cycleZoneColors={menstruacion:'rgba(224,80,80,.18)',folicular:'rgba(90,138,80,.18)',ovulacion:'rgba(208,112,48,.18)',lutea:'rgba(122,90,170,.18)'};
     const cycleLabels={menstruacion:'Mens.',folicular:'Fol.',ovulacion:'Ovu.',lutea:'Lutea'};
 
     // Build per-day cycle phase data based on today's cycle + 60 days back
@@ -856,6 +857,32 @@ function scrollChat(){const el=document.getElementById('chat-msgs');if(el)el.scr
 // ══════════════════════════════════════════════════
 //  TABS
 // ══════════════════════════════════════════════════
+window.toggleCyclePicker=function(){
+  const picker=document.getElementById('cycle-picker');
+  if(picker.style.display==='none'){
+    const phases=[['menstruacion','🌑 Menstruación','Días 1–5'],['folicular','🌱 Folicular','Días 6–12'],['ovulacion','🌕 Ovulación','Días 13–16'],['lutea','🌘 Lútea','Días 17–28']];
+    picker.innerHTML=phases.map(([v,l,d])=>'<div onclick="setCycle(\'' +v+ '\')" style="padding:.45rem .75rem;border-radius:7px;cursor:pointer;font-size:.78rem;color:var(--text2);display:flex;justify-content:space-between;align-items:center;gap:.75rem" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'\'">'+'<span>'+l+'</span><span style="font-size:.62rem;color:var(--muted)">'+d+'</span></div>').join('');
+    picker.innerHTML='<div style="font-size:.6rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:.3rem .5rem .5rem">Cambiar fase del ciclo</div>'+picker.innerHTML;
+    picker.style.display='block';
+    setTimeout(()=>document.addEventListener('click',closePicker,{once:true}),100);
+  } else picker.style.display='none';
+};
+function closePicker(e){const p=document.getElementById('cycle-picker');if(p&&!p.contains(e.target))p.style.display='none';}
+window.setCycle=function(cycle){
+  S.cycle=cycle;
+  const prof=JSON.parse(localStorage.getItem('carol_profile')||'{}');
+  prof.cycle=cycle;
+  localStorage.setItem('carol_profile',JSON.stringify(prof));
+  const phaseName={menstruacion:'🌑 Menstruación',folicular:'🌱 Folicular',ovulacion:'🌕 Ovulación',lutea:'🌘 Lútea'}[cycle]||'';
+  document.getElementById('h-phase').textContent=phaseName;
+  document.getElementById('cycle-picker').style.display='none';
+  ['inicio','forma','nutricion','reporte'].forEach(t=>builtTabs.delete(t));
+  const active=document.querySelector('.tab.active');
+  const activeName=active?active.getAttribute('onclick').match(/'(\w+)'/)?.[1]:'inicio';
+  const builders={inicio:buildInicio,forma:buildForma,nutricion:buildNutricion,reporte:buildReporte};
+  if(builders[activeName]){builders[activeName]();builtTabs.add(activeName);}
+};
+
 const tabBuilders={inicio:buildInicio,forma:buildForma,nutricion:buildNutricion,reporte:buildReporte,perfil:buildPerfil};
 const builtTabs=new Set();
 function showTab(name,el){
