@@ -319,41 +319,135 @@ main{padding:1.75rem 2rem;max-width:1300px;margin:0 auto}
 <script>
 // ══════════════════════════════════════════════════
 //  NUTRITION SHEET CONFIG
+//  Hoja: diario (gid=1172432642)
+//  Columnas: fecha | Desayuno | Almuerzo | Merienda | Cena | Pre entreno |
+//            calorías_est | proteínas_g | carbos_g | grasas_g | Calidad sueño |
+//            VFC | Estrés | Fatiga | Dolor muscular | Dia ciclo | Fase ciclo | Notas sensaciones
+//
+//  Perfil hoja 2 (gid=0 o el que corresponda):
+//  Columnas: Fecha | Nombre | Fecha de nacimiento | Altura (cm) | Peso actual (kg) |
+//            IMC | % Grasa corporal | Masa muscular (kg)
 // ══════════════════════════════════════════════════
+const SHEET_ID = '1zrUQaq20RtGQLBFsTSwPb9VBJSsaERtjF-c3v_VRrg4';
+// Para que funcione el CSV público, la planilla debe estar publicada:
+// Archivo → Compartir → Publicar en la web → hoja específica → CSV
+// Si no está publicada, pegá la URL de publicación en NUTRI_SHEET_URL y PERFIL_SHEET_URL
+const NUTRI_SHEET_URL  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1172432642`;
+const PERFIL_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+
 const NUTRI_CONFIG = {
-  SHEET_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGBZ172IdFEj878LM9tr_Vyt2wGzsKS8JVB8mfuHDSsUe7m7QFrjl9i9olCPyi321X1EtygH7l5PKn/pub?gid=0&single=true&output=csv',
-  metas: { kcal:2100, proteina:120, carbos:220, grasas:65, agua_ml:2500 },
+  SHEET_URL: NUTRI_SHEET_URL,
+  metas: { kcal:2100, proteina:130, carbos:220, grasas:65 },
 };
 let _nutriCache = { rows:null, ts:0 };
+let _perfilCache = { data:null, ts:0 };
+
+// Parsea una línea CSV respetando comillas
+function parseCSVLine(line){
+  const result=[];let cur='';let inQ=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){inQ=!inQ;}
+    else if(c===','&&!inQ){result.push(cur.trim());cur='';}
+    else cur+=c;
+  }
+  result.push(cur.trim());
+  return result;
+}
 
 async function fetchNutritionRows(force=false) {
   const now=Date.now();
   if(!force&&_nutriCache.rows&&(now-_nutriCache.ts)<5*60*1000) return _nutriCache.rows;
   const res=await fetch(NUTRI_CONFIG.SHEET_URL+'&t='+now);
+  if(!res.ok) throw new Error('HTTP '+res.status+' — verificá que la planilla esté publicada como CSV');
   const text=await res.text();
-  const rows=text.trim().split('\n').slice(1).filter(r=>r.trim()).map(r=>{
-    const cols=r.match(/(".*?"|[^,]+)(?=,|$)/g)||r.split(',');
-    const clean=cols.map(c=>c.replace(/^"|"$/g,'').trim());
-    return{fecha:clean[0]||'',hora:clean[1]||'',comida:(clean[2]||'').toLowerCase(),alimento:clean[3]||'',gramos:parseFloat(clean[4])||0,kcal:parseFloat(clean[5])||0,proteina:parseFloat(clean[6])||0,carbos:parseFloat(clean[7])||0,grasas:parseFloat(clean[8])||0,agua_ml:parseFloat(clean[9])||0,fase_ciclo:clean[10]||'',energia:clean[11]||'',sueno_h:parseFloat(clean[12])||0,nota:clean[13]||''};
+  const lines=text.trim().split('\n');
+  // Detectar índices por encabezado
+  const headers=parseCSVLine(lines[0]).map(h=>h.toLowerCase().trim());
+  const idx=(name)=>headers.findIndex(h=>h.includes(name));
+  const iF=idx('fecha'),iD=idx('desayuno'),iAl=idx('almuerzo'),iMe=idx('merienda'),iCe=idx('cena'),iPre=idx('pre'),
+        iKcal=idx('calor'),iProt=idx('prote'),iCarb=idx('carbo'),iGras=idx('gras'),
+        iSleep=idx('sue'),iVfc=idx('vfc'),iEst=idx('estr'),iFat=idx('fati'),iDol=idx('dolor'),
+        iDiaCiclo=idx('dia ciclo'),iFaseCiclo=idx('fase ciclo'),iNotas=idx('nota');
+  const rows=lines.slice(1).filter(r=>r.trim()).map(r=>{
+    const c=parseCSVLine(r);
+    const get=(i)=>i>=0?(c[i]||'').trim():'';
+    return{
+      fecha:get(iF), desayuno:get(iD), almuerzo:get(iAl), merienda:get(iMe),
+      cena:get(iCe), pre_entreno:get(iPre),
+      kcal:parseFloat(get(iKcal))||0, proteina:parseFloat(get(iProt))||0,
+      carbos:parseFloat(get(iCarb))||0, grasas:parseFloat(get(iGras))||0,
+      sueno_q:parseFloat(get(iSleep))||0, vfc:parseFloat(get(iVfc))||0,
+      estres:parseFloat(get(iEst))||0, fatiga:parseFloat(get(iFat))||0,
+      dolor:parseFloat(get(iDol))||0,
+      dia_ciclo:get(iDiaCiclo), fase_ciclo:get(iFaseCiclo), notas:get(iNotas),
+    };
   });
   _nutriCache={rows,ts:now};
   return rows;
 }
+
+async function fetchPerfilRow(force=false){
+  const now=Date.now();
+  if(!force&&_perfilCache.data&&(now-_perfilCache.ts)<10*60*1000) return _perfilCache.data;
+  try{
+    const res=await fetch(PERFIL_SHEET_URL+'&t='+now);
+    if(!res.ok) return null;
+    const text=await res.text();
+    const lines=text.trim().split('\n');
+    if(lines.length<2) return null;
+    const headers=parseCSVLine(lines[0]).map(h=>h.toLowerCase().trim());
+    const idx=(name)=>headers.findIndex(h=>h.includes(name));
+    const c=parseCSVLine(lines[1]);
+    const get=(i)=>i>=0?(c[i]||'').trim():'';
+    const data={
+      nombre:get(idx('nombre')), nacimiento:get(idx('nacimiento')),
+      altura:parseFloat(get(idx('altura')))||0, peso:parseFloat(get(idx('peso')))||0,
+      imc:parseFloat(get(idx('imc')))||0, grasa:parseFloat(get(idx('grasa')))||0,
+      masa_muscular:parseFloat(get(idx('muscular')))||0,
+    };
+    _perfilCache={data,ts:now};
+    return data;
+  }catch(e){return null;}
+}
 function todayAR(){return new Date().toLocaleDateString('es-AR',{year:'numeric',month:'2-digit',day:'2-digit'});}
-function sumNutri(rows){return rows.reduce((a,r)=>({kcal:a.kcal+r.kcal,proteina:a.proteina+r.proteina,carbos:a.carbos+r.carbos,grasas:a.grasas+r.grasas,agua_ml:a.agua_ml+r.agua_ml}),{kcal:0,proteina:0,carbos:0,grasas:0,agua_ml:0});}
+function normalizeFecha(f){
+  if(!f) return '';
+  f=f.trim();
+  if(/^\d{4}-\d{2}-\d{2}$/.test(f)){const[y,m,d]=f.split('-');return d+'/'+m+'/'+y;}
+  if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(f)){const[d,m,y]=f.split('/');return d.padStart(2,'0')+'/'+m.padStart(2,'0')+'/'+y;}
+  if(/^\d{1,2}-\d{1,2}-\d{4}$/.test(f)){const[d,m,y]=f.split('-');return d.padStart(2,'0')+'/'+m.padStart(2,'0')+'/'+y;}
+  return f;
+}
+function sumNutri(rows){return rows.reduce((a,r)=>({kcal:a.kcal+r.kcal,proteina:a.proteina+r.proteina,carbos:a.carbos+r.carbos,grasas:a.grasas+r.grasas}),{kcal:0,proteina:0,carbos:0,grasas:0});}
 function buildWeekNutri(allRows){
   const days=[];
-  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const fecha=d.toLocaleDateString('es-AR',{year:'numeric',month:'2-digit',day:'2-digit'});const lbl=d.toLocaleDateString('es-AR',{weekday:'short'}).slice(0,2);const kcal=allRows.filter(r=>r.fecha===fecha).reduce((s,r)=>s+r.kcal,0);days.push({lbl,kcal,isToday:i===0});}
+  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const fecha=d.toLocaleDateString('es-AR',{year:'numeric',month:'2-digit',day:'2-digit'});const lbl=d.toLocaleDateString('es-AR',{weekday:'short'}).slice(0,2);const kcal=allRows.filter(r=>normalizeFecha(r.fecha)===fecha).reduce((s,r)=>s+r.kcal,0);days.push({lbl,kcal,isToday:i===0});}
   return days;
 }
 function renderNutriReal(container,allRows){
-  const today=todayAR(),todayRows=allRows.filter(r=>r.fecha===today),totals=sumNutri(todayRows),metas=NUTRI_CONFIG.metas,weekData=buildWeekNutri(allRows),maxKcal=Math.max(...weekData.map(d=>d.kcal),metas.kcal,100);
-  const fase=[...allRows].reverse().find(r=>r.fase_ciclo)?.fase_ciclo||'',energia=todayRows.find(r=>r.energia)?.energia||'',sueno=todayRows.find(r=>r.sueno_h>0)?.sueno_h||0;
+  const today=todayAR(),todayRows=allRows.filter(r=>normalizeFecha(r.fecha)===today),totals=sumNutri(todayRows),metas=NUTRI_CONFIG.metas,weekData=buildWeekNutri(allRows),maxKcal=Math.max(...weekData.map(d=>d.kcal),metas.kcal,100);
+  const latestRow=[...allRows].reverse().find(r=>r.fase_ciclo||r.sueno_q||r.estres)||{};
+  const fase=latestRow.fase_ciclo||'',sueno=todayRows.find(r=>r.sueno_q>0)?.sueno_q||latestRow.sueno_q||0;
+  const estres=todayRows.find(r=>r.estres>0)?.estres||latestRow.estres||0;
+  const fatiga=todayRows.find(r=>r.fatiga>0)?.fatiga||latestRow.fatiga||0;
+  const vfc=todayRows.find(r=>r.vfc>0)?.vfc||latestRow.vfc||0;
+  const notas=todayRows.find(r=>r.notas)?.notas||'';
   const R=40,circ=2*Math.PI*R,pct=Math.min(totals.kcal/metas.kcal,1),color=totals.kcal>metas.kcal?'#e05050':'#b87040',arcOffset=circ-pct*circ;
   const faseMap={menstruacion:{cls:'mens',label:'Menstruación'},folicular:{cls:'foli',label:'Folicular'},ovulacion:{cls:'ovu',label:'Ovulación'},lutea:{cls:'lute',label:'Lútea'}};
   const faseInfo=faseMap[fase?.toLowerCase()]||null;
-  const logRows=todayRows.filter(r=>r.kcal>0||r.agua_ml>0);
-  container.innerHTML=`<div class="nutri-real"><div class="nr-header"><div class="nr-title">registro de <em>hoy</em> · ${new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'})}</div><div class="nr-sync" onclick="reloadNutri()"><div class="nr-dot"></div> sincronizar bot</div></div><div class="nr-body"><div class="nr-ring-row"><div class="nr-ring"><svg width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="${R}" fill="none" stroke="var(--surface2)" stroke-width="8"/><circle id="nr-arc" cx="50" cy="50" r="${R}" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${circ.toFixed(1)}" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/></svg><div class="nr-ring-center"><div class="nr-kcal" id="nr-kcal-count">0</div><div class="nr-kcal-lbl">kcal</div></div></div><div class="nr-cal-meta"><div class="nr-cal-row"><span class="nr-cal-key">Meta diaria</span><span class="nr-cal-val neu">${metas.kcal} kcal</span></div><div class="nr-cal-row"><span class="nr-cal-key">Consumidas</span><span class="nr-cal-val">${Math.round(totals.kcal)} kcal</span></div><div class="nr-cal-row"><span class="nr-cal-key">Restantes</span><span class="nr-cal-val ${metas.kcal-totals.kcal>=0?'pos':'neg'}">${Math.round(Math.abs(metas.kcal-totals.kcal))} kcal ${metas.kcal-totals.kcal>=0?'↓':'sobre'}</span></div></div></div><div class="nr-macros">${[{k:'proteina',label:'Proteína',meta:metas.proteina,val:totals.proteina,color:'#6a9aba'},{k:'carbos',label:'Carbos',meta:metas.carbos,val:totals.carbos,color:'#b87040'},{k:'grasas',label:'Grasas',meta:metas.grasas,val:totals.grasas,color:'#e8845a'}].map(m=>`<div class="nr-macro"><div class="nr-macro-lbl">${m.label}</div><div class="nr-macro-val">${Math.round(m.val)}<span style="font-size:.65rem;color:var(--muted)">g</span></div><div class="nr-macro-sub">/ ${m.meta}g</div><div class="nr-bar"><div class="nr-bar-fill" data-pct="${Math.min(m.val/m.meta*100,100).toFixed(0)}" style="width:0%;background:${m.color}"></div></div></div>`).join('')}</div><div class="nr-wellness">${totals.agua_ml>0?`<span class="nr-chip agua">💧 ${Math.round(totals.agua_ml)} ml agua</span>`:''} ${sueno>0?`<span class="nr-chip sueno">😴 ${sueno}h sueño</span>`:''} ${energia?`<span class="nr-chip energia">⚡ Energía ${energia}</span>`:''} ${faseInfo?`<span class="nr-chip ciclo ${faseInfo.cls}">🌿 ${faseInfo.label}</span>`:''}</div><div class="lbl" style="margin-bottom:.5rem">últimos 7 días · kcal</div><div class="nr-week">${weekData.map(d=>`<div class="nr-week-col"><div class="nr-week-bar ${d.isToday?'today':d.kcal>metas.kcal?'over':'past'}" data-h="${d.kcal>0?(d.kcal/maxKcal*100).toFixed(0):0}" style="height:2px"></div><div class="nr-week-lbl ${d.isToday?'today':''}">${d.lbl}</div></div>`).join('')}</div>${logRows.length?`<div class="lbl" style="margin:1rem 0 .5rem">registro del día</div><div class="nr-log">${logRows.map(r=>`<div class="nr-log-item"><span class="nr-log-tag tag-${r.comida}">${r.comida}</span><span class="nr-log-name">${r.alimento}</span>${r.gramos?`<span class="nr-log-g">${r.gramos}g</span>`:''} ${r.agua_ml>0?`<span class="nr-log-kcal" style="color:#6a9aba">${r.agua_ml}ml</span>`:`<span class="nr-log-kcal">${Math.round(r.kcal)} kcal</span><span class="nr-log-macros">P:${Math.round(r.proteina)}g<br>C:${Math.round(r.carbos)}g G:${Math.round(r.grasas)}g</span>`}</div>`).join('')}</div>`:`<div class="nr-empty">Todavía nada registrado hoy.<br><span style="font-size:.72rem">Escribile al bot en WhatsApp 💬</span></div>`}</div></div>`;
+  const logRows=todayRows.filter(r=>r.kcal>0||r.desayuno||r.almuerzo||r.cena);
+  container.innerHTML=`<div class="nutri-real"><div class="nr-header"><div class="nr-title">registro de <em>hoy</em> · ${new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'})}</div><div class="nr-sync" onclick="reloadNutri()"><div class="nr-dot"></div> sincronizar bot</div></div><div class="nr-body"><div class="nr-ring-row"><div class="nr-ring"><svg width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="${R}" fill="none" stroke="var(--surface2)" stroke-width="8"/><circle id="nr-arc" cx="50" cy="50" r="${R}" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${circ.toFixed(1)}" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/></svg><div class="nr-ring-center"><div class="nr-kcal" id="nr-kcal-count">0</div><div class="nr-kcal-lbl">kcal</div></div></div><div class="nr-cal-meta"><div class="nr-cal-row"><span class="nr-cal-key">Meta diaria</span><span class="nr-cal-val neu">${metas.kcal} kcal</span></div><div class="nr-cal-row"><span class="nr-cal-key">Consumidas</span><span class="nr-cal-val">${Math.round(totals.kcal)} kcal</span></div><div class="nr-cal-row"><span class="nr-cal-key">Restantes</span><span class="nr-cal-val ${metas.kcal-totals.kcal>=0?'pos':'neg'}">${Math.round(Math.abs(metas.kcal-totals.kcal))} kcal ${metas.kcal-totals.kcal>=0?'↓':'sobre'}</span></div></div></div><div class="nr-macros">${[{k:'proteina',label:'Proteína',meta:metas.proteina,val:totals.proteina,color:'#6a9aba'},{k:'carbos',label:'Carbos',meta:metas.carbos,val:totals.carbos,color:'#b87040'},{k:'grasas',label:'Grasas',meta:metas.grasas,val:totals.grasas,color:'#e8845a'}].map(m=>`<div class="nr-macro"><div class="nr-macro-lbl">${m.label}</div><div class="nr-macro-val">${Math.round(m.val)}<span style="font-size:.65rem;color:var(--muted)">g</span></div><div class="nr-macro-sub">/ ${m.meta}g</div><div class="nr-bar"><div class="nr-bar-fill" data-pct="${Math.min(m.val/m.meta*100,100).toFixed(0)}" style="width:0%;background:${m.color}"></div></div></div>`).join('')}</div><div class="nr-wellness">${sueno>0?`<span class="nr-chip sueno">😴 Sueño ${sueno}/10</span>`:''} ${vfc>0?`<span class="nr-chip agua">💗 VFC ${vfc}</span>`:''} ${estres>0?`<span class="nr-chip ${estres>6?'rosa':'energia'}">⚡ Estrés ${estres}/10</span>`:''} ${fatiga>0?`<span class="nr-chip ${fatiga>6?'rosa':'sueno'}">🔋 Fatiga ${fatiga}/10</span>`:''} ${faseInfo?`<span class="nr-chip ciclo ${faseInfo.cls}">🌿 ${faseInfo.label}</span>`:''} ${notas?`<div style="margin-top:.5rem;font-size:.74rem;color:var(--text2);line-height:1.55;font-style:italic">📝 ${notas}</div>`:''}</div><div class="lbl" style="margin-bottom:.5rem">últimos 7 días · kcal</div><div class="nr-week">${weekData.map(d=>`<div class="nr-week-col"><div class="nr-week-bar ${d.isToday?'today':d.kcal>metas.kcal?'over':'past'}" data-h="${d.kcal>0?(d.kcal/maxKcal*100).toFixed(0):0}" style="height:2px"></div><div class="nr-week-lbl ${d.isToday?'today':''}">${d.lbl}</div></div>`).join('')}</div>${(()=>{
+  const meals=[
+    {key:'desayuno',label:'Desayuno',val:todayRows[0]?.desayuno||''},
+    {key:'almuerzo',label:'Almuerzo',val:todayRows[0]?.almuerzo||''},
+    {key:'merienda',label:'Merienda',val:todayRows[0]?.merienda||''},
+    {key:'cena',label:'Cena',val:todayRows[0]?.cena||''},
+    {key:'pre_entreno',label:'Pre entreno',val:todayRows[0]?.pre_entreno||''},
+  ].filter(m=>m.val);
+  if(!meals.length&&!totals.kcal) return `<div class="nr-empty">Todavía nada registrado hoy.<br><span style="font-size:.72rem">Completá tu planilla de Google Sheets 📋</span></div>`;
+  return `<div class="lbl" style="margin:1rem 0 .5rem">comidas del día</div><div class="nr-log">${meals.map(m=>`<div class="nr-log-item"><span class="nr-log-tag tag-${m.key}">${m.label}</span><span class="nr-log-name">${m.val}</span></div>`).join('')}${totals.kcal>0?`<div class="nr-log-item" style="border-top:1px solid var(--border);margin-top:.3rem;padding-top:.5rem"><span class="nr-log-tag tag-total">Totales</span><span class="nr-log-kcal">${Math.round(totals.kcal)} kcal</span><span class="nr-log-macros">P:${Math.round(totals.proteina)}g C:${Math.round(totals.carbos)}g G:${Math.round(totals.grasas)}g</span></div>`:''}</div>`;
+})()}</div></div>`;
   requestAnimationFrame(()=>{
     const arc=document.getElementById('nr-arc');if(arc)arc.style.strokeDashoffset=arcOffset.toFixed(1);
     const kcalEl=document.getElementById('nr-kcal-count');if(kcalEl){const target=Math.round(totals.kcal);let cur=0,step=Math.max(1,Math.round(target/40));const t=setInterval(()=>{cur=Math.min(cur+step,target);kcalEl.textContent=cur;if(cur>=target)clearInterval(t);},25);}
@@ -429,7 +523,7 @@ const api=async ep=>{const r=await fetch('https://www.strava.com/api/v3'+ep,{hea
 async function boot(token,athlete){
   S.token=token;S.athlete=athlete;
   const prof=JSON.parse(localStorage.getItem('carol_profile')||'{}');
-  S.age=prof.age||30;S.fcmax=prof.fcmax||(220-S.age);S.weight=prof.weight||58;S.cycle=prof.cycle||'ovulacion';
+  S.age=prof.age||30;S.fcmax=prof.fcmax||(220-S.age);S.weight=prof.peso||prof.weight||58;S.cycle=prof.cycle||'ovulacion';
   try{const j=localStorage.getItem('carol_journal');if(j)JOURNAL=JSON.parse(j);}catch(e){}
   showLoad('Cargando actividades…');
   let acts=[];
@@ -824,10 +918,78 @@ function buildReporte(){
 // ══════════════════════════════════════════════════
 //  TAB: MI PERFIL
 // ══════════════════════════════════════════════════
-function buildPerfil(){
+async function buildPerfil(){
   const el=document.getElementById('tab-perfil');
-  el.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:300px;flex-direction:column;gap:1rem;color:var(--muted)"><div style="font-size:2.5rem">👤</div><div style="font-family:\'Fraunces\',serif;font-size:1.2rem;font-weight:300;color:var(--text2)">Mi Perfil</div><div style="font-size:.8rem">Próximamente — se cargará con los datos del bot</div></div>';
+  el.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:200px;gap:.75rem;color:var(--muted)"><div class="spinner"></div><span style="font-size:.8rem">Cargando perfil…</span></div>';
+  let sheet=null;
+  try{sheet=await fetchPerfilRow();}catch(e){}
+  const saved=JSON.parse(localStorage.getItem('carol_profile')||'{}');
+  const p={
+    nombre:sheet?.nombre||saved.nombre||S.athlete?.firstname||'Carol',
+    nacimiento:sheet?.nacimiento||saved.nacimiento||'24-09-1994',
+    altura:sheet?.altura||saved.altura||167,
+    peso:sheet?.peso||saved.peso||S.weight||62,
+    imc:sheet?.imc||saved.imc||0,
+    grasa:sheet?.grasa||saved.grasa||0,
+    masa_muscular:sheet?.masa_muscular||saved.masa_muscular||0,
+    fcmax:saved.fcmax||S.fcmax||180,
+    cycle:saved.cycle||S.cycle||'ovulacion',
+  };
+  if(!p.imc&&p.peso&&p.altura)p.imc=+(p.peso/((p.altura/100)**2)).toFixed(1);
+  let edad=0;
+  if(p.nacimiento){const parts=p.nacimiento.split(/[-\/]/);const birthYear=parts.length===3?(parts[0].length===4?+parts[0]:+parts[2]):0;if(birthYear)edad=new Date().getFullYear()-birthYear;}
+  const sheetStatus=sheet
+    ?'<span style="font-size:.65rem;padding:.2rem .6rem;border-radius:100px;background:var(--sage-l);color:#7ab060;border:1px solid var(--sage)">✓ sincronizado con Sheets</span>'
+    :'<span style="font-size:.65rem;padding:.2rem .6rem;border-radius:100px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)">⚠ Sheet no disponible — publicá la planilla o editá acá</span>';
+  const imc_label=p.imc<18.5?'Bajo peso':p.imc<25?'Normal':p.imc<30?'Sobrepeso':'Obesidad';
+  const imc_color=p.imc<18.5?'var(--sky)':p.imc<25?'var(--sage)':p.imc<30?'var(--dusk)':'var(--rose)';
+  const metricItems=[
+    {l:'Altura',v:p.altura+'cm',c:'var(--sky)'},{l:'Peso actual',v:p.peso+'kg',c:'var(--dusk)'},
+    {l:'IMC',v:p.imc+' · '+imc_label,c:imc_color},{l:'% Grasa',v:p.grasa?p.grasa+'%':'—',c:'var(--terra)'},
+    {l:'Masa muscular',v:p.masa_muscular?p.masa_muscular+'kg':'—',c:'var(--sage)'},{l:'FCmáx',v:p.fcmax+' bpm',c:'var(--rose)'},
+  ];
+  const zoneNames=['Recuperación','Quema de grasa','Aeróbico','Umbral','Máximo'];
+  const zoneColors=['var(--z1c)','var(--z2c)','var(--z3c)','var(--z4c)','var(--z5c)'];
+  const fieldDefs=[
+    {id:'p-nombre',l:'Nombre',v:p.nombre,t:'text'},{id:'p-nac',l:'Fecha nac.',v:p.nacimiento,t:'text'},
+    {id:'p-altura',l:'Altura (cm)',v:p.altura,t:'number'},{id:'p-peso',l:'Peso (kg)',v:p.peso,t:'number'},
+    {id:'p-grasa',l:'% Grasa corporal',v:p.grasa,t:'number'},{id:'p-muscular',l:'Masa muscular (kg)',v:p.masa_muscular,t:'number'},
+    {id:'p-fcmax',l:'FCmáx',v:p.fcmax,t:'number'},
+  ];
+  el.innerHTML=
+    '<div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;flex-wrap:wrap">'+sheetStatus
+    +'<button onclick="reloadPerfil()" style="font-size:.65rem;padding:.2rem .6rem;border-radius:100px;background:transparent;color:var(--muted);border:1px solid var(--border);cursor:pointer;font-family:DM Sans,sans-serif">↻ actualizar</button></div>'
+    +'<div class="grid g2" style="margin-bottom:1.5rem">'
+    +'<div class="card"><div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">'
+    +'<div style="width:52px;height:52px;border-radius:50%;background:var(--terra-l);border:2px solid var(--terra);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;overflow:hidden">'
+    +'<img src="'+(S.athlete?.profile_medium||'')+'" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\'"><span style="font-size:1.4rem">👤</span></div>'
+    +'<div><div style="font-family:\'Fraunces\',serif;font-size:1.3rem;font-weight:300;color:var(--text)">'+p.nombre+'</div>'
+    +'<div style="font-size:.72rem;color:var(--muted);margin-top:.15rem">'+(edad?edad+' años · ':'')+p.altura+'cm · '+p.peso+'kg</div></div></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">'
+    +metricItems.map(m=>'<div style="background:var(--surface2);border-radius:8px;padding:.65rem .85rem"><div style="font-size:.6rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem">'+m.l+'</div><div style="font-size:.95rem;font-weight:500;color:'+m.c+'">'+m.v+'</div></div>').join('')
+    +'</div></div>'
+    +'<div class="card"><div class="lbl">editar perfil</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.75rem">'
+    +fieldDefs.map(f=>'<div><div style="font-size:.6rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.2rem">'+f.l+'</div><input type="'+f.t+'" id="'+f.id+'" value="'+(f.v||'')+'" style="width:100%;padding:.45rem .65rem;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);font-size:.82rem;font-family:DM Sans,sans-serif;outline:none"></div>').join('')
+    +'</div><button onclick="savePerfil()" style="width:100%;padding:.65rem;background:var(--terra);color:#fff;border:none;border-radius:8px;font-size:.82rem;font-weight:500;cursor:pointer;font-family:DM Sans,sans-serif">Guardar cambios</button>'
+    +'<div id="perfil-saved-msg" style="font-size:.72rem;color:var(--sage);text-align:center;margin-top:.4rem;display:none">✓ Guardado</div></div></div>'
+    +'<div class="sec">zonas cardíacas personalizadas</div>'
+    +'<div class="grid g3">'
+    +[1,2,3,4,5].map(z=>{const lo=Math.round(p.fcmax*[0,.60,.70,.80,.90][z-1]);const hi=Math.round(p.fcmax*[.60,.70,.80,.90,1.00][z-1]);return '<div class="card"><div style="color:'+zoneColors[z-1]+';font-size:.72rem;font-weight:500;margin-bottom:.25rem">Z'+z+' · '+zoneNames[z-1]+'</div><div style="font-family:\'Fraunces\',serif;font-size:1.2rem;font-weight:300">'+lo+'–'+hi+'<span class="unit">bpm</span></div></div>';}).join('')
+    +'</div>';
 }
+window.savePerfil=function(){
+  const get=id=>document.getElementById(id)?.value||'';
+  const nac=get('p-nac');const parts=nac.split(/[-\/]/);const birthYear=parts.length===3?(parts[0].length===4?+parts[0]:+parts[2]):0;
+  const prof={nombre:get('p-nombre'),nacimiento:nac,altura:+get('p-altura'),peso:+get('p-peso'),grasa:+get('p-grasa'),masa_muscular:+get('p-muscular'),fcmax:+get('p-fcmax'),cycle:S.cycle,age:birthYear?new Date().getFullYear()-birthYear:S.age};
+  if(prof.altura&&prof.peso)prof.imc=+(prof.peso/((prof.altura/100)**2)).toFixed(1);
+  localStorage.setItem('carol_profile',JSON.stringify(prof));
+  S.weight=prof.peso||S.weight;S.fcmax=prof.fcmax||S.fcmax;S.age=prof.age||S.age;
+  const msg=document.getElementById('perfil-saved-msg');
+  if(msg){msg.style.display='block';setTimeout(()=>msg.style.display='none',2000);}
+  builtTabs.delete('inicio');
+};
+window.reloadPerfil=async function(){_perfilCache.data=null;builtTabs.delete('perfil');buildPerfil();builtTabs.add('perfil');};
 
 // ══════════════════════════════════════════════════
 //  CHAT
